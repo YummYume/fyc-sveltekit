@@ -1,0 +1,17 @@
+version: '3.9'
+
+services:
+  svelte-kit:
+    image: oven/bun:1.0
+    working_dir: /home/bun/fyc-svelte-kit
+    user: bun
+    entrypoint: ['./bun.sh']
+    volumes:
+      - ./:/home/bun/fyc-svelte-kit
+    stdin_open: true
+    tty: true
+    restart: unless-stopped
+    container_name: fyc-svelte-kit
+    ports:
+      - 5173:5173
+      - 4173:4173
