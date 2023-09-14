@@ -7,7 +7,7 @@ module.exports = {
 		'prettier'
 	],
 	parser: '@typescript-eslint/parser',
-	plugins: ['@typescript-eslint'],
+	plugins: ['@typescript-eslint', 'prettier'],
 	ignorePatterns: ['*.cjs'],
 	parserOptions: {
 		sourceType: 'module',
@@ -27,5 +27,8 @@ module.exports = {
 				parser: '@typescript-eslint/parser'
 			}
 		}
-	]
+	],
+  rules: {
+    'prettier/prettier': 'warn'
+  }
 };
