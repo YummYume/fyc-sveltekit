@@ -5,10 +5,12 @@ EXECSVELTEKIT=$(COMPOSE) exec svelte-kit
 start:
 	$(COMPOSE) build --force-rm
 	$(COMPOSE) up -d --remove-orphans --force-recreate
+	make db
 
 start-nocache:
 	$(COMPOSE) build --force-rm --no-cache
 	$(COMPOSE) up -d --remove-orphans --force-recreate
+	make db
 
 up:
 	$(COMPOSE) up -d --remove-orphans
@@ -27,9 +29,6 @@ down:
 
 # SSH
 ssh:
-	$(EXECSVELTEKIT) sh
-
-bash:
 	$(EXECSVELTEKIT) bash
 
 # Build
@@ -45,3 +44,12 @@ lint:
 
 format:
 	$(EXECSVELTEKIT) bun run format
+
+# DB
+db: schema
+
+schema:
+	$(EXECSVELTEKIT) bun run db/schema.ts
+
+schema-drop:
+	$(EXECSVELTEKIT) bun run db/schema.ts --clear-db
