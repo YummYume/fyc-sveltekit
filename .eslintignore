@@ -6,6 +6,11 @@ node_modules
 .env
 .env.*
 !.env.example
+*.cjs
+playwright.config.js
+svelte.config.js
+/coverage
+/db
 
 # Ignore files for PNPM, NPM and YARN
 pnpm-lock.yaml
