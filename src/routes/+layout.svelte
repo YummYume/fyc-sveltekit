@@ -1,9 +1,10 @@
-<script>
-    import Form from '$lib/components/Form.svelte';
+<script lang="ts">
+    import { enhance } from '$app/forms';
     import UserCircle from '$lib/svg/UserCircle.svelte';
-    import '../app.postcss';
+    import '../app.scss';
+    import type { PageData } from './$types';
 
-    export let data;
+    export let data: PageData;
 </script>
 
 <header>
@@ -21,7 +22,7 @@
 
             {#if data.user}
                 <div class="flex items-center lg:order-2">
-                    <Form method="POST" action="/?/logout">
+                    <form method="POST" action="/?/logout" use:enhance>
                         <button
                             type="submit"
                             class="
@@ -31,7 +32,7 @@
                         >
                             Se déconnecter
                         </button>
-                    </Form>
+                    </form>
                     <a href="/account">
                         <UserCircle />
                     </a>
