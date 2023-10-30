@@ -1,4 +1,4 @@
-import { betterSqlite3 } from '@lucia-auth/adapter-sqlite';
+import { prisma } from '@lucia-auth/adapter-prisma';
 import { lucia } from 'lucia';
 import { sveltekit } from 'lucia/middleware';
 
@@ -9,10 +9,10 @@ import { dev } from '$app/environment';
 export const auth = lucia({
   env: dev ? 'DEV' : 'PROD',
   middleware: sveltekit(),
-  adapter: betterSqlite3(db, {
+  adapter: prisma(db, {
     user: 'user',
-    key: 'user_key',
-    session: 'user_session',
+    key: 'key',
+    session: 'session',
   }),
   sessionCookie: {
     expires: false,
