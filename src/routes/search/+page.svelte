@@ -6,7 +6,7 @@
 
 <h1>Search</h1>
 
-{#await data.streamd.result}
+{#await data.streamed.result}
     <span>loading...</span>
 {:then value}
     <span>{value.choices[0].message.content}</span>

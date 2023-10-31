@@ -8,8 +8,11 @@ echo "Installing dependencies"
 
 bun install
 
+echo "Sync schema database"
+
+bunx prisma db push
+
 echo "Starting dev server"
 
 bun run dev --host
 
-bunx prisma db push
