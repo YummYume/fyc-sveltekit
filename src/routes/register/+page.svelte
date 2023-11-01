@@ -8,10 +8,10 @@
 
 <section class="section">
     <Card title="Créer un compte">
-        <form method="POST" action="?/register" class="form" use:enhance>
+        <form action="?/register" method="POST" class="form" use:enhance>
             <div>
                 <label for="username">Votre nom d'utilisateur</label>
-                <input type="text" name="username" id="username" placeholder="name@company.com" required={true} />
+                <input type="text" name="username" id="username" required={true} />
             </div>
             <div>
                 <label for="password">Mot de passe</label>

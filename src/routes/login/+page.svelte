@@ -11,7 +11,7 @@
         <form method="POST" action="?/login" class="form" use:enhance>
             <div>
                 <label for="username">Nom d'utilisateur</label>
-                <input type="username" name="username" id="username" placeholder="name@company.com" required={true} />
+                <input type="username" name="username" id="username" required={true} />
             </div>
             <div>
                 <label for="password">Mot de passe</label>
