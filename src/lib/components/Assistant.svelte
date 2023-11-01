@@ -21,7 +21,7 @@
         {/if}
 
         {#if open}
-            <div class="absolute bottom-0 !w-fit" transition:fly={{ duration: 1000, y: 600, opacity: 0, easing: bounceOut }}>
+            <div class="absolute bottom-0 !w-fit" transition:fly={{ duration: 1000, y: 600, opacity: 1, easing: bounceOut }}>
                 <Card>
                     <div class="flex justify-between items-start">
                         <img src="/img/carlos.png" alt="" height="244" width="244" decoding="async" loading="lazy" class="rounded-full h-20 w-20" />
