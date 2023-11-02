@@ -1,6 +1,7 @@
 {
   "name": "sveltekit-lesson",
   "version": "0.0.1",
+  "trustedDependencies": ["prisma"],
   "devDependencies": {
     "@tailwindcss/forms": "^0.5.6",
     "@typescript-eslint/eslint-plugin": "^6.9.0",
