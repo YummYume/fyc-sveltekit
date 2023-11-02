@@ -1,0 +1,77 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["fullTextSearch", "fullTextIndex"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String    @id @unique
+  username     String
+
+  auth_session Session[]
+  auth_key     UserKey[]
+  comments     Comment[]
+  scores       Score[]
+}
+
+model Session {
+  id             String @id @unique
+  user_id        String
+  active_expires BigInt
+  idle_expires   BigInt
+  user           User   @relation(references: [id], fields: [user_id], onDelete: Cascade)
+
+  @@index([user_id])
+}
+
+model UserKey {
+  id              String  @id @unique
+  hashed_password String?
+  user_id         String
+  user            User    @relation(references: [id], fields: [user_id], onDelete: Cascade)
+
+  @@index([user_id])
+}
+
+model Recipe {
+  id          String  @id @unique
+  name        String  @db.Text
+  description String
+  steps       Json
+
+  comments    Comment[]
+  scores      Score[]
+
+  @@fulltext([name])
+}
+
+model Comment {
+  id        String  @id @unique
+  content   String  @db.Text
+  user_id   String
+  user      User    @relation(references: [id], fields: [user_id], onDelete: Cascade)
+  recipe_id String
+  recipe    Recipe  @relation(references: [id], fields: [recipe_id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@index([recipe_id])
+}
+
+model Score {
+  id        String  @id @unique
+  score     Int     @db.Int
+  user_id   String
+  user      User    @relation(references: [id], fields: [user_id], onDelete: Cascade)
+  recipe_id String
+  recipe    Recipe  @relation(references: [id], fields: [recipe_id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@index([recipe_id])
+}

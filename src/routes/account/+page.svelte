@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { ActionData, PageData } from "./$types";
+    import type { ActionData, PageData } from './$types';
 
     export let data: PageData;
 </script>

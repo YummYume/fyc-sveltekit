@@ -1,3 +1,3 @@
-import Database from 'bun:sqlite';
+import { PrismaClient } from '@prisma/client';
 
-export const db = new Database('db.sqlite', { create: true });
+export const db = new PrismaClient();

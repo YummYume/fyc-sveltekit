@@ -1,5 +1,5 @@
 import type { Auth as AuthType } from '$lib/server/auth';
-import type Database from 'bun:sqlite';
+import type { PrismaClient } from '@prisma/client';
 import type { AuthRequest, Session } from 'lucia';
 
 // See https://kit.svelte.dev/docs/types#app
@@ -8,7 +8,7 @@ declare global {
   namespace App {
     // interface Error {}
     interface Locals {
-      db: Database;
+      db: PrismaClient;
       auth: AuthRequest;
       session: Session | null;
     }

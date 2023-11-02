@@ -2,12 +2,14 @@ version: '3.9'
 
 services:
   svelte-kit:
-    image: oven/bun:latest
-    working_dir: /home/bun/fyc-svelte-kit
-    user: bun
-    entrypoint: ['./bun.sh']
+    build:
+      context: .
+      dockerfile: ./docker/bun/Dockerfile
     volumes:
       - ./:/home/bun/fyc-svelte-kit
+    depends_on:
+      mariadb:
+        condition: service_healthy
     stdin_open: true
     tty: true
     restart: unless-stopped
@@ -15,3 +17,33 @@ services:
     ports:
       - 5173:5173
       - 4173:4173
+
+  mariadb:
+    image: mariadb:11.1.2
+    restart: unless-stopped
+    container_name: fyc-mariadb
+    volumes:
+      - ./data/mysql:/var/lib/mysql
+    environment:
+      MARIADB_DATABASE: "${MARIADB_DATABASE:?err}"
+      MARIADB_ROOT_PASSWORD: "${MARIADB_ROOT_PASSWORD:?err}"
+    healthcheck:
+      test: [ "CMD", "mariadb-admin", "ping", "-h", "localhost" ]
+      interval: 10s
+      timeout: 20s
+      retries: 5
+      start_period: 60s
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    restart: unless-stopped
+    container_name: fyc-phpmyadmin
+    ports:
+      - 8080:80
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    environment:
+      PMA_ARBITRARY: 1
+      UPLOAD_LIMIT: 512M
+      MAX_EXECUTION_TIME: 300
