@@ -47,3 +47,4 @@ format:
 
 db: 
 	$(EXECSVELTEKIT) bunx prisma db push
+	

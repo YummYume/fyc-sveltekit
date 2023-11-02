@@ -11,7 +11,7 @@ export const auth = lucia({
   middleware: sveltekit(),
   adapter: prisma(db, {
     user: 'user',
-    key: 'key',
+    key: 'userKey',
     session: 'session',
   }),
   sessionCookie: {

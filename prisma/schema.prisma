@@ -16,7 +16,7 @@ model User {
   username     String
 
   auth_session Session[]
-  auth_key     Key[]
+  auth_key     UserKey[]
   comments     Comment[]
   scores       Score[]
 }
@@ -31,7 +31,7 @@ model Session {
   @@index([user_id])
 }
 
-model Key {
+model UserKey {
   id              String  @id @unique
   hashed_password String?
   user_id         String

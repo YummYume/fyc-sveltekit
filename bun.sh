@@ -8,9 +8,9 @@ echo "Installing dependencies"
 
 bun install
 
-echo "Sync schema database"
+echo "Syncing schema database"
 
-bunx prisma db push
+bunx prisma db push --accept-data-loss
 
 echo "Starting dev server"
 

@@ -18,8 +18,6 @@ export const load = (async ({ url, locals }) => {
     },
   });
 
-  console.log(recipes);
-
   return {
     streamed: {
       result: queryGPT({ inputSystem: foundARecipe(recipes), inputUser: `${queryParams}` }, false),
