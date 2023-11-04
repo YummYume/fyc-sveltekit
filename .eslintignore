@@ -10,7 +10,7 @@ node_modules
 playwright.config.js
 svelte.config.js
 /coverage
-/db
+/data
 
 # Ignore files for PNPM, NPM and YARN
 pnpm-lock.yaml
