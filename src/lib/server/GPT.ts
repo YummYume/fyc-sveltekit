@@ -20,7 +20,10 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-export async function queryGPT<T extends boolean>({ inputSystem, inputUser }: InputsGPT, stream: T): Promise<IsStreaming<T>> {
+export async function queryGPT<T extends boolean>(
+  { inputSystem, inputUser }: InputsGPT,
+  stream: T,
+): Promise<IsStreaming<T>> {
   return openai.chat.completions.create({
     model: 'gpt-3.5-turbo',
     stream,

@@ -1,13 +1,13 @@
 <script lang="ts">
-    import type { PageData } from './$types';
+  import type { PageData } from './$types';
 
-    export let data: PageData;
+  export let data: PageData;
 </script>
 
 <h1>Search</h1>
 
 {#await data.streamed.result}
-    <span>loading...</span>
+  <span>loading...</span>
 {:then value}
-    <span>{value.choices[0].message.content}</span>
+  <span>{value.choices[0].message.content}</span>
 {/await}
