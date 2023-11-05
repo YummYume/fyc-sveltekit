@@ -35,7 +35,10 @@ export const actions = {
 
       cookies.set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes);
     } catch (e) {
-      if (e instanceof LuciaError && (e.message === 'AUTH_INVALID_KEY_ID' || e.message === 'AUTH_INVALID_PASSWORD')) {
+      if (
+        e instanceof LuciaError &&
+        (e.message === 'AUTH_INVALID_KEY_ID' || e.message === 'AUTH_INVALID_PASSWORD')
+      ) {
         return fail(400, { error: 'Invalid credentials.' });
       }
 

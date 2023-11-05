@@ -42,8 +42,8 @@
     "preview": "vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-    "lint": "prettier --check . '!./data' && eslint .",
-    "format": "prettier --write . '!./data' && eslint . --fix"
+    "lint": "eslint .",
+    "format": "eslint . --fix"
   },
   "type": "module",
   "dependencies": {
