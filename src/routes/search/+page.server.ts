@@ -1,4 +1,4 @@
-import { foundARecipe, queryGPT } from '$lib/server/GPT';
+import { getRecipe, queryGPT } from '$lib/server/GPT';
 
 import type { PageServerLoad } from './$types';
 
@@ -20,7 +20,8 @@ export const load = (async ({ url, locals }) => {
 
   return {
     streamed: {
-      result: queryGPT({ inputSystem: foundARecipe(recipes), inputUser: `${queryParams}` }, false),
+      dish: queryParams,
+      result: queryGPT({ inputSystem: getRecipe(recipes), inputUser: `${queryParams}` }, false),
     },
   };
 }) satisfies PageServerLoad;

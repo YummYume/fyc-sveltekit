@@ -1,9 +1,12 @@
 <script lang="ts">
-    import { enhance } from '$app/forms';
     import Assistant from '$lib/components/Assistant.svelte';
     import UserCircle from '$lib/svg/UserCircle.svelte';
-    import '../app.scss';
+
     import type { PageData } from './$types';
+
+    import { enhance } from '$app/forms';
+
+    import '../app.scss';
 
     export let data: PageData;
 </script>
@@ -33,7 +36,7 @@
                         Se déconnecter
                     </button>
                 </form>
-                <a href="/account">
+                <a aria-label="Profil" href="/account">
                     <UserCircle />
                 </a>
             </div>

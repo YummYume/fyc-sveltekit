@@ -1,8 +1,10 @@
 <script lang="ts">
-    import { enhance } from '$app/forms';
     import { bounceOut } from 'svelte/easing';
     import { blur, fly } from 'svelte/transition';
+
     import Card from './Card.svelte';
+
+    import { enhance } from '$app/forms';
 
     let open = false;
 </script>
@@ -13,7 +15,9 @@
             <button
                 aria-label="Discuter avec l'assistant personnel"
                 class="absolute bottom-0 h-10 w-10 sm:h-20 sm:w-20"
-                on:click={() => (open = true)}
+                on:click={() => {
+                    open = true;
+                }}
                 transition:blur={{ amount: 10 }}
             >
                 <img src="/img/carlos.png" alt="" height="244" width="244" decoding="async" loading="lazy" class="rounded-full shadow-2xl" />
@@ -21,11 +25,16 @@
         {/if}
 
         {#if open}
-            <div class="absolute bottom-0 !w-fit" transition:fly={{ duration: 1000, y: 600, opacity: 1, easing: bounceOut }}>
+            <div class="absolute bottom-0 !w-fit" transition:fly={{ duration: 1000, y: 575, easing: bounceOut }}>
                 <Card>
                     <div class="flex justify-between items-start">
                         <img src="/img/carlos.png" alt="" height="244" width="244" decoding="async" loading="lazy" class="rounded-full h-20 w-20" />
-                        <button aria-label="Fermer la discussion" on:click={() => (open = false)}>
+                        <button
+                            aria-label="Fermer la discussion"
+                            on:click={() => {
+                                open = false;
+                            }}
+                        >
                             <svg class="w-6 h-6 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
                                 <path
                                     stroke="currentColor"
@@ -41,7 +50,7 @@
                         <p class="max-w-[25ch] mb-3 text-gray-500 sm:max-w-sm md:max-w-md lg:max-w-lg">
                             Bonjour, je suis Carlos de CookConnect, et je suis votre assistant personnel.
                             <br /><br />
-                            Demandez-moi n'importequoi en rapport avec la cuisine, et je vous aiderai de mon mieux !
+                            Demandez-moi n'importe quoi en rapport avec la cuisine, et je vous aiderai de mon mieux !
                         </p>
                     </div>
                     <form method="POST" action="" class="form" use:enhance>

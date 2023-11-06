@@ -37,29 +37,25 @@ export async function queryGPT<T extends boolean>({ inputSystem, inputUser }: In
   }) as APIPromise<IsStreaming<T>>;
 }
 
-export const generateRecipe = `I will give you a dish name 
-if not output 'null',
-ignore anything that is not a dish.
-If you cannot find a recipe for the dish, output 'null',
-or else ouput the complete step for the recipe, 
-and you must translate everything in french and if [json] is present format each steps in json like this
-{
-  recipe: string
-  description: string
-  steps: string[]
-} 
-or if [raw] is present format in plain text with return line`;
+export const MAKE_RECIPE = `
+  I will give you a dish name, and you will give me the recipe steps in French.
+  If you cannot find a recipe for the dish, or if the dish is not valid, output "null", or else give me the steps.
+  Format the recipe in json like this:
+  {
+    description: string,
+    dish: string,
+    steps: string[]
+  }
+`;
 
-export const foundARecipe = (storedRecipes: StoredRecipe[]) => `I will give you a recipe name,
-if not, output 'null'.
-If input isn't a recipe name or not an existing recipe, output 'null'.
-iF the input is just a color, output 'null'.
-Ignore anything that is not a recipe.
-This is a list of cooking recipes in json format: ${JSON.stringify(storedRecipes)}.
-If you found in the list, a recipe for the recipe I gave you, give me the result with id's suggestions of similar recipes from the list only.
-If the list is empty just set suggestions array to [] and result to null, and
-format everything in json like this: 
-{
-  result: id|null
-  suggestions: id[]
-}`;
+export const getRecipe = (storedRecipes: StoredRecipe[]) => `
+  This is a list of cooking recipes in json format: ${JSON.stringify(storedRecipes)}.
+  I will give you a dish name, and you will give me the recipe for it, only if you find it in the list.
+  If you cannot find a recipe for the dish, or if the dish is not valid, output "null", or else give me the result with suggestions of similar recipes from the list.
+  If the list is empty, set the suggestions array to "[]" and result to "null".
+  Format your output in json like this: 
+  {
+    result: id|null,
+    suggestions: id[]
+  }
+`;

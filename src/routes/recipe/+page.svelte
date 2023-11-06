@@ -4,14 +4,8 @@
     export let data: PageData;
 </script>
 
-<h1 class="h1">Recherche</h1>
-
 {#await data.streamed.result}
     <span>loading...</span>
 {:then value}
     <span>{value.choices[0].message.content}</span>
-    <form method="GET" action="/recipe">
-        <input type="text" name="dish" value={data.streamed.dish} class="hidden" />
-        <button type="submit" class="btn">Générer la recette</button>
-    </form>
 {/await}
