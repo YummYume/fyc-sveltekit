@@ -12,18 +12,19 @@ datasource db {
 }
 
 model User {
-  id           String    @id @unique
+  id           Int      @id @default(autoincrement())
   username     String
 
   auth_session Session[]
   auth_key     UserKey[]
   comments     Comment[]
   scores       Score[]
+  favourites   Favourite[]
 }
 
 model Session {
-  id             String @id @unique
-  user_id        String
+  id             Int    @id @default(autoincrement())
+  user_id        Int
   active_expires BigInt
   idle_expires   BigInt
   user           User   @relation(references: [id], fields: [user_id], onDelete: Cascade)
@@ -32,32 +33,34 @@ model Session {
 }
 
 model UserKey {
-  id              String  @id @unique
+  id              Int     @id @default(autoincrement())
   hashed_password String?
-  user_id         String
+  user_id         Int
   user            User    @relation(references: [id], fields: [user_id], onDelete: Cascade)
 
   @@index([user_id])
 }
 
 model Recipe {
-  id          String  @id @unique
+  id          Int     @id @default(autoincrement())
   name        String  @db.Text
   description String
   steps       Json
+  slug        String  @unique
 
   comments    Comment[]
   scores      Score[]
+  favourites  Favourite[]
 
   @@fulltext([name])
 }
 
 model Comment {
-  id        String  @id @unique
+  id        Int     @id @default(autoincrement())
   content   String  @db.Text
-  user_id   String
+  user_id   Int
   user      User    @relation(references: [id], fields: [user_id], onDelete: Cascade)
-  recipe_id String
+  recipe_id Int
   recipe    Recipe  @relation(references: [id], fields: [recipe_id], onDelete: Cascade)
 
   @@index([user_id])
@@ -65,11 +68,22 @@ model Comment {
 }
 
 model Score {
-  id        String  @id @unique
+  id        Int     @id @default(autoincrement())
   score     Int     @db.Int
-  user_id   String
+  user_id   Int
   user      User    @relation(references: [id], fields: [user_id], onDelete: Cascade)
-  recipe_id String
+  recipe_id Int
+  recipe    Recipe  @relation(references: [id], fields: [recipe_id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@index([recipe_id])
+}
+
+model Favourite {
+  id        Int  @id @default(autoincrement())
+  user_id   Int
+  user      User    @relation(references: [id], fields: [user_id], onDelete: Cascade)
+  recipe_id Int
   recipe    Recipe  @relation(references: [id], fields: [recipe_id], onDelete: Cascade)
 
   @@index([user_id])

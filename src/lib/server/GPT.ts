@@ -12,7 +12,7 @@ type InputsGPT = {
 type IsStreaming<T extends boolean> = T extends true ? Stream<ChatCompletionChunk> : ChatCompletion;
 
 type StoredRecipe = {
-  id: string;
+  id: number;
   name: string;
 };
 
@@ -39,7 +39,7 @@ export async function queryGPT<T extends boolean>({ inputSystem, inputUser }: In
 
 export const MAKE_RECIPE = `
   I will give you a dish name, and you will give me the recipe steps in French.
-  If you cannot find a recipe for the dish, or if the dish is not valid, output "null", or else give me the steps.
+  If you cannot find a recipe for the dish, or if the dish is not valid, output "null", or else give me the steps in French.
   Format the recipe in json like this:
   {
     description: string,
@@ -55,7 +55,7 @@ export const getRecipe = (storedRecipes: StoredRecipe[]) => `
   If the list is empty, set the suggestions array to "[]" and result to "null".
   Format your output in json like this: 
   {
-    result: id|null,
-    suggestions: id[]
+    result: number|null,
+    suggestions: number[]
   }
 `;

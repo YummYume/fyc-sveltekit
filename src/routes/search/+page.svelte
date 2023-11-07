@@ -2,16 +2,23 @@
     import type { PageData } from './$types';
 
     export let data: PageData;
+
+    const getSlug = (str: string) => {
+        return str
+            .toLowerCase()
+            .replace(/ /g, '-')
+            .replace(/[^\w-]+/g, '');
+    };
 </script>
 
 <h1 class="h1">Recherche</h1>
 
 {#await data.streamed.result}
-    <span>loading...</span>
+    <p>chargement...</p>
 {:then value}
-    <span>{value.choices[0].message.content}</span>
+    <p>{value.choices[0].message.content}</p>
     <form method="GET" action="/recipe">
-        <input type="text" name="dish" value={data.streamed.dish} class="hidden" />
+        <input type="text" name="dish" value={getSlug(data.streamed.dish)} class="hidden" />
         <button type="submit" class="btn">Générer la recette</button>
     </form>
 {/await}
