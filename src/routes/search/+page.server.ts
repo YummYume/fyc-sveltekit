@@ -4,24 +4,24 @@ import type { PageServerLoad } from './$types';
 
 export const load = (async ({ url, locals }) => {
   const { db } = locals;
-  const queryParams = url.searchParams.get('q') ?? '';
+  const search = url.searchParams.get('q') ?? '';
 
   const recipes = await db.recipe.findMany({
     select: {
       id: true,
-      name: true,
+      dish: true,
     },
     where: {
-      name: {
-        search: queryParams,
+      dish: {
+        search,
       },
     },
   });
 
   return {
     streamed: {
-      dish: queryParams,
-      result: queryGPT({ inputSystem: getRecipe(recipes), inputUser: `${queryParams}` }, false),
+      dish: search,
+      result: queryGPT({ inputSystem: getRecipe(recipes), inputUser: search }, false),
     },
   };
 }) satisfies PageServerLoad;

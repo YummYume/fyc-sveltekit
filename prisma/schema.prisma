@@ -43,8 +43,9 @@ model UserKey {
 
 model Recipe {
   id          Int    @id @default(autoincrement())
-  name        String @db.Text
   description String
+  dish        String @db.Text
+  ingredients Json
   steps       Json
   slug        String @unique
 
@@ -52,7 +53,7 @@ model Recipe {
   scores      Score[]
   favourites  Favourite[]
 
-  @@fulltext([name])
+  @@fulltext([dish])
 }
 
 model Comment {
