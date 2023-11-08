@@ -1,9 +1,13 @@
 <script lang="ts">
+  import { applyAction, enhance } from '$app/forms';
+  import { goto } from '$app/navigation';
+  import { updated } from '$app/stores';
   import Loader from '$lib/components/Loader.svelte';
-  import { slugify } from '$lib/utils/functions';
   import type { PageData } from './$types';
 
   export let data: PageData;
+
+  let isLoading = false;
 </script>
 
 <h1 class="h1">Recherche</h1>
@@ -12,8 +16,22 @@
   <Loader />
 {:then value}
   <p>{value.choices[0].message.content}</p>
-  <form method="GET" action="/recipe">
-    <input type="text" name="dish" value={slugify(data.streamed.dish)} class="hidden" />
-    <button type="submit" class="btn">Générer la recette</button>
+  <form
+    method="POST"
+    action="?/generate"
+    use:enhance={() => {
+      isLoading = true;
+      return async ({ update }) => {
+        await update();
+        isLoading = false;
+      };
+    }}
+  >
+    <input type="text" name="dish" value={data.streamed.dish} class="hidden" />
+    <button type="submit" class="btn" disabled={isLoading}>Générer la recette</button>
+
+    {#if isLoading}
+      <Loader />
+    {/if}
   </form>
 {/await}

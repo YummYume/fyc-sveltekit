@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { enhance } from '$app/forms';
   import Loader from '$lib/components/Loader.svelte';
   import StarEmpty from '$lib/svg/StarEmpty.svelte';
   import type { PageData } from './$types';
