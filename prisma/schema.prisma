@@ -12,13 +12,14 @@ datasource db {
 }
 
 model User {
-  id           String    @id @unique
+  id           String @id @unique
   username     String
 
   auth_session Session[]
   auth_key     UserKey[]
   comments     Comment[]
   scores       Score[]
+  favourites   Favourite[]
 }
 
 model Session {
@@ -41,23 +42,25 @@ model UserKey {
 }
 
 model Recipe {
-  id          String  @id @unique
-  name        String  @db.Text
+  id          Int    @id @default(autoincrement())
+  name        String @db.Text
   description String
   steps       Json
+  slug        String @unique
 
   comments    Comment[]
   scores      Score[]
+  favourites  Favourite[]
 
   @@fulltext([name])
 }
 
 model Comment {
-  id        String  @id @unique
+  id        Int     @id @default(autoincrement())
   content   String  @db.Text
   user_id   String
   user      User    @relation(references: [id], fields: [user_id], onDelete: Cascade)
-  recipe_id String
+  recipe_id Int
   recipe    Recipe  @relation(references: [id], fields: [recipe_id], onDelete: Cascade)
 
   @@index([user_id])
@@ -65,12 +68,23 @@ model Comment {
 }
 
 model Score {
-  id        String  @id @unique
-  score     Int     @db.Int
+  id        Int    @id @default(autoincrement())
+  score     Int    @db.Int
   user_id   String
-  user      User    @relation(references: [id], fields: [user_id], onDelete: Cascade)
-  recipe_id String
-  recipe    Recipe  @relation(references: [id], fields: [recipe_id], onDelete: Cascade)
+  user      User   @relation(references: [id], fields: [user_id], onDelete: Cascade)
+  recipe_id Int
+  recipe    Recipe @relation(references: [id], fields: [recipe_id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@index([recipe_id])
+}
+
+model Favourite {
+  id        Int    @id @default(autoincrement())
+  user_id   String
+  user      User   @relation(references: [id], fields: [user_id], onDelete: Cascade)
+  recipe_id Int
+  recipe    Recipe @relation(references: [id], fields: [recipe_id], onDelete: Cascade)
 
   @@index([user_id])
   @@index([recipe_id])

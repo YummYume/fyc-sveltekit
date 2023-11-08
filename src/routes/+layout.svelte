@@ -1,25 +1,53 @@
-<script>
-  import '../app.postcss';
+<script lang="ts">
+  import Assistant from '$lib/components/Assistant.svelte';
+  import UserCircle from '$lib/svg/UserCircle.svelte';
+
+  import type { PageData } from './$types';
 
   import { enhance } from '$app/forms';
 
-  export let data;
+  import '../app.scss';
+
+  export let data: PageData;
 </script>
 
-<div class="flex justify-between w-screen p-4">
-  <h1 class="text-xl">CookConnect</h1>
+<svelte:head>
+  <title>CookConnect</title>
+</svelte:head>
 
-  <div>
+<nav class="bg-white border-gray-200 px-4 lg:px-6 py-2.5">
+  <div class="flex flex-wrap justify-between items-center mx-auto max-w-screen-xl">
+    <a
+      href="/"
+      class="
+                text-gray-800 hover:bg-gray-50 focus:ring-4 focus:ring-gray-300 font-bold rounded-lg text-xl
+                px-4 lg:px-5 py-2 lg:py-2.5 mr-2 focus:outline-none
+            "
+    >
+      CookConnect
+    </a>
+
     {#if data.user}
-      <a href="/account">{data.user.username}</a>
-      <form method="POST" action="/?/logout" use:enhance>
-        <button type="submit">Logout</button>
-      </form>
-    {:else}
-      <a href="/login">Login</a>
-      <a href="/register">Register</a>
+      <div class="flex items-center lg:order-2">
+        <form method="POST" action="/?/logout" use:enhance>
+          <button
+            type="submit"
+            class="
+                            text-gray-800 hover:bg-gray-50 focus:ring-4 focus:ring-gray-300 font-medium
+                            rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 mr-2 focus:outline-none
+                        "
+          >
+            Se déconnecter
+          </button>
+        </form>
+        <a aria-label="Profil" href="/account">
+          <UserCircle />
+        </a>
+      </div>
     {/if}
   </div>
-</div>
-
-<slot />
+</nav>
+<main class="flex flex-col grow p-5">
+  <slot />
+  <Assistant />
+</main>
