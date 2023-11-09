@@ -1,7 +1,5 @@
 <script lang="ts">
-  import { applyAction, enhance } from '$app/forms';
-  import { goto } from '$app/navigation';
-  import { updated } from '$app/stores';
+  import { enhance } from '$app/forms';
   import Loader from '$lib/components/Loader.svelte';
   import type { PageData } from './$types';
 

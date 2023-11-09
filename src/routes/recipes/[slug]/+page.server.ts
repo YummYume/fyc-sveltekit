@@ -15,20 +15,3 @@ export const load = (async ({ locals, url }) => {
     },
   };
 }) satisfies PageServerLoad;
-
-export const actions = {
-  // favourite: async ({ locals, request }) => {
-  //   const { db, session } = locals;
-  //   const { dish } = (await request.formData()).get('recipe');
-  //   const favourite = await db.favourite.create({
-  //     data: {
-  //       users: {
-  //         connect: [{ id: session?.userId }],
-  //       },
-  //       recipes: {
-  //         connect: [{ slug: dish }],
-  //       },
-  //     },
-  //   });
-  // },
-};
