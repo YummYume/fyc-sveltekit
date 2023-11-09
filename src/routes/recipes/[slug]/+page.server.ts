@@ -1,0 +1,17 @@
+import type { PageServerLoad } from '../../$types.js';
+
+export const load = (async ({ locals, url }) => {
+  const { db } = locals;
+
+  const dish = (url.searchParams.get('slug') ?? '') as string;
+
+  return {
+    streamed: {
+      recipe: await db.recipe.findUnique({
+        where: {
+          slug: dish,
+        },
+      }),
+    },
+  };
+}) satisfies PageServerLoad;
