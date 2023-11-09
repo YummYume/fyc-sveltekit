@@ -14,15 +14,18 @@ type InputsGPT = {
 type IsStreaming<T extends boolean> = T extends true ? Stream<ChatCompletionChunk> : ChatCompletion;
 
 type StoredRecipe = {
-  id: number;
   dish: string;
+  slug: string;
 };
 
 const openai = new OpenAI({
   apiKey: OPENAI_API_KEY,
 });
 
-export async function queryGPT<T extends boolean>({ inputSystem, inputUser }: InputsGPT, stream: T): Promise<IsStreaming<T>> {
+export async function queryGPT<T extends boolean>(
+  { inputSystem, inputUser }: InputsGPT,
+  stream: T,
+): Promise<IsStreaming<T>> {
   return openai.chat.completions.create({
     model: 'gpt-3.5-turbo',
     stream,
@@ -41,24 +44,27 @@ export async function queryGPT<T extends boolean>({ inputSystem, inputUser }: In
 
 export const MAKE_RECIPE = `
   I will give you a prompt, and you will give me a cooking recipe for it in French.
-  If you cannot find a recipe, or if the prompt is not valid, output "null", or else give me recipe.
+  If you cannot find a recipe, or if the prompt is not valid, output "null", otherwise give me recipe.
   Format your output in json like this:
   {
-    description: string,
-    dish: string,
-    ingredients: string[],
-    steps: string[]
+    "description": string,
+    "dish": string,
+    "ingredients": string[],
+    "steps": string[]
   }
 `;
 
 export const getRecipe = (storedRecipes: StoredRecipe[]) => `
-  This is a list of cooking recipes in json format: ${JSON.stringify(storedRecipes)}.
-  I will give you a prompt, and you will give me a cooking recipe for it, only if you find it in the list.
-  If you cannot find a recipe for the prompt, or if the prompt is not valid, output "null", or else give me the result with suggestions of similar recipes from the list.
-  If the list is empty, set the suggestions array to "[]" and the result to "null".
-  Format your output in json like this: 
+  This is a list of cooking recipes in json format: "${JSON.stringify(storedRecipes)}".
+  Ignore any data that is not from the list I gave you.
+  If the list is empty, output this json: {"recipe": null, "suggestions": []} and ignore the rest of the prompt.
+  Otherwise, I will give you a cooking related prompt, and you will give me a cooking recipe for it.
+  If the prompt is not related to cooking, output "null",
+  otherwise, output the recipe with suggestions of similar recipes, like this: 
   {
-    result: id|null,
-    suggestions: id[]
+    "recipe": {"dish": string, "slug": slug}|null,
+    "suggestions": {"dish": string, "slug": slug}[],
   }
+  The "recipe" property is containing the recipe id or null,
+  and the "suggestions" property is containing an id array of suggested recipes.
 `;
