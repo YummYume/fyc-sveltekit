@@ -1,3 +1,4 @@
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library.js';
 import { error, fail } from '@sveltejs/kit';
 
 import type { PageServerLoad } from './$types.js';
@@ -5,20 +6,16 @@ import type { PageServerLoad } from './$types.js';
 export const load = (async ({ locals, params }) => {
   const { db } = locals;
 
-  const recipe = await db.recipe.findUnique({
-    where: {
-      slug: params.slug,
-    },
-    include: {
-      favourites: true,
-    },
-  });
+  try {
+    const recipe = await db.recipe.findUniqueOrThrow({
+      where: {
+        slug: params.slug,
+      },
+      include: {
+        favourites: true,
+      },
+    });
 
-  if (!recipe) {
-    throw error(404, 'Recipe not found');
-  }
-
-  const getData = async () => {
     const favourite = await db.favourite.findFirst({
       where: {
         recipe_id: recipe.id,
@@ -30,11 +27,15 @@ export const load = (async ({ locals, params }) => {
       isFavourite: !!favourite,
       recipe,
     };
-  };
+  } catch (e) {
+    if (e instanceof PrismaClientKnownRequestError) {
+      if (e.code === 'P2025') {
+        throw error(404, 'Recipe not found');
+      }
+    }
 
-  return {
-    streamed: { result: getData() },
-  };
+    throw e;
+  }
 }) satisfies PageServerLoad;
 
 export const actions = {

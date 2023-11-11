@@ -1,64 +1,83 @@
 <script lang="ts">
   import { enhance } from '$app/forms';
-  import Loader from '$lib/components/Loader.svelte';
   import StarEmpty from '$lib/svg/StarEmpty.svelte';
   import StarFull from '$lib/svg/StarFull.svelte';
-  import type { PageData } from './$types';
+  import { quintOut } from 'svelte/easing';
+  import { crossfade } from 'svelte/transition';
+  import type { ActionData, PageData } from './$types';
 
   export let data: PageData;
+
+  export let form: ActionData;
+
+  $: starKey = data.isFavourite ? 'full' : 'empty';
+
+  const [send, receive] = crossfade({
+    duration: 700,
+    easing: quintOut,
+  });
 </script>
 
-{#await data.streamed.result}
-  <Loader />
-{:then value}
-  <div class="flex gap-2 items-center justify-center">
-    <h1 class="h1 first-letter:capitalize">{value.recipe.dish}</h1>
-    <form
-      method="POST"
-      action="?/favourite"
-      aria-label="Ajouter la recette aux favoris"
-      use:enhance
+<div class="flex gap-2 items-center justify-center">
+  <form method="POST" action="?/favourite" class="relative" use:enhance>
+    <h1 class="h1 first-letter:capitalize">{data.recipe.dish}</h1>
+    <input type="hidden" name="recipe" value={data.recipe.id} class="hidden" />
+    <button
+      aria-label={data.isFavourite
+        ? 'Retirer la recette des favoris'
+        : 'Ajouter la recette aux favoris'}
+      type="submit"
     >
-      <input type="number" name="recipe" value={value.recipe.id} class="hidden" />
-
-      {#if value.isFavourite}
-        <button aria-label="Retirer la recette des favoris" type="submit">
+      {#if data.isFavourite}
+        <span
+          class="absolute right-0 top-0 translate-x-full"
+          in:send={{ key: starKey }}
+          out:receive={{ key: starKey }}
+        >
           <StarFull />
-        </button>
+        </span>
       {:else}
-        <button aria-label="Ajouter la recette aux favoris" type="submit">
+        <span
+          class="absolute right-0 top-0 translate-x-full"
+          in:send={{ key: starKey }}
+          out:receive={{ key: starKey }}
+        >
           <StarEmpty />
-        </button>
+        </span>
       {/if}
-    </form>
-  </div>
-  <div class="container mx-auto">
-    <p class="mb-3 text-lg text-gray-500 text-center md:text-xl">{value.recipe.description}</p>
-    <div class="grid gap-6 sm:grid-cols-2">
-      <div>
-        <h2 class="mb-2 text-lg font-semibold text-gray-900">Ingrédients nécessaires</h2>
-        <ol class="space-y-1 text-gray-500 list-decimal list-inside">
-          {#if Array.isArray(value.recipe.ingredients)}
-            {#each value.recipe.ingredients as ingredient}
-              <li>
-                <span class="text-gray-900">{ingredient}</span>
-              </li>
-            {/each}
-          {/if}
-        </ol>
-      </div>
-      <div>
-        <h2 class="mb-2 text-lg font-semibold text-gray-900">Etapes de la recette</h2>
-        <ol class="space-y-1 text-gray-500 list-decimal list-inside">
-          {#if Array.isArray(value.recipe.steps)}
-            {#each value.recipe.steps as step}
-              <li>
-                <span class="text-gray-900">{step}</span>
-              </li>
-            {/each}
-          {/if}
-        </ol>
-      </div>
+    </button>
+  </form>
+</div>
+<div class="container mx-auto">
+  {#if form?.error}
+    <p class="text-sm font-light text-red-600">{form.error}</p>
+  {/if}
+
+  <p class="mb-3 text-lg text-gray-500 text-center md:text-xl">{data.recipe.description}</p>
+  <div class="grid gap-6 sm:grid-cols-2">
+    <div>
+      <h2 class="mb-2 text-lg font-semibold text-gray-900">Ingrédients nécessaires</h2>
+      <ol class="space-y-1 text-gray-500 list-decimal list-inside">
+        {#if Array.isArray(data.recipe.ingredients)}
+          {#each data.recipe.ingredients as ingredient}
+            <li>
+              <span class="text-gray-900">{ingredient}</span>
+            </li>
+          {/each}
+        {/if}
+      </ol>
+    </div>
+    <div>
+      <h2 class="mb-2 text-lg font-semibold text-gray-900">Etapes de la recette</h2>
+      <ol class="space-y-1 text-gray-500 list-decimal list-inside">
+        {#if Array.isArray(data.recipe.steps)}
+          {#each data.recipe.steps as step}
+            <li>
+              <span class="text-gray-900">{step}</span>
+            </li>
+          {/each}
+        {/if}
+      </ol>
     </div>
   </div>
-{/await}
+</div>

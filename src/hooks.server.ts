@@ -8,8 +8,6 @@ export const handle: Handle = async ({ event, resolve }) => {
   event.locals.auth = auth.handleRequest(event);
   event.locals.session = await event.locals.auth.validate();
 
-  const response = await resolve(event);
-
   if (!event.locals.session && !['/login', '/register'].includes(event.url.pathname)) {
     return new Response(null, {
       status: 302,
@@ -17,5 +15,5 @@ export const handle: Handle = async ({ event, resolve }) => {
     });
   }
 
-  return response;
+  return resolve(event);
 };

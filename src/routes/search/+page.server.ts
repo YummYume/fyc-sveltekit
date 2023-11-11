@@ -4,32 +4,52 @@ import { fail, redirect } from '@sveltejs/kit';
 import { MAKE_RECIPE, getRecipe, queryGPT } from '$lib/server/GPT';
 import { slugify } from '$lib/utils/functions';
 
+import type { Recipe } from '$lib/server/types.js';
 import type { PageServerLoad } from './$types.js';
 
 export const load = (async ({ url, locals }) => {
   const { db } = locals;
-  const search = url.searchParams.get('q') ?? '';
+  const query = url.searchParams.get('q') ?? '';
 
-  const recipes = await db.recipe.findMany({
-    select: {
-      dish: true,
-      slug: true,
-    },
-    where: {
-      dish: {
-        search,
+  const getResult = async () => {
+    const recipes = await db.recipe.findMany({
+      select: {
+        dish: true,
+        slug: true,
       },
-    },
-  });
+      where: {
+        dish: {
+          search: query,
+        },
+      },
+    });
 
-  const result = queryGPT({ inputSystem: getRecipe(recipes), inputUser: search }, false).then(
-    (res) => JSON.parse(res.choices[0].message.content ?? ''),
-  );
+    const output = queryGPT({ inputSystem: getRecipe(recipes), inputUser: query }, false);
+    const result: { recipe: Recipe | null; suggestions: Recipe[] } = await output.then((res) =>
+      JSON.parse(res.choices[0].message.content ?? ''),
+    );
+
+    // Remove non-existing recipes
+
+    result.recipe = recipes.find((r) => r.slug === result.recipe?.slug) ?? null;
+
+    result.suggestions = recipes.reduce((acc, curr) => {
+      const suggestion = recipes.find((r) => r.slug === curr.slug);
+
+      if (suggestion) {
+        acc.push(suggestion);
+      }
+
+      return acc;
+    }, [] as Recipe[]);
+
+    return result;
+  };
 
   return {
+    query,
     streamed: {
-      dish: search,
-      result,
+      result: getResult(),
     },
   };
 }) satisfies PageServerLoad;
@@ -39,8 +59,13 @@ export const actions = {
     const { db } = locals;
     const data = await request.formData();
     const dish = (data.get('dish') ?? '') as string;
-    const recipeGenerated = await queryGPT({ inputSystem: MAKE_RECIPE, inputUser: dish }, false);
-    const recipeParsed = JSON.parse(recipeGenerated.choices[0].message.content ?? '');
+    const result = await queryGPT({ inputSystem: MAKE_RECIPE, inputUser: dish }, false);
+
+    const recipe = JSON.parse(result.choices[0].message.content ?? '');
+
+    if (!recipe) {
+      return fail(404, { error: 'Invalid prompt.' });
+    }
 
     try {
       await db.recipe.create({
@@ -48,8 +73,8 @@ export const actions = {
           slug: true,
         },
         data: {
-          ...recipeParsed,
-          slug: slugify(recipeParsed.dish),
+          ...recipe,
+          slug: slugify(recipe.dish),
         },
       });
     } catch (e) {
@@ -60,6 +85,6 @@ export const actions = {
       return fail(500, { error: 'Oops... Something went terribly wrong.' });
     }
 
-    throw redirect(303, `/recipes/${slugify(recipeParsed.dish)}`);
+    throw redirect(303, `/recipes/${slugify(recipe.dish)}`);
   },
 };
