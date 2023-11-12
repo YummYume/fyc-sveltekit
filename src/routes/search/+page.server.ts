@@ -2,7 +2,7 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { fail, redirect } from '@sveltejs/kit';
 
 import { MAKE_RECIPE, getRecipe, queryGPT } from '$lib/server/GPT';
-import { slugify } from '$lib/utils/functions';
+import { slugify } from '$lib/utils/slug';
 
 import type { Recipe } from '$lib/server/types.js';
 import type { PageServerLoad } from './$types.js';
