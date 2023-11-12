@@ -26,7 +26,7 @@
   let disabled = false;
   let chatInput: HTMLInputElement | null = null;
   let messages: Message[] = [];
-  let messageContainer: HTMLDivElement | null = null;
+  let messageContainer: HTMLUListElement | null = null;
   let abortController: AbortController | null = null;
 
   // Handle the chunks of the response body
@@ -180,8 +180,8 @@
           open = true;
 
           requestAnimationFrame(() => {
-            if (messageContainer) {
-              messageContainer.scrollIntoView(false);
+            if (chatInput) {
+              chatInput.focus();
             }
           });
         }}
@@ -254,7 +254,7 @@
                 mieux!
               </p>
             </div>
-            <div
+            <ul
               id="message-container"
               aria-label="Conversation avec l'assistant personnel"
               role="region"
@@ -263,10 +263,14 @@
               bind:this={messageContainer}
             >
               {#each messages as message, index (index)}
-                <div
+                {@const messageId = `message-${index}`}
+
+                <li
                   class:ml-auto={message.role === 'user'}
                   class:mr-auto={message.role === 'assistant'}
                   class="w-11/12"
+                  aria-label={message.role === 'user' ? 'Mon message' : 'Message de Carlos'}
+                  aria-describedby={messageId}
                   transition:scale={{ duration: prefersReducedMotion() ? 0 : 500 }}
                 >
                   <div
@@ -274,17 +278,19 @@
                     class:bg-gray-100={message.role === 'user'}
                     class:bg-gray-200={message.role === 'assistant'}
                   >
-                    <p class="text-gray-800">{message.content}</p>
+                    <p class="text-gray-800" id={messageId}>
+                      {message.content}
+                    </p>
                   </div>
-                </div>
+                </li>
               {/each}
-            </div>
+            </ul>
           </div>
           <form class="form" on:submit|preventDefault={handleFormSubmit}>
             <div>
               <label for="question">
-                {#if messages.length > 0}
-                  {messages[messages.length - 1].role === 'user' ? 'Ma question' : 'Ma réponse'}
+                {#if messages.length > 0 && messages.some((message) => message.role === 'user')}
+                  Ma réponse
                 {:else}
                   Ma question
                 {/if}

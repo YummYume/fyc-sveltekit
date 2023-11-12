@@ -23,18 +23,20 @@ export const POST: RequestHandler = async ({ request }) => {
     return new Response('Property "messages" must not be empty.', { status: 400 });
   }
 
-  messages = messages.filter((message) => {
-    if (typeof message !== 'object') {
-      return false;
-    }
+  messages = messages
+    .filter((message) => {
+      if (typeof message !== 'object') {
+        return false;
+      }
 
-    return (
-      ['user', 'system', 'assistant'].includes(message.role) &&
-      typeof message.content === 'string' &&
-      message.content.length > 0 &&
-      message.content.length <= 255
-    );
-  });
+      return (
+        ['user', 'system', 'assistant'].includes(message.role) &&
+        typeof message.content === 'string' &&
+        message.content.length > 0 &&
+        message.content.length <= 255
+      );
+    })
+    .map((message) => ({ content: message.content, role: message.role }));
 
   const stream = await openai.chat.completions.create({
     model: 'gpt-3.5-turbo',
