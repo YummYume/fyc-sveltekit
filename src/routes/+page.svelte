@@ -1,8 +1,8 @@
-<h1>Homepage</h1>
+<script lang="ts">
+  import Search from '$lib/components/Search.svelte';
+</script>
 
-<form action="/search">
-  <label>
-    Search
-    <input name="q" />
-  </label>
-</form>
+<h1 class="h1">CookConnect</h1>
+<div class="max-w-xl mx-auto w-full">
+  <Search />
+</div>
