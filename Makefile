@@ -45,6 +45,10 @@ lint:
 format:
 	$(EXECSVELTEKIT) bun run format
 
-db: 
+# DB
+db:
 	$(EXECSVELTEKIT) bunx prisma db push
-	
+
+# Logs
+logs:
+	$(COMPOSE) logs

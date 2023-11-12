@@ -1,14 +1,29 @@
 <script lang="ts">
+  import '../app.scss';
+
   import Assistant from '$lib/components/Assistant.svelte';
   import UserCircle from '$lib/svg/UserCircle.svelte';
 
   import type { PageData } from './$types';
 
   import { enhance } from '$app/forms';
-
-  import '../app.scss';
+  import { onNavigate } from '$app/navigation';
 
   export let data: PageData;
+
+  onNavigate((navigation) => {
+    if (!document.startViewTransition) {
+      return Promise.resolve();
+    }
+
+    return new Promise((resolve) => {
+      document.startViewTransition(async () => {
+        resolve();
+
+        await navigation.complete;
+      });
+    });
+  });
 </script>
 
 <svelte:head>
@@ -20,9 +35,9 @@
     <a
       href="/"
       class="
-                text-gray-800 hover:bg-gray-50 focus:ring-4 focus:ring-gray-300 font-bold rounded-lg text-xl
-                px-4 lg:px-5 py-2 lg:py-2.5 mr-2 focus:outline-none
-            "
+        text-gray-800 hover:bg-gray-50 focus:ring-4 focus:ring-gray-300 font-bold rounded-lg text-xl
+        px-4 lg:px-5 py-2 lg:py-2.5 mr-2 focus:outline-none
+      "
     >
       CookConnect
     </a>
@@ -33,9 +48,9 @@
           <button
             type="submit"
             class="
-                            text-gray-800 hover:bg-gray-50 focus:ring-4 focus:ring-gray-300 font-medium
-                            rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 mr-2 focus:outline-none
-                        "
+              text-gray-800 hover:bg-gray-50 focus:ring-4 focus:ring-gray-300 font-medium
+              rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 mr-2 focus:outline-none
+            "
           >
             Se déconnecter
           </button>
@@ -49,5 +64,7 @@
 </nav>
 <main class="flex flex-col grow p-5">
   <slot />
-  <Assistant />
+  {#if data.user}
+    <Assistant />
+  {/if}
 </main>
