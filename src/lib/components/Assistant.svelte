@@ -16,18 +16,25 @@
     role: 'user' | 'assistant';
   };
 
+  type CarlosStatus = 'available' | 'thinking' | 'answering';
+
   type ChunkReader = (reader: ReadableStreamDefaultReader<Uint8Array>) => Promise<void>;
 
   // Constants
   const decoder = new TextDecoder('utf-8');
+  const statusMessage = {
+    available: 'Carlos est disponible',
+    thinking: 'Carlos réfléchit...',
+    answering: 'Carlos est en train de répondre...',
+  };
 
   // Variables
   let open = false;
-  let disabled = false;
   let chatInput: HTMLInputElement | null = null;
   let messages: Message[] = [];
   let messageContainer: HTMLUListElement | null = null;
   let abortController: AbortController | null = null;
+  let carlosStatus: CarlosStatus = 'available';
 
   // Handle the chunks of the response body
   const handleMessageChunk: ChunkReader = async (
@@ -87,11 +94,11 @@
   };
 
   const handleFormSubmit = async (event: SubmitEvent) => {
-    if (disabled) {
+    if (carlosStatus !== 'available') {
       return;
     }
 
-    disabled = true;
+    carlosStatus = 'thinking';
 
     const formData = new FormData(event.target as HTMLFormElement);
     const question = formData.get('question');
@@ -99,7 +106,7 @@
     if (typeof question !== 'string' || question.trim() === '') {
       // TODO: handle error
 
-      disabled = false;
+      carlosStatus = 'available';
 
       return;
     }
@@ -138,6 +145,8 @@
     try {
       const reader = response.body.getReader();
 
+      carlosStatus = 'answering';
+
       await handleMessageChunk(reader);
     } catch (error) {
       console.error('Carlos is not available...', error);
@@ -146,7 +155,7 @@
     }
 
     abortController = null;
-    disabled = false;
+    carlosStatus = 'available';
   };
 
   // Lifecycle
@@ -199,10 +208,10 @@
         aria-modal="false"
         aria-label="Discussion avec l'assistant personnel"
         aria-describedby="carlos-description"
-        class="absolute bottom-0 max-w-xl w-screen min-h-[23.5rem]"
+        class="absolute bottom-0 max-w-xl w-screen"
         transition:fly={{ duration: prefersReducedMotion() ? 0 : 1000, y: 575, easing: bounceOut }}
       >
-        <Card>
+        <Card innerContainerClass="min-h-[50vh] flex flex-col">
           <div class="flex justify-between items-start p-2 space-y-4 md:space-y-6 sm:p-4">
             <div class="flex gap-2 items-center">
               <enhanced:img
@@ -211,10 +220,10 @@
                 class="rounded-full h-20 w-20"
               />
               <div class="flex gap-1 items-center">
-                <div class="h-3 w-3 bg-green-600 rounded-full shadow" />
-                {#key disabled}
+                <div class="h-3 w-3 bg-primary-600 rounded-full shadow" />
+                {#key carlosStatus}
                   <p in:fade={{ duration: prefersReducedMotion() ? 0 : 500 }} role="status">
-                    {disabled ? 'Carlos est en train de répondre...' : 'Carlos est disponible'}
+                    {statusMessage[carlosStatus]}
                   </p>
                 {/key}
               </div>
@@ -242,7 +251,9 @@
               </svg>
             </button>
           </div>
-          <div class="max-h-[50vh] overflow-auto">
+          <div
+            class="max-h-[50vh] overflow-auto sm:p-1 p-0.5 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-primary-600 scrollbar-thumb-rounded-full scrollbar-track-rounded-full flex-grow"
+          >
             <div
               class="max-w-[25ch] mb-3 text-gray-500 sm:max-w-sm md:max-w-md lg:max-w-lg flex flex-col gap-2"
               class:sr-only={messages.length > 0}
@@ -306,9 +317,9 @@
                 />
                 <button
                   type="submit"
-                  class="btn | sm:w-fit"
+                  class="btn | sm:w-fit disabled:saturate-50 bg-primary-600 enabled:hover:bg-primary-700 disabled:bg-primary-400"
                   aria-controls="message-container"
-                  {disabled}
+                  disabled={carlosStatus !== 'available'}
                 >
                   Envoyer
                 </button>
