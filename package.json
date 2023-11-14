@@ -10,6 +10,7 @@
     "@types/dom-view-transitions": "^1.0.4",
     "@typescript-eslint/eslint-plugin": "^6.9.0",
     "@typescript-eslint/parser": "^6.9.0",
+    "@zerodevx/svelte-toast": "^0.9.5",
     "autoprefixer": "^10.4.14",
     "bun-types": "^1.0.7",
     "eslint": "^8.52.0",
