@@ -9,7 +9,12 @@
   import { enhance } from '$app/forms';
   import { onNavigate } from '$app/navigation';
 
+  import { SvelteToast } from '@zerodevx/svelte-toast';
+  import type { SvelteToastOptions } from '@zerodevx/svelte-toast/stores';
+
   export let data: PageData;
+
+  const options: SvelteToastOptions = {};
 
   onNavigate((navigation) => {
     if (!document.startViewTransition) {
@@ -63,6 +68,7 @@
   </div>
 </nav>
 <main class="flex flex-col grow p-5">
+  <SvelteToast {options} />
   <slot />
   {#if data.user}
     <Assistant />

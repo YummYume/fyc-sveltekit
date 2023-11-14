@@ -55,6 +55,7 @@
     "@lucia-auth/adapter-prisma": "^3.0.2",
     "@prisma/client": "^5.5.2",
     "@sveltejs/kit": "^1.27.1",
+    "@zerodevx/svelte-toast": "^0.9.5",
     "lucia": "^2.7.2",
     "openai": "^4.14.1",
     "vite": "^4.5.0"
