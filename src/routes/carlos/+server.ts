@@ -12,7 +12,7 @@ const prompt = `
   Tu limiteras tes réponses à 255 caractères.
 `;
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST = (async ({ request }) => {
   const body = await request.json();
 
   let messages = body.messages || [];
@@ -52,4 +52,4 @@ export const POST: RequestHandler = async ({ request }) => {
       'Cache-Control': 'no-cache',
     },
   });
-};
+}) satisfies RequestHandler;

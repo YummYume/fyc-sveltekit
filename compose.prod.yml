@@ -1,0 +1,67 @@
+version: '3.9'
+
+services:
+  caddy:
+    image: caddy:2.7.4-alpine
+    restart: unless-stopped
+    container_name: fyc-caddy
+    ports:
+      - 80:80
+      - 443:443
+      - 443:443/udp
+    expose:
+      - 9000
+    environment:
+      ACME_EMAIL: "${ACME_EMAIL:?err}"
+    volumes:
+      - ./docker/prod/caddy/Caddyfile:/etc/caddy/Caddyfile
+      - ./data/caddy/data:/data
+      - ./data/caddy/config:/config
+    depends_on:
+      svelte-kit:
+        condition: service_healthy
+    networks:
+      - webserver
+
+  svelte-kit:
+    build:
+      context: .
+      dockerfile: ./docker/prod/bun/Dockerfile
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    stdin_open: true
+    tty: true
+    restart: unless-stopped
+    container_name: fyc-svelte-kit
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://127.0.0.1:5173/api/healthz || exit 1
+      interval: 10s
+      timeout: 20s
+      retries: 10
+      start_period: 60s
+      # Uncomment once start_interval is available (https://github.com/docker/compose/issues/10830)
+      # interval: 60s
+      # start_interval: 1s
+    networks:
+      - webserver
+      - db
+
+  mariadb:
+    image: mariadb:11.1.2
+    restart: unless-stopped
+    container_name: fyc-mariadb
+    volumes:
+      - ./data/mysql:/var/lib/mysql
+    environment:
+      MARIADB_RANDOM_ROOT_PASSWORD: "yes"
+      MARIADB_USER: "${MARIADB_USER:?err}"
+      MARIADB_PASSWORD: "${MARIADB_PASSWORD:?err}"
+    healthcheck:
+      test: ['CMD', 'mariadb-admin', 'ping', '-h', 'localhost']
+      interval: 10s
+      timeout: 20s
+      retries: 5
+      start_period: 60s
+    networks:
+      - db

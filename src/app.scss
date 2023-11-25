@@ -8,7 +8,7 @@
   }
 
   .btn {
-    @apply mx-auto flex w-fit items-center rounded-lg bg-primary-700 px-5 py-2.5 text-sm font-medium text-white transition-all duration-75 ease-in hover:bg-primary-800 focus:outline-none focus:ring-4 focus:ring-primary-300 disabled:cursor-not-allowed disabled:bg-primary-400;
+    @apply mx-auto flex w-fit items-center rounded-lg bg-primary-700 px-5 py-2.5 text-sm font-medium text-white transition-all duration-75 ease-in enabled:hover:bg-primary-800 enabled:focus:outline-none enabled:focus:ring-4 enabled:focus:ring-primary-300 disabled:cursor-not-allowed disabled:bg-primary-400 disabled:saturate-50;
   }
 
   .form {

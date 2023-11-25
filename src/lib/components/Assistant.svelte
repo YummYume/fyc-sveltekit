@@ -1,15 +1,16 @@
 <script lang="ts">
+  import { Stream } from 'openai/streaming';
   import { onDestroy } from 'svelte';
   import { bounceOut } from 'svelte/easing';
   import { blur, fade, fly, scale } from 'svelte/transition';
 
   import { prefersReducedMotion } from '$lib/utils/preferences';
   import { requestAnimationFrame } from '$lib/utils/request-animation-frame';
+  import { toasts } from '$lib/utils/toats';
 
   import Card from './Card.svelte';
 
   import type { ChatCompletionChunk } from 'openai/resources';
-  import { toasts } from '$lib/utils/toats';
 
   // Types
   type Message = {
@@ -19,10 +20,7 @@
 
   type CarlosStatus = 'available' | 'thinking' | 'answering';
 
-  type ChunkReader = (reader: ReadableStreamDefaultReader<Uint8Array>) => Promise<void>;
-
   // Constants
-  const decoder = new TextDecoder('utf-8');
   const statusMessage = {
     available: 'Carlos est disponible',
     thinking: 'Carlos réfléchit...',
@@ -32,68 +30,58 @@
   // Variables
   let open = false;
   let chatInput: HTMLInputElement | null = null;
+  let inputValue = '';
   let messages: Message[] = [];
   let messageContainer: HTMLUListElement | null = null;
   let abortController: AbortController | null = null;
   let carlosStatus: CarlosStatus = 'available';
 
-  // Handle the chunks of the response body
-  const handleMessageChunk: ChunkReader = async (
-    reader: ReadableStreamDefaultReader<Uint8Array>,
+  // Handle the readable stream
+  const handleReadableStream = async (
+    readableStream: ReadableStream<Uint8Array>,
+    controller: AbortController,
   ) => {
-    const chunk = await reader.read();
-
-    if (chunk.done || abortController?.signal.aborted) {
-      return Promise.resolve();
+    if (controller.signal.aborted || readableStream.locked) {
+      return;
     }
 
-    const message = decoder.decode(chunk.value, { stream: true });
-    // Split the message into lines
-    const lines = message.split(/}\n/g).filter((line) => line.trim() !== '');
-    const chatCompletions: ChatCompletionChunk[] = JSON.parse(`[${lines.join('},')}}]`);
-    const newMessages = [...messages];
-    let lastMessage = newMessages.pop();
+    const stream = Stream.fromReadableStream<ChatCompletionChunk>(readableStream, controller);
 
-    // If there is no last message, create one
-    if (!lastMessage || lastMessage.role !== 'assistant') {
-      if (lastMessage) {
-        newMessages.push(lastMessage);
-      }
+    // Read the stream chunk by chunk
+    for await (const message of stream) {
+      const newMessages = [...messages];
+      let lastMessage = newMessages.pop();
 
-      lastMessage = {
-        content: '',
-        role: 'assistant',
-      };
+      // If there is no last message, create one
+      if (!lastMessage || lastMessage.role !== 'assistant') {
+        if (lastMessage) {
+          newMessages.push(lastMessage);
+        }
 
-      // Start the transition
-      messages = newMessages;
-    }
-
-    // Add the new message to the last one
-    lastMessage.content = chatCompletions.reduce((currentMessage, chatCompletion) => {
-      if (chatCompletion.choices.length === 0) {
-        return currentMessage;
+        lastMessage = {
+          content: '',
+          role: 'assistant',
+        };
       }
 
       // Take the first choice
-      const choice = chatCompletion.choices[0];
+      const choice = message.choices[0];
 
-      if (choice.finish_reason !== null) {
-        return currentMessage;
+      if (choice.finish_reason === null) {
+        // Append the choice to the current message (only if valid)
+        lastMessage.content += choice.delta.content;
+
+        if (lastMessage.content.trim() !== '') {
+          newMessages.push(lastMessage);
+
+          // Replace the last message with the new one
+          messages = newMessages;
+        }
       }
-
-      // Append the choice to the current message (only if valid)
-      return `${currentMessage}${choice.delta.content}`;
-    }, lastMessage.content);
-
-    newMessages.push(lastMessage);
-
-    // Replace the last message with the new one
-    messages = newMessages;
-
-    return handleMessageChunk(reader);
+    }
   };
 
+  // Handle the form submit
   const handleFormSubmit = async (event: SubmitEvent) => {
     if (carlosStatus !== 'available') {
       return;
@@ -105,16 +93,22 @@
     const question = formData.get('question');
 
     if (typeof question !== 'string' || question.trim() === '') {
-      toasts.error('Veuillez saisir une question');
+      toasts.warning(`Veuillez entrer une ${messages.length > 0 ? 'réponse' : 'question'}.`);
 
       carlosStatus = 'available';
 
       return;
     }
 
-    if (chatInput) {
-      chatInput.value = '';
+    if (question.trim().length > 255) {
+      toasts.warning('Votre question ne doit pas dépasser 255 caractères.');
+
+      carlosStatus = 'available';
+
+      return;
     }
+
+    inputValue = '';
 
     messages = [
       ...messages,
@@ -136,19 +130,20 @@
     });
 
     if (!response.ok || !response.body) {
-      toasts.error('Carlos n\'est pas disponible');
+      toasts.error("Carlos n'est pas disponible. Veuillez réessayer plus tard.");
+
+      abortController = null;
+      carlosStatus = 'available';
 
       return;
     }
 
     try {
-      const reader = response.body.getReader();
-
       carlosStatus = 'answering';
 
-      await handleMessageChunk(reader);
+      await handleReadableStream(response.body, abortController);
     } catch (error) {
-      toasts.error('Carlos n\'est pas disponible');
+      toasts.error('Carlos a rencontré une erreur. Veuillez réessayer plus tard.');
     }
 
     abortController = null;
@@ -219,13 +214,18 @@
               <div class="flex gap-1 items-center">
                 <div class="h-3 w-3 bg-primary-600 rounded-full shadow" />
                 {#key carlosStatus}
-                  <p in:fade={{ duration: prefersReducedMotion() ? 0 : 500 }} role="status">
+                  <p
+                    in:fade={{ duration: prefersReducedMotion() ? 0 : 500 }}
+                    role="status"
+                    aria-live="polite"
+                  >
                     {statusMessage[carlosStatus]}
                   </p>
                 {/key}
               </div>
             </div>
             <button
+              type="button"
               aria-label="Fermer la discussion"
               on:click={() => {
                 open = false;
@@ -296,7 +296,7 @@
           </div>
           <form class="form" on:submit|preventDefault={handleFormSubmit}>
             <div>
-              <label for="question">
+              <label for="carlos-question">
                 {#if messages.length > 0 && messages.some((message) => message.role === 'user')}
                   Ma réponse
                 {:else}
@@ -306,9 +306,10 @@
               <div class="gap-3 grid sm:flex">
                 <input
                   bind:this={chatInput}
-                  type="question"
+                  bind:value={inputValue}
+                  type="text"
                   name="question"
-                  id="question"
+                  id="carlos-question"
                   maxlength="255"
                   required
                 />
@@ -316,7 +317,7 @@
                   type="submit"
                   class="btn | sm:w-fit disabled:saturate-50 bg-primary-600 enabled:hover:bg-primary-700 disabled:bg-primary-400"
                   aria-controls="message-container"
-                  disabled={carlosStatus !== 'available'}
+                  disabled={carlosStatus !== 'available' || inputValue.trim() === ''}
                 >
                   Envoyer
                 </button>

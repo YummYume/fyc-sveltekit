@@ -89,6 +89,10 @@
         </ul>
       </Card>
     {/if}
+  {:catch}
+    <p class="text-sm font-light text-red-600">
+      Quelque chose s'est mal passé. Veuillez réessayer plus tard.
+    </p>
   {/await}
 
   {#if form?.error}
