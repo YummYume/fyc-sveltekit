@@ -9,6 +9,7 @@
   import Card from './Card.svelte';
 
   import type { ChatCompletionChunk } from 'openai/resources';
+  import { toasts } from '$lib/utils/toats';
 
   // Types
   type Message = {
@@ -104,7 +105,7 @@
     const question = formData.get('question');
 
     if (typeof question !== 'string' || question.trim() === '') {
-      // TODO: handle error
+      toasts.error('Veuillez saisir une question');
 
       carlosStatus = 'available';
 
@@ -135,9 +136,7 @@
     });
 
     if (!response.ok || !response.body) {
-      console.error('Carlos is not available...', response);
-
-      // TODO: handle error
+      toasts.error('Carlos n\'est pas disponible');
 
       return;
     }
@@ -149,9 +148,7 @@
 
       await handleMessageChunk(reader);
     } catch (error) {
-      console.error('Carlos is not available...', error);
-
-      // TODO: handle error
+      toasts.error('Carlos n\'est pas disponible');
     }
 
     abortController = null;
