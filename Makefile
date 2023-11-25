@@ -69,6 +69,9 @@ logs:
 	$(COMPOSE) logs
 
 # Prod
+fetch:
+	git fetch --all && git checkout master && git reset --hard origin/master
+
 deploy:
 	$(COMPOSEPROD) stop
 	$(COMPOSEPROD) build --force-rm
