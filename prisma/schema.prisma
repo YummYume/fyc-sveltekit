@@ -2,7 +2,7 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["fullTextSearch", "fullTextIndex"]
 }
 
@@ -12,8 +12,8 @@ datasource db {
 }
 
 model User {
-  id           String @id @unique
-  username     String
+  id       String @id @unique
+  username String
 
   auth_session Session[]
   auth_key     UserKey[]
@@ -49,20 +49,20 @@ model Recipe {
   steps       Json
   slug        String @unique
 
-  comments    Comment[]
-  scores      Score[]
-  favourites  Favourite[]
+  comments   Comment[]
+  scores     Score[]
+  favourites Favourite[]
 
   @@fulltext([dish])
 }
 
 model Comment {
-  id        Int     @id @default(autoincrement())
-  content   String  @db.Text
+  id        Int    @id @default(autoincrement())
+  content   String @db.Text
   user_id   String
-  user      User    @relation(references: [id], fields: [user_id], onDelete: Cascade)
+  user      User   @relation(references: [id], fields: [user_id], onDelete: Cascade)
   recipe_id Int
-  recipe    Recipe  @relation(references: [id], fields: [recipe_id], onDelete: Cascade)
+  recipe    Recipe @relation(references: [id], fields: [recipe_id], onDelete: Cascade)
 
   @@index([user_id])
   @@index([recipe_id])

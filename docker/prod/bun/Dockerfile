@@ -8,18 +8,14 @@ COPY --from=node:20-alpine /usr/local/lib /usr/local/lib
 COPY --from=node:20-alpine /usr/local/include /usr/local/include
 COPY --from=node:20-alpine /usr/local/bin /usr/local/bin
 
-COPY src prisma ./
-COPY vite.config.js ./
-COPY package.json ./
-COPY bun.lockb ./
-COPY tsconfig.json ./
-COPY svelte.config.js ./
-COPY postcss.config.cjs ./
-COPY .env ./
-COPY .env.local ./
+COPY src ./src
+COPY prisma ./prisma
+COPY vite.config.ts package.json bun.lockb tsconfig.json svelte.config.js postcss.config.cjs tailwind.config.cjs .env .env.local ./
 
 RUN bun install && \
-    bun build
+    bun run prisma generate && \
+    bun run check && \
+    bun run build
 
 FROM oven/bun:alpine
 
@@ -31,11 +27,16 @@ COPY --from=node:20-alpine /usr/local/lib /usr/local/lib
 COPY --from=node:20-alpine /usr/local/include /usr/local/include
 COPY --from=node:20-alpine /usr/local/bin /usr/local/bin
 
-COPY --from=builder --chown=bun:bun /home/bun/fyc-svelte-kit/build ./
-COPY --chown=bun:bun static ./
+COPY --from=builder --chown=bun:bun /home/bun/fyc-svelte-kit/build ./build
+COPY --chown=bun:bun static ./static
+COPY --chown=bun:bun prisma ./prisma
+COPY --chown=bun:bun package.json bun.lockb .env .env.local ./
 
-RUN bun install --production --frozen-lockfile
+RUN bun install --production --frozen-lockfile && \
+    bun run prisma generate
 
 USER bun
 
-CMD ["bun", "build/index.js"]
+ENV ORIGIN=https://ai.yam-yam.dev
+
+CMD ["node", "build/index.js"]

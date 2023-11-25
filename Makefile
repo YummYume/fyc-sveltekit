@@ -77,3 +77,6 @@ deploy:
 	$(COMPOSEPROD) build --force-rm
 	$(COMPOSEPROD) up -d --remove-orphans --force-recreate
 	$(COMPOSEPROD) exec svelte-kit bunx prisma migrate deploy
+
+logs-prod:
+	$(COMPOSEPROD) logs

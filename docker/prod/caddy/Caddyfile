@@ -4,5 +4,5 @@
 }
 
 ai.yam-yam.dev {
-    reverse_proxy * svelte-kit:5173
+    reverse_proxy * svelte-kit:3000
 }

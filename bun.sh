@@ -8,11 +8,6 @@ echo "Installing dependencies"
 
 bun install
 
-echo "Syncing schema database"
-
-bunx prisma db push --accept-data-loss
-
 echo "Starting dev server"
 
 bun run dev --host
-
