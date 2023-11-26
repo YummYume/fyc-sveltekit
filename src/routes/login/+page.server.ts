@@ -6,9 +6,9 @@ import { auth } from '$lib/server/auth';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load = (({ locals }) => {
-  const user = locals.session?.user;
+  const { session } = locals;
 
-  if (user) {
+  if (session) {
     throw redirect(303, '/');
   }
 
@@ -16,22 +16,28 @@ export const load = (({ locals }) => {
 }) satisfies PageServerLoad;
 
 export const actions = {
-  login: async ({ request, cookies }) => {
+  login: async ({ request, cookies, locals }) => {
+    const { session } = locals;
+
+    if (session) {
+      throw redirect(303, '/');
+    }
+
     const data = await request.formData();
     const username = (data.get('username') ?? '') as string;
     const password = (data.get('password') ?? '') as string;
 
     if (username.length < 1 || password.length < 1 || password.length > 255) {
-      return fail(400, { error: 'Invalid credentials.' });
+      return fail(400, { error: 'Identifiants invalides.' });
     }
 
     try {
       const key = await auth.useKey('username', username.toLowerCase(), password);
-      const session = await auth.createSession({
+      const newSession = await auth.createSession({
         userId: key.userId,
         attributes: {},
       });
-      const sessionCookie = auth.createSessionCookie(session);
+      const sessionCookie = auth.createSessionCookie(newSession);
 
       cookies.set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes);
     } catch (e) {
@@ -39,10 +45,15 @@ export const actions = {
         e instanceof LuciaError &&
         (e.message === 'AUTH_INVALID_KEY_ID' || e.message === 'AUTH_INVALID_PASSWORD')
       ) {
-        return fail(400, { error: 'Invalid credentials.' });
+        return fail(400, { error: 'Identifiants invalides.' });
       }
 
-      return fail(500, { error: 'Oops... Something went terribly wrong.' });
+      // eslint-disable-next-line no-console
+      console.error('Error logging in:', e);
+
+      return fail(500, {
+        error: "Oops... Quelque chose s'est mal passé. Veuillez réessayer plus tard.",
+      });
     }
 
     throw redirect(303, '/');

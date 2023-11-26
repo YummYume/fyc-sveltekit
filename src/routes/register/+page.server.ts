@@ -6,9 +6,9 @@ import { auth } from '$lib/server/auth';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load = (({ locals }) => {
-  const user = locals.session?.user;
+  const { session } = locals;
 
-  if (user) {
+  if (session) {
     throw redirect(303, '/');
   }
 
@@ -16,22 +16,32 @@ export const load = (({ locals }) => {
 }) satisfies PageServerLoad;
 
 export const actions = {
-  register: async ({ request, cookies }) => {
+  register: async ({ request, cookies, locals }) => {
+    const { session } = locals;
+
+    if (session) {
+      throw redirect(303, '/');
+    }
+
     const data = await request.formData();
     const username = (data.get('username') ?? '') as string;
     const password = (data.get('password') ?? '') as string;
     const passwordRepeat = (data.get('password-repeat') ?? '') as string;
 
     if (username.length < 3) {
-      return fail(422, { error: 'Username is too short. It must be at least 3 characters long.' });
+      return fail(422, {
+        error: "Votre nom d'utilisateur est trop court. Il doit faire au moins 3 caractères.",
+      });
     }
 
     if (password.length < 8) {
-      return fail(422, { error: 'Password is too short. It must be at least 8 characters long.' });
+      return fail(422, {
+        error: 'Votre mot de passe est trop court. Il doit faire au moins 8 caractères.',
+      });
     }
 
     if (password !== passwordRepeat) {
-      return fail(422, { error: 'Passwords do not match.' });
+      return fail(422, { error: 'Les mots de passe ne correspondent pas.' });
     }
 
     try {
@@ -45,19 +55,24 @@ export const actions = {
           username,
         },
       });
-      const session = await auth.createSession({
+      const newSession = await auth.createSession({
         userId: user.userId,
         attributes: {},
       });
-      const sessionCookie = auth.createSessionCookie(session);
+      const sessionCookie = auth.createSessionCookie(newSession);
 
       cookies.set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes);
     } catch (e) {
       if (e instanceof LuciaError && e.message === `AUTH_DUPLICATE_KEY_ID`) {
-        return fail(400, { error: 'Username is already taken.' });
+        return fail(400, { error: "Ce nom d'utilisateur est déjà pris." });
       }
 
-      return fail(500, { error: 'Oops... Something went terribly wrong.' });
+      // eslint-disable-next-line no-console
+      console.error('Error registering:', e);
+
+      return fail(500, {
+        error: "Oops... Quelque chose s'est mal passé. Veuillez réessayer plus tard.",
+      });
     }
 
     throw redirect(303, '/');

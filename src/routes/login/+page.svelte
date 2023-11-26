@@ -8,6 +8,14 @@
   export let form: ActionData;
 </script>
 
+<svelte:head>
+  <title>Se connecter</title>
+  <meta
+    name="description"
+    content="Connectez-vous à votre compte CookConnect pour accéder à toutes vos recettes."
+  />
+</svelte:head>
+
 <section class="section">
   <Card title="Se connecter">
     <form method="POST" action="?/login" class="form" use:enhance>

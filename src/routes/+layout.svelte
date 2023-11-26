@@ -1,6 +1,8 @@
 <script lang="ts">
   import '../app.scss';
 
+  import { SvelteToast } from '@zerodevx/svelte-toast';
+
   import Assistant from '$lib/components/Assistant.svelte';
   import UserCircle from '$lib/svg/UserCircle.svelte';
 
@@ -9,12 +11,7 @@
   import { enhance } from '$app/forms';
   import { onNavigate } from '$app/navigation';
 
-  import { SvelteToast } from '@zerodevx/svelte-toast';
-  import type { SvelteToastOptions } from '@zerodevx/svelte-toast/stores';
-
   export let data: PageData;
-
-  const options: SvelteToastOptions = {};
 
   onNavigate((navigation) => {
     if (!document.startViewTransition) {
@@ -34,6 +31,14 @@
 <svelte:head>
   <title>CookConnect</title>
 </svelte:head>
+
+<SvelteToast
+  options={{
+    duration: 5000,
+    dismissable: true,
+    pausable: true,
+  }}
+/>
 
 <nav class="bg-white border-gray-200 px-4 lg:px-6 py-2.5">
   <div class="flex flex-wrap justify-between items-center mx-auto max-w-screen-xl">
@@ -68,9 +73,16 @@
   </div>
 </nav>
 <main class="flex flex-col grow p-5">
-  <SvelteToast {options} />
   <slot />
   {#if data.user}
     <Assistant />
   {/if}
 </main>
+
+<style>
+  :root {
+    --toastContainerTop: auto;
+    --toastContainerBottom: 1.5rem;
+    --toastBorderRadius: 0.5rem;
+  }
+</style>

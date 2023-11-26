@@ -1,10 +1,14 @@
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library.js';
-import { error, fail } from '@sveltejs/kit';
+import { error, fail, redirect } from '@sveltejs/kit';
 
 import type { PageServerLoad } from './$types.js';
 
 export const load = (async ({ locals, params }) => {
-  const { db } = locals;
+  const { db, session } = locals;
+
+  if (!session) {
+    throw redirect(303, '/login');
+  }
 
   try {
     const recipe = await db.recipe.findUniqueOrThrow({
@@ -30,7 +34,7 @@ export const load = (async ({ locals, params }) => {
   } catch (e) {
     if (e instanceof PrismaClientKnownRequestError) {
       if (e.code === 'P2025') {
-        throw error(404, 'Recipe not found');
+        throw error(404, "Cette recette n'existe pas.");
       }
     }
 
@@ -42,12 +46,16 @@ export const actions = {
   favourite: async ({ locals, request }) => {
     const { db, session } = locals;
 
+    if (!session) {
+      throw redirect(303, '/login');
+    }
+
     const data = await request.formData();
 
     const recipe = data.get('recipe') as string;
 
     if (!recipe) {
-      return fail(400, { error: 'Wrong recipe id' });
+      return fail(400, { error: 'La recette n’a pas été spécifiée.' });
     }
 
     const recipeId = parseInt(recipe, 10);

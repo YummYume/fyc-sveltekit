@@ -3,13 +3,13 @@ import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 
 export const load = (({ locals }) => {
-  const user = locals.session?.user;
+  const { session } = locals;
 
-  if (!user) {
+  if (!session) {
     throw redirect(303, '/login');
   }
 
   return {
-    user,
+    user: session.user,
   };
 }) satisfies PageServerLoad;

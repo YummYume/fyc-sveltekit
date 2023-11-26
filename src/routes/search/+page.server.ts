@@ -8,7 +8,12 @@ import type { Recipe } from '$lib/server/types.js';
 import type { PageServerLoad } from './$types.js';
 
 export const load = (async ({ url, locals }) => {
-  const { db } = locals;
+  const { db, session } = locals;
+
+  if (!session) {
+    throw redirect(303, '/login');
+  }
+
   const query = url.searchParams.get('q') ?? '';
 
   const getResult = async () => {
@@ -30,7 +35,6 @@ export const load = (async ({ url, locals }) => {
     );
 
     // Remove non-existing recipes
-
     result.recipe = recipes.find((r) => r.slug === result.recipe?.slug) ?? null;
 
     result.suggestions = recipes.reduce((acc, curr) => {
@@ -64,7 +68,7 @@ export const actions = {
     const recipe = JSON.parse(result.choices[0].message.content ?? '');
 
     if (!recipe) {
-      return fail(404, { error: 'Invalid prompt.' });
+      return fail(404, { error: "Votre demande n'est pas valide. Veuillez réessayer." });
     }
 
     try {
@@ -79,10 +83,15 @@ export const actions = {
       });
     } catch (e) {
       if (e instanceof PrismaClientKnownRequestError && e.code === 'P2002') {
-        return fail(400, { error: 'Recipe already exists.' });
+        return fail(400, { error: 'Cette recette existe déjà.' });
       }
 
-      return fail(500, { error: 'Oops... Something went terribly wrong.' });
+      // eslint-disable-next-line no-console
+      console.error('Error creating recipe:', e);
+
+      return fail(500, {
+        error: "Oops... Quelque chose s'est mal passé. Veuillez réessayer plus tard.",
+      });
     }
 
     throw redirect(303, `/recipes/${slugify(recipe.dish)}`);

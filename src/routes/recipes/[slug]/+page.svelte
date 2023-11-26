@@ -21,6 +21,11 @@
   });
 </script>
 
+<svelte:head>
+  <title>{data.recipe.dish}</title>
+  <meta name="description" content={data.recipe.description} />
+</svelte:head>
+
 <div class="flex gap-2 items-center justify-center">
   <form method="POST" action="?/favourite" class="relative" use:enhance>
     <h1 class="h1 first-letter:capitalize">{data.recipe.dish}</h1>
