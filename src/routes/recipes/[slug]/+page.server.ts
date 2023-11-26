@@ -1,10 +1,14 @@
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library.js';
-import { error, fail } from '@sveltejs/kit';
+import { error, fail, redirect } from '@sveltejs/kit';
 
 import type { PageServerLoad } from './$types.js';
 
 export const load = (async ({ locals, params }) => {
-  const { db } = locals;
+  const { db, session } = locals;
+
+  if (!session) {
+    throw redirect(303, '/login');
+  }
 
   try {
     const recipe = await db.recipe.findUniqueOrThrow({
@@ -41,6 +45,10 @@ export const load = (async ({ locals, params }) => {
 export const actions = {
   favourite: async ({ locals, request }) => {
     const { db, session } = locals;
+
+    if (!session) {
+      throw redirect(303, '/login');
+    }
 
     const data = await request.formData();
 

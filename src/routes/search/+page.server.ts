@@ -8,7 +8,12 @@ import type { Recipe } from '$lib/server/types.js';
 import type { PageServerLoad } from './$types.js';
 
 export const load = (async ({ url, locals }) => {
-  const { db } = locals;
+  const { db, session } = locals;
+
+  if (!session) {
+    throw redirect(303, '/login');
+  }
+
   const query = url.searchParams.get('q') ?? '';
 
   const getResult = async () => {

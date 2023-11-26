@@ -6,9 +6,9 @@ import { auth } from '$lib/server/auth';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load = (({ locals }) => {
-  const user = locals.session?.user;
+  const { session } = locals;
 
-  if (user) {
+  if (session) {
     throw redirect(303, '/');
   }
 
@@ -16,7 +16,13 @@ export const load = (({ locals }) => {
 }) satisfies PageServerLoad;
 
 export const actions = {
-  register: async ({ request, cookies }) => {
+  register: async ({ request, cookies, locals }) => {
+    const { session } = locals;
+
+    if (session) {
+      throw redirect(303, '/');
+    }
+
     const data = await request.formData();
     const username = (data.get('username') ?? '') as string;
     const password = (data.get('password') ?? '') as string;
@@ -49,11 +55,11 @@ export const actions = {
           username,
         },
       });
-      const session = await auth.createSession({
+      const newSession = await auth.createSession({
         userId: user.userId,
         attributes: {},
       });
-      const sessionCookie = auth.createSessionCookie(session);
+      const sessionCookie = auth.createSessionCookie(newSession);
 
       cookies.set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes);
     } catch (e) {

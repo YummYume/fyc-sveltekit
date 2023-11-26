@@ -12,17 +12,21 @@ const prompt = `
   Tu limiteras tes réponses à 255 caractères.
 `;
 
-export const POST = (async ({ request }) => {
+export const POST = (async ({ request, locals }) => {
+  if (!locals.session) {
+    return new Response("Vous n'êtes pas connecté.", { status: 401 });
+  }
+
   const body = await request.json();
 
   let messages = body.messages || [];
 
   if (!Array.isArray(messages)) {
-    return new Response('Property "messages" must be an array.', { status: 400 });
+    return new Response('La propriété "messages" doit être un tableau.', { status: 400 });
   }
 
   if (messages.length === 0) {
-    return new Response('Property "messages" must not be empty.', { status: 400 });
+    return new Response('La propriété "messages" ne peut pas être vide.', { status: 400 });
   }
 
   messages = messages

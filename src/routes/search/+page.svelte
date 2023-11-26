@@ -15,6 +15,11 @@
   let isLoading = false;
 </script>
 
+<svelte:head>
+  <title>Recherche de recettes</title>
+  <meta name="description" content="Recherchez une recette sur CookConnect." />
+</svelte:head>
+
 <h1 class="h1">Recherche</h1>
 <div class="max-w-xl mb-4 mx-auto w-full">
   <Search value={data.query} />
