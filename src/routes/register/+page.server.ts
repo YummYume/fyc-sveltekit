@@ -23,15 +23,19 @@ export const actions = {
     const passwordRepeat = (data.get('password-repeat') ?? '') as string;
 
     if (username.length < 3) {
-      return fail(422, { error: 'Username is too short. It must be at least 3 characters long.' });
+      return fail(422, {
+        error: "Votre nom d'utilisateur est trop court. Il doit faire au moins 3 caractères.",
+      });
     }
 
     if (password.length < 8) {
-      return fail(422, { error: 'Password is too short. It must be at least 8 characters long.' });
+      return fail(422, {
+        error: 'Votre mot de passe est trop court. Il doit faire au moins 8 caractères.',
+      });
     }
 
     if (password !== passwordRepeat) {
-      return fail(422, { error: 'Passwords do not match.' });
+      return fail(422, { error: 'Les mots de passe ne correspondent pas.' });
     }
 
     try {
@@ -54,10 +58,15 @@ export const actions = {
       cookies.set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes);
     } catch (e) {
       if (e instanceof LuciaError && e.message === `AUTH_DUPLICATE_KEY_ID`) {
-        return fail(400, { error: 'Username is already taken.' });
+        return fail(400, { error: "Ce nom d'utilisateur est déjà pris." });
       }
 
-      return fail(500, { error: 'Oops... Something went terribly wrong.' });
+      // eslint-disable-next-line no-console
+      console.error('Error registering:', e);
+
+      return fail(500, {
+        error: "Oops... Quelque chose s'est mal passé. Veuillez réessayer plus tard.",
+      });
     }
 
     throw redirect(303, '/');

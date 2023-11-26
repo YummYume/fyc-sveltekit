@@ -7,7 +7,7 @@ import type { Actions } from './$types';
 export const actions = {
   logout: async ({ locals, cookies }) => {
     if (!locals.session) {
-      throw fail(401, { error: 'You are not logged in.' });
+      throw fail(401, { error: "Vous n'êtes pas connecté." });
     }
 
     await auth.invalidateSession(locals.session.sessionId);

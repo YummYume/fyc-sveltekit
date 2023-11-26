@@ -30,7 +30,7 @@ export const load = (async ({ locals, params }) => {
   } catch (e) {
     if (e instanceof PrismaClientKnownRequestError) {
       if (e.code === 'P2025') {
-        throw error(404, 'Recipe not found');
+        throw error(404, "Cette recette n'existe pas.");
       }
     }
 
@@ -47,7 +47,7 @@ export const actions = {
     const recipe = data.get('recipe') as string;
 
     if (!recipe) {
-      return fail(400, { error: 'Wrong recipe id' });
+      return fail(400, { error: 'La recette n’a pas été spécifiée.' });
     }
 
     const recipeId = parseInt(recipe, 10);

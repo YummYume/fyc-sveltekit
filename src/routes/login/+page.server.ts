@@ -22,7 +22,7 @@ export const actions = {
     const password = (data.get('password') ?? '') as string;
 
     if (username.length < 1 || password.length < 1 || password.length > 255) {
-      return fail(400, { error: 'Invalid credentials.' });
+      return fail(400, { error: 'Identifiants invalides.' });
     }
 
     try {
@@ -39,10 +39,15 @@ export const actions = {
         e instanceof LuciaError &&
         (e.message === 'AUTH_INVALID_KEY_ID' || e.message === 'AUTH_INVALID_PASSWORD')
       ) {
-        return fail(400, { error: 'Invalid credentials.' });
+        return fail(400, { error: 'Identifiants invalides.' });
       }
 
-      return fail(500, { error: 'Oops... Something went terribly wrong.' });
+      // eslint-disable-next-line no-console
+      console.error('Error logging in:', e);
+
+      return fail(500, {
+        error: "Oops... Quelque chose s'est mal passé. Veuillez réessayer plus tard.",
+      });
     }
 
     throw redirect(303, '/');
