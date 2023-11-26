@@ -57,6 +57,7 @@ services:
       MARIADB_RANDOM_ROOT_PASSWORD: "yes"
       MARIADB_USER: "${MARIADB_USER:?err}"
       MARIADB_PASSWORD: "${MARIADB_PASSWORD:?err}"
+      MARIADB_DATABASE: app
     healthcheck:
       test: ['CMD', 'mariadb-admin', 'ping', '-h', 'localhost']
       interval: 10s
