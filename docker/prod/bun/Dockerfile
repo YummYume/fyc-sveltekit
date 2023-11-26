@@ -22,6 +22,12 @@ FROM oven/bun:alpine
 
 WORKDIR /home/bun/fyc-svelte-kit
 
+ENV ORIGIN=https://ai.yam-yam.dev
+ENV PORT=3000
+ENV PROTOCOL_HEADER=x-forwarded-proto
+ENV HOST_HEADER=x-forwarded-host
+ENV ADDRESS_HEADER=True-Client-IP
+
 COPY --from=node:20-alpine /usr/lib /usr/lib
 COPY --from=node:20-alpine /usr/local/share /usr/local/share
 COPY --from=node:20-alpine /usr/local/lib /usr/local/lib
@@ -39,6 +45,4 @@ RUN bun install --production --frozen-lockfile && \
 
 USER bun
 
-ENV ORIGIN=https://ai.yam-yam.dev
-
-CMD ["node", "build/index.js"]
+CMD ["node", "-r", "dotenv/config", "build"]
