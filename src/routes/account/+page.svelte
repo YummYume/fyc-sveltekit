@@ -8,11 +8,6 @@
   export let data: PageData;
 </script>
 
-<svelte:head>
-  <title>Mon profil</title>
-  <meta name="description" content="Modifiez votre profil sur CookConnect." />
-</svelte:head>
-
 <h1 class="h1">Profil</h1>
 <div class="container grid mx-auto gap-x-6 gap-y-8 px-3 py-8 md:grid-cols-2">
   <Card>

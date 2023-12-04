@@ -15,22 +15,17 @@
   let isLoading = false;
 </script>
 
-<svelte:head>
-  <title>Recherche de recettes</title>
-  <meta name="description" content="Recherchez une recette sur CookConnect." />
-</svelte:head>
-
 <h1 class="h1">Recherche</h1>
 <div class="max-w-xl mb-4 mx-auto w-full">
   <Search value={data.query} />
 </div>
-<div class="max-w-xl mx-auto space-y-6 w-full">
+<div class="max-w-xl mx-auto space-y-6 w-full" role="region" aria-live="polite">
   {#await data.streamed.result}
     <Loader />
   {:then value}
     {#if !value.recipe}
       <Card>
-        <p class="text-gray-500 text-center">Aucun résulat pour "{data.query}"</p>
+        <p class="text-gray-500 text-center" role="status">Aucun résulat pour "{data.query}"</p>
         <form
           method="POST"
           action="?/generate"
@@ -95,7 +90,7 @@
       </Card>
     {/if}
   {:catch}
-    <p class="text-sm font-light text-red-600">
+    <p class="text-sm font-light text-red-600" role="status">
       Quelque chose s'est mal passé. Veuillez réessayer plus tard.
     </p>
   {/await}

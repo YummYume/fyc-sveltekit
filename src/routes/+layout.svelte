@@ -10,6 +10,7 @@
 
   import { enhance } from '$app/forms';
   import { onNavigate } from '$app/navigation';
+  import { page } from '$app/stores';
 
   export let data: PageData;
 
@@ -29,7 +30,14 @@
 </script>
 
 <svelte:head>
-  <title>CookConnect</title>
+  {#if $page.data.seo?.title}
+    <title>{$page.data.seo.title}</title>
+  {/if}
+  {#if $page.data.seo?.meta}
+    {#each Object.entries($page.data.seo.meta) as [name, content] (name)}
+      <meta {name} {content} />
+    {/each}
+  {/if}
 </svelte:head>
 
 <SvelteToast

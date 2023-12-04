@@ -12,7 +12,15 @@ declare global {
       auth: AuthRequest;
       session: Session | null;
     }
-    // interface PageData {}
+    interface PageData {
+      seo?: {
+        title?: string;
+        meta?: {
+          description?: string;
+          [key: string]: string;
+        };
+      };
+    }
     // interface Platform {}
   }
 

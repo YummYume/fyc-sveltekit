@@ -8,14 +8,6 @@
   export let form: ActionData;
 </script>
 
-<svelte:head>
-  <title>Créer un compte</title>
-  <meta
-    name="description"
-    content="Créez un compte sur CookConnect pour générer et sauvegarder vos recettes préférées."
-  />
-</svelte:head>
-
 <section class="section">
   <Card title="Créer un compte">
     <form action="?/register" method="POST" class="form" use:enhance>

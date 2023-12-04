@@ -12,7 +12,15 @@ export const load = (({ locals }) => {
     throw redirect(303, '/');
   }
 
-  return {};
+  return {
+    seo: {
+      title: 'Créer un compte',
+      meta: {
+        description:
+          'Créez un compte sur CookConnect pour générer et sauvegarder vos recettes préférées.',
+      },
+    },
+  };
 }) satisfies PageServerLoad;
 
 export const actions = {

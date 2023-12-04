@@ -2,6 +2,13 @@
   import { page } from '$app/stores';
 </script>
 
+<svelte:head>
+  <title>{$page.status}</title>
+  <meta name="description" content={$page.error?.message ?? 'Une erreur est survenue.'} />
+  <meta name="robots" content="noindex" />
+  <meta name="googlebot" content="noindex" />
+</svelte:head>
+
 <section>
   <div class="py-8 px-4 mx-auto max-w-screen-xl lg:py-16 lg:px-6">
     <div class="mx-auto max-w-screen-sm text-center">
