@@ -11,5 +11,11 @@ export const load = (({ locals }) => {
 
   return {
     user: session.user,
+    seo: {
+      title: 'Mon profil',
+      meta: {
+        description: 'Modifiez votre profil sur CookConnect.',
+      },
+    },
   };
 }) satisfies PageServerLoad;

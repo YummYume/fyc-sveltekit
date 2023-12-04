@@ -11,7 +11,15 @@ export const load = (({ locals }) => {
     throw redirect(303, '/login');
   }
 
-  return {};
+  return {
+    seo: {
+      title: 'CookConnect',
+      meta: {
+        description:
+          "CookConnect, le moteur de recherche de recettes de cuisine, alimenté par l'intelligence artificielle.",
+      },
+    },
+  };
 }) satisfies PageServerLoad;
 
 export const actions = {

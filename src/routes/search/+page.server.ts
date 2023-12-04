@@ -52,6 +52,12 @@ export const load = (async ({ url, locals }) => {
 
   return {
     query,
+    seo: {
+      title: 'Recherche de recettes',
+      meta: {
+        description: 'Recherchez une recette sur CookConnect.',
+      },
+    },
     streamed: {
       result: getResult(),
     },

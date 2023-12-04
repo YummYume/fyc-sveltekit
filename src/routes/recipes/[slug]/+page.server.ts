@@ -30,6 +30,12 @@ export const load = (async ({ locals, params }) => {
     return {
       isFavourite: !!favourite,
       recipe,
+      seo: {
+        title: recipe.dish,
+        meta: {
+          description: recipe.description,
+        },
+      },
     };
   } catch (e) {
     if (e instanceof PrismaClientKnownRequestError) {
