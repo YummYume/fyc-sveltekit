@@ -55,7 +55,7 @@ export const load = (async ({ locals, url }) => {
   ]);
 
   let prompt = `
-    L'utilisateur consulte actuellement la page "/account/favourites" qui contient la liste de ses recettes favorites.
+    L'utilisateur consulte actuellement la page "Favoris" qui contient la liste de ses recettes favorites.
     Sa question peut donc (ou non) porter sur cette page.
   `;
 
