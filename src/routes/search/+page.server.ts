@@ -58,6 +58,15 @@ export const load = (async ({ url, locals }) => {
         description: 'Recherchez une recette sur CookConnect.',
       },
     },
+    carlosContext: {
+      prompt: `
+        L'utilisateur consulte actuellement la page "Recherche" qui contient la liste des recettes correspondant à sa recherche.
+        Sa question peut donc (ou non) porter sur cette page.
+        Si une recette est trouvée, l'utilisateur peut alors y accéder, sinon, l'utilisateur peut demander à générer la recette.
+        L'utilisateur peut également bénéficier de suggestions de recettes.
+        La recherche de l'utilisateur est : ${query}.
+      `,
+    },
     streamed: {
       result: getResult(),
     },

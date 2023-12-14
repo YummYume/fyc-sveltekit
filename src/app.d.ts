@@ -20,6 +20,9 @@ declare global {
           [key: string]: string;
         };
       };
+      carlosContext?: {
+        prompt: string;
+      };
     }
     // interface Platform {}
   }

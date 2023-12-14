@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { assistantOpen } from '$lib/stores/assistant';
+
   import { page } from '$app/stores';
 </script>
 
@@ -16,7 +18,17 @@
         {$page.status}
       </h1>
       <p class="mb-4 text-lg font-light text-gray-500">
-        {$page.error?.message}
+        {$page.error?.message ?? 'Une erreur est survenue.'}
+      </p>
+      <p class="mb-4 text-lg font-light text-gray-800">
+        Besoin d'aide ? <button
+          type="button"
+          class="text-green-700 hover:text-green-800 focus-visible:text-green-800 transition-colors motion-reduce:transition-none"
+          aria-label="Carlos (ouvrir l'assistant)"
+          on:click={() => {
+            $assistantOpen = true;
+          }}>Carlos</button
+        > peut vous aider.
       </p>
       <a
         href="/"

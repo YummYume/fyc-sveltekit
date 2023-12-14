@@ -17,9 +17,8 @@ model User {
 
   auth_session Session[]
   auth_key     UserKey[]
-  comments     Comment[]
-  scores       Score[]
   favourites   Favourite[]
+  reviews      Review[]
 }
 
 model Session {
@@ -42,51 +41,45 @@ model UserKey {
 }
 
 model Recipe {
-  id          Int    @id @default(autoincrement())
+  id          Int       @id @default(autoincrement())
   description String
-  dish        String @db.Text
+  dish        String    @db.Text
   ingredients Json
   steps       Json
-  slug        String @unique
+  slug        String    @unique
+  createdAt   DateTime  @default(now()) @db.Timestamp(6)
+  updatedAt   DateTime? @updatedAt @db.Timestamp(6)
 
-  comments   Comment[]
-  scores     Score[]
   favourites Favourite[]
+  reviews    Review[]
 
   @@fulltext([dish])
 }
 
-model Comment {
-  id        Int    @id @default(autoincrement())
-  content   String @db.Text
-  user_id   String
-  user      User   @relation(references: [id], fields: [user_id], onDelete: Cascade)
-  recipe_id Int
-  recipe    Recipe @relation(references: [id], fields: [recipe_id], onDelete: Cascade)
+model Review {
+  id        Int       @id @default(autoincrement())
+  rating    Float     @db.Float
+  content   String    @db.Text
+  userId    String
+  user      User      @relation(references: [id], fields: [userId], onDelete: Cascade)
+  recipeId  Int
+  recipe    Recipe    @relation(references: [id], fields: [recipeId], onDelete: Cascade)
+  createdAt DateTime  @default(now()) @db.Timestamp(6)
+  updatedAt DateTime? @updatedAt @db.Timestamp(6)
 
-  @@index([user_id])
-  @@index([recipe_id])
-}
-
-model Score {
-  id        Int    @id @default(autoincrement())
-  score     Int    @db.Int
-  user_id   String
-  user      User   @relation(references: [id], fields: [user_id], onDelete: Cascade)
-  recipe_id Int
-  recipe    Recipe @relation(references: [id], fields: [recipe_id], onDelete: Cascade)
-
-  @@index([user_id])
-  @@index([recipe_id])
+  @@index([userId])
+  @@index([recipeId])
 }
 
 model Favourite {
-  id        Int    @id @default(autoincrement())
-  user_id   String
-  user      User   @relation(references: [id], fields: [user_id], onDelete: Cascade)
-  recipe_id Int
-  recipe    Recipe @relation(references: [id], fields: [recipe_id], onDelete: Cascade)
+  id        Int       @id @default(autoincrement())
+  userId    String
+  user      User      @relation(references: [id], fields: [userId], onDelete: Cascade)
+  recipeId  Int
+  recipe    Recipe    @relation(references: [id], fields: [recipeId], onDelete: Cascade)
+  createdAt DateTime  @default(now()) @db.Timestamp(6)
+  updatedAt DateTime? @updatedAt @db.Timestamp(6)
 
-  @@index([user_id])
-  @@index([recipe_id])
+  @@index([userId])
+  @@index([recipeId])
 }
