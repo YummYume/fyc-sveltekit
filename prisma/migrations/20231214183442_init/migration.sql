@@ -38,6 +38,8 @@ CREATE TABLE `Recipe` (
     `ingredients` JSON NOT NULL,
     `steps` JSON NOT NULL,
     `slug` VARCHAR(191) NOT NULL,
+    `createdAt` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    `updatedAt` TIMESTAMP(6) NULL,
 
     UNIQUE INDEX `Recipe_slug_key`(`slug`),
     FULLTEXT INDEX `Recipe_dish_idx`(`dish`),
@@ -45,37 +47,30 @@ CREATE TABLE `Recipe` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `Comment` (
+CREATE TABLE `Review` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `rating` FLOAT NOT NULL,
     `content` TEXT NOT NULL,
-    `user_id` VARCHAR(191) NOT NULL,
-    `recipe_id` INTEGER NOT NULL,
+    `userId` VARCHAR(191) NOT NULL,
+    `recipeId` INTEGER NOT NULL,
+    `createdAt` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    `updatedAt` TIMESTAMP(6) NULL,
 
-    INDEX `Comment_user_id_idx`(`user_id`),
-    INDEX `Comment_recipe_id_idx`(`recipe_id`),
-    PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- CreateTable
-CREATE TABLE `Score` (
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `score` INTEGER NOT NULL,
-    `user_id` VARCHAR(191) NOT NULL,
-    `recipe_id` INTEGER NOT NULL,
-
-    INDEX `Score_user_id_idx`(`user_id`),
-    INDEX `Score_recipe_id_idx`(`recipe_id`),
+    INDEX `Review_userId_idx`(`userId`),
+    INDEX `Review_recipeId_idx`(`recipeId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
 CREATE TABLE `Favourite` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `user_id` VARCHAR(191) NOT NULL,
-    `recipe_id` INTEGER NOT NULL,
+    `userId` VARCHAR(191) NOT NULL,
+    `recipeId` INTEGER NOT NULL,
+    `createdAt` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    `updatedAt` TIMESTAMP(6) NULL,
 
-    INDEX `Favourite_user_id_idx`(`user_id`),
-    INDEX `Favourite_recipe_id_idx`(`recipe_id`),
+    INDEX `Favourite_userId_idx`(`userId`),
+    INDEX `Favourite_recipeId_idx`(`recipeId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -86,19 +81,13 @@ ALTER TABLE `Session` ADD CONSTRAINT `Session_user_id_fkey` FOREIGN KEY (`user_i
 ALTER TABLE `UserKey` ADD CONSTRAINT `UserKey_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Comment` ADD CONSTRAINT `Comment_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `Review` ADD CONSTRAINT `Review_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Comment` ADD CONSTRAINT `Comment_recipe_id_fkey` FOREIGN KEY (`recipe_id`) REFERENCES `Recipe`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `Review` ADD CONSTRAINT `Review_recipeId_fkey` FOREIGN KEY (`recipeId`) REFERENCES `Recipe`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Score` ADD CONSTRAINT `Score_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `Favourite` ADD CONSTRAINT `Favourite_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Score` ADD CONSTRAINT `Score_recipe_id_fkey` FOREIGN KEY (`recipe_id`) REFERENCES `Recipe`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `Favourite` ADD CONSTRAINT `Favourite_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `Favourite` ADD CONSTRAINT `Favourite_recipe_id_fkey` FOREIGN KEY (`recipe_id`) REFERENCES `Recipe`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `Favourite` ADD CONSTRAINT `Favourite_recipeId_fkey` FOREIGN KEY (`recipeId`) REFERENCES `Recipe`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;

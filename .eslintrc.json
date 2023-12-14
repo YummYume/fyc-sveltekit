@@ -45,7 +45,13 @@
     "project": ["./tsconfig.json"],
     "sourceType": "module"
   },
-  "plugins": ["@typescript-eslint", "jsdoc", "import", "import-no-duplicates-prefix-resolved-path", "prettier"],
+  "plugins": [
+    "@typescript-eslint",
+    "jsdoc",
+    "import",
+    "import-no-duplicates-prefix-resolved-path",
+    "prettier"
+  ],
   "root": true,
   "rules": {
     "@typescript-eslint/no-throw-literal": "off",
@@ -88,7 +94,16 @@
           "caseInsensitive": false,
           "order": "asc"
         },
-        "groups": ["external", "builtin", "internal", "sibling", "parent", "index", "object", "type"],
+        "groups": [
+          "external",
+          "builtin",
+          "internal",
+          "sibling",
+          "parent",
+          "index",
+          "object",
+          "type"
+        ],
         "newlines-between": "always",
         "pathGroups": [
           {
@@ -113,7 +128,8 @@
     "one-var": ["error", "never"],
     "prefer-arrow-callback": ["off"],
     "prettier/prettier": ["warn"],
-    "no-restricted-syntax": ["off"]
+    "no-restricted-syntax": ["off"],
+    "@typescript-eslint/naming-convention": ["off"]
   },
   "settings": {
     "import/parsers": {

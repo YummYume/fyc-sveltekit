@@ -2,9 +2,12 @@
   import '../app.scss';
 
   import { SvelteToast } from '@zerodevx/svelte-toast';
+  import { blur } from 'svelte/transition';
 
   import Assistant from '$lib/components/Assistant.svelte';
+  import { assistantOpen } from '$lib/stores/assistant';
   import UserCircle from '$lib/svg/UserCircle.svelte';
+  import { prefersReducedMotion } from '$lib/utils/preferences';
 
   import type { PageData } from './$types';
 
@@ -13,6 +16,8 @@
   import { page } from '$app/stores';
 
   export let data: PageData;
+
+  let assistantButton: HTMLButtonElement | null = null;
 
   onNavigate((navigation) => {
     if (!document.startViewTransition) {
@@ -73,7 +78,14 @@
             Se déconnecter
           </button>
         </form>
-        <a aria-label="Profil" href="/account">
+        <a
+          class="
+            text-gray-800 hover:bg-gray-50 focus:ring-4 focus:ring-gray-300 font-medium
+            rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 mr-2 focus:outline-none
+          "
+          href="/account/favourites">Mes favoris</a
+        >
+        <a aria-label="Mon profil" href="/account">
           <UserCircle />
         </a>
       </div>
@@ -82,8 +94,44 @@
 </nav>
 <main class="flex flex-col grow p-5">
   <slot />
+
   {#if data.user}
-    <Assistant />
+    <div class="bottom-0 left-0 p-2.5 fixed lg:p-5">
+      <div class="relative">
+        {#key $assistantOpen}
+          <button
+            aria-label="Discuter avec l'assistant personnel"
+            aria-haspopup="dialog"
+            aria-expanded={$assistantOpen ? 'true' : 'false'}
+            class="absolute bottom-0 h-10 w-10 sm:h-20 sm:w-20 bg-slate-400 rounded-full"
+            bind:this={assistantButton}
+            on:click={() => {
+              $assistantOpen = true;
+            }}
+            transition:blur={{ amount: 10, duration: prefersReducedMotion() ? 0 : 1000 }}
+          >
+            <enhanced:img
+              src="$lib/assets/carlos.png"
+              alt="Assistant personnel Carlos"
+              class="rounded-full shadow-2xl"
+            />
+          </button>
+        {/key}
+
+        <Assistant
+          open={$assistantOpen}
+          on:close={() => {
+            $assistantOpen = false;
+
+            requestAnimationFrame(() => {
+              if (assistantButton) {
+                assistantButton.focus();
+              }
+            });
+          }}
+        />
+      </div>
+    </div>
   {/if}
 </main>
 

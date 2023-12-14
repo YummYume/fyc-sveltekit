@@ -16,9 +16,11 @@
 </script>
 
 <h1 class="h1">Recherche</h1>
+
 <div class="max-w-xl mb-4 mx-auto w-full">
   <Search value={data.query} />
 </div>
+
 <div class="max-w-xl mx-auto space-y-6 w-full" role="region" aria-live="polite">
   {#await data.streamed.result}
     <Loader />
@@ -90,12 +92,12 @@
       </Card>
     {/if}
   {:catch}
-    <p class="text-sm font-light text-red-600" role="status">
+    <p class="text-sm font-light text-red-600 text-center" role="status">
       Quelque chose s'est mal passé. Veuillez réessayer plus tard.
     </p>
   {/await}
 
   {#if form?.error}
-    <p class="text-sm font-light text-red-600">{form.error}</p>
+    <p class="text-sm font-light text-red-600 text-center">{form.error}</p>
   {/if}
 </div>
