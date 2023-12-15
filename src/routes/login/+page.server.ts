@@ -9,7 +9,7 @@ export const load = (({ locals }) => {
   const { session } = locals;
 
   if (session) {
-    throw redirect(303, '/');
+    redirect(303, '/');
   }
 
   return {
@@ -28,7 +28,7 @@ export const actions = {
     const { session } = locals;
 
     if (session) {
-      throw redirect(303, '/');
+      redirect(303, '/');
     }
 
     const data = await request.formData();
@@ -47,7 +47,10 @@ export const actions = {
       });
       const sessionCookie = auth.createSessionCookie(newSession);
 
-      cookies.set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes);
+      cookies.set(sessionCookie.name, sessionCookie.value, {
+        ...sessionCookie.attributes,
+        path: sessionCookie.attributes.path ?? '/',
+      });
     } catch (e) {
       if (
         e instanceof LuciaError &&
@@ -64,6 +67,6 @@ export const actions = {
       });
     }
 
-    throw redirect(303, '/');
+    redirect(303, '/');
   },
 } satisfies Actions;

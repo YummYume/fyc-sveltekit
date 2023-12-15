@@ -22,7 +22,7 @@
 </div>
 
 <div class="max-w-xl mx-auto space-y-6 w-full" role="region" aria-live="polite">
-  {#await data.streamed.result}
+  {#await data.result}
     <Loader />
   {:then value}
     {#if !value.recipe}

@@ -8,7 +8,7 @@ export const load = (({ locals }) => {
   const { session } = locals;
 
   if (!session) {
-    throw redirect(303, '/login');
+    redirect(303, '/login');
   }
 
   return {
@@ -38,8 +38,11 @@ export const actions = {
 
     const sessionCookie = auth.createSessionCookie(null);
 
-    cookies.set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes);
+    cookies.set(sessionCookie.name, sessionCookie.value, {
+      ...sessionCookie.attributes,
+      path: sessionCookie.attributes.path ?? '/',
+    });
 
-    throw redirect(303, '/');
+    redirect(303, '/');
   },
 } satisfies Actions;

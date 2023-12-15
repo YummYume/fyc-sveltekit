@@ -6,7 +6,7 @@ export const load = (({ locals }) => {
   const { session } = locals;
 
   if (!session) {
-    throw redirect(303, '/login');
+    redirect(303, '/login');
   }
 
   return {

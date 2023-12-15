@@ -9,7 +9,7 @@ export const load = (async ({ locals, params }) => {
   const { db, session } = locals;
 
   if (!session) {
-    throw redirect(303, '/login');
+    redirect(303, '/login');
   }
 
   try {
@@ -92,7 +92,7 @@ export const load = (async ({ locals, params }) => {
   } catch (e) {
     if (e instanceof PrismaClientKnownRequestError) {
       if (e.code === 'P2025') {
-        throw error(404, "Cette recette n'existe pas.");
+        error(404, "Cette recette n'existe pas.");
       }
     }
 
@@ -105,7 +105,7 @@ export const actions = {
     const { db, session } = locals;
 
     if (!session) {
-      throw redirect(303, '/login');
+      redirect(303, '/login');
     }
 
     // Get favourite
@@ -154,7 +154,7 @@ export const actions = {
     const { db, session } = locals;
 
     if (!session) {
-      throw redirect(303, '/login');
+      redirect(303, '/login');
     }
 
     const body = await request.formData();
@@ -237,7 +237,7 @@ export const actions = {
     const { db, session } = locals;
 
     if (!session) {
-      throw redirect(303, '/login');
+      redirect(303, '/login');
     }
 
     const formData = await request.formData();
@@ -285,7 +285,7 @@ export const actions = {
     const { db, session } = locals;
 
     if (!session) {
-      throw redirect(303, '/login');
+      redirect(303, '/login');
     }
 
     const formData = await request.formData();

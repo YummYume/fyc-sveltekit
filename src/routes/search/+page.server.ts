@@ -11,7 +11,7 @@ export const load = (async ({ url, locals }) => {
   const { db, session } = locals;
 
   if (!session) {
-    throw redirect(303, '/login');
+    redirect(303, '/login');
   }
 
   const query = url.searchParams.get('q') ?? '';
@@ -37,7 +37,7 @@ export const load = (async ({ url, locals }) => {
     // Remove non-existing recipes
     result.recipe = recipes.find((r) => r.slug === result.recipe?.slug) ?? null;
 
-    result.suggestions = recipes.reduce((acc, curr) => {
+    result.suggestions = recipes.reduce<Recipe[]>((acc, curr) => {
       const suggestion = recipes.find((r) => r.slug === curr.slug);
 
       if (suggestion) {
@@ -45,7 +45,7 @@ export const load = (async ({ url, locals }) => {
       }
 
       return acc;
-    }, [] as Recipe[]);
+    }, []);
 
     return result;
   };
@@ -67,9 +67,7 @@ export const load = (async ({ url, locals }) => {
         La recherche de l'utilisateur est : ${query}.
       `,
     },
-    streamed: {
-      result: getResult(),
-    },
+    result: getResult(),
   };
 }) satisfies PageServerLoad;
 
@@ -109,6 +107,6 @@ export const actions = {
       });
     }
 
-    throw redirect(303, `/recipes/${slugify(recipe.dish)}`);
+    redirect(303, `/recipes/${slugify(recipe.dish)}`);
   },
 };

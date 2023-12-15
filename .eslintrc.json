@@ -129,7 +129,8 @@
     "prefer-arrow-callback": ["off"],
     "prettier/prettier": ["warn"],
     "no-restricted-syntax": ["off"],
-    "@typescript-eslint/naming-convention": ["off"]
+    "@typescript-eslint/naming-convention": ["off"],
+    "consistent-return": ["off"]
   },
   "settings": {
     "import/parsers": {
