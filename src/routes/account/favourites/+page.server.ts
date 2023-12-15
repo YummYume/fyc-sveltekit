@@ -8,7 +8,7 @@ export const load = (async ({ locals, url }) => {
   const { db, session } = locals;
 
   if (!session) {
-    throw redirect(303, '/login');
+    redirect(303, '/login');
   }
 
   const page = parseInt(url.searchParams.get('page') ?? '1', 10);
