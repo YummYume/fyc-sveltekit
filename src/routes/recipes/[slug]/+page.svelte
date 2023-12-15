@@ -70,6 +70,13 @@
   } else if (form?.removeReviewError) {
     toasts.error(form.removeReviewError);
   }
+
+  const clipBoard = () => {
+    let shoppingList = data.recipe.shoppingList as string[];
+    navigator.clipboard.writeText(shoppingList.join('\n'));
+  };
+
+  const postOnSocialMedia = (media: string) => {};
 </script>
 
 <div class="flex gap-2 items-center justify-center">
@@ -106,6 +113,7 @@
       <span class="text-gray-500 text-sm">Note des utilisateurs</span>
       <span class="text-gray-900 text-lg font-semibold">{data.reviewAverage}</span>
       <StarFull class="w-5 h-5 text-yellow-500" />
+      <button on:click={clipBoard}>clipBoard</button>
     </div>
   {/if}
 </div>

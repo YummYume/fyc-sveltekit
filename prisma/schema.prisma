@@ -41,14 +41,15 @@ model UserKey {
 }
 
 model Recipe {
-  id          Int       @id @default(autoincrement())
-  description String
-  dish        String    @db.Text
-  ingredients Json
-  steps       Json
-  slug        String    @unique
-  createdAt   DateTime  @default(now()) @db.Timestamp(6)
-  updatedAt   DateTime? @updatedAt @db.Timestamp(6)
+  id           Int       @id @default(autoincrement())
+  description  String
+  dish         String    @db.Text
+  shoppingList Json
+  ingredients  Json
+  steps        Json
+  slug         String    @unique
+  createdAt    DateTime  @default(now()) @db.Timestamp(6)
+  updatedAt    DateTime? @updatedAt @db.Timestamp(6)
 
   favourites Favourite[]
   reviews    Review[]

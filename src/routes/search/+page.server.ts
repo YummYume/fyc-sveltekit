@@ -99,9 +99,6 @@ export const actions = {
         return fail(400, { error: 'Cette recette existe déjà.' });
       }
 
-      // eslint-disable-next-line no-console
-      console.error('Error creating recipe:', e);
-
       return fail(500, {
         error: "Oops... Quelque chose s'est mal passé. Veuillez réessayer plus tard.",
       });
