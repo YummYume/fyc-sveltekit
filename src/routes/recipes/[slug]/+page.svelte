@@ -14,6 +14,10 @@
   import type { Review, User } from '@prisma/client';
 
   import { enhance } from '$app/forms';
+  import Reddit from '$lib/svg/Reddit.svelte';
+  import Facebook from '$lib/svg/Facebook.svelte';
+  import X from '$lib/svg/X.svelte';
+  import Clipboard from '$lib/svg/Clipboard.svelte';
 
   export let data: PageData;
   export let form: ActionData;
@@ -76,7 +80,21 @@
     navigator.clipboard.writeText(shoppingList.join('\n'));
   };
 
-  const postOnSocialMedia = (media: string) => {};
+  const postOnSocialMedia = () => {
+    window.open(
+      `https://www.facebook.com/sharer/sharer.php?u=${window.location.href}`,
+      'facebook-share-dialog',
+      'width=626,height=436'
+    );
+  };
+
+  const postOnReddit = () => {
+    window.open(
+      `https://www.reddit.com/submit?url=${window.location.href}&title=${data.recipe.dish}`,
+      'reddit-share-dialog',
+      'width=626,height=436'
+    );
+  };
 </script>
 
 <div class="flex gap-2 items-center justify-center">
@@ -113,9 +131,12 @@
       <span class="text-gray-500 text-sm">Note des utilisateurs</span>
       <span class="text-gray-900 text-lg font-semibold">{data.reviewAverage}</span>
       <StarFull class="w-5 h-5 text-yellow-500" />
-      <button on:click={clipBoard}>clipBoard</button>
     </div>
   {/if}
+  <button on:click={clipBoard}><Clipboard/></button>
+  <button on:click={postOnSocialMedia}><Facebook/></button>
+  <button on:click={postOnReddit}><Reddit/></button>
+  <button on:click={postOnReddit}><X/></button>
 </div>
 
 <section class="container mx-auto">
