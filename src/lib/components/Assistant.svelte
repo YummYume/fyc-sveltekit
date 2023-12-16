@@ -207,19 +207,20 @@
     aria-modal="false"
     aria-label="Discussion avec l'assistant personnel"
     aria-describedby="carlos-description"
-    class="absolute bottom-0 max-w-xl w-screen"
+    class="absolute bottom-0 max-w-xl w-[calc(100vw-1.25rem)]"
     transition:fly={{ duration: prefersReducedMotion() ? 0 : 1000, y: 575, easing: bounceOut }}
   >
     <Card innerContainerClass="min-h-[50vh] flex flex-col">
-      <div class="flex justify-between items-start p-2 space-y-4 md:space-y-6 sm:p-4">
-        <div class="flex gap-2 items-center">
+      <div class="flex justify-between items-start">
+        <div class="flex gap-2.5 items-center">
           <enhanced:img
             src="$lib/assets/carlos.png"
             alt="Assistant personnel Carlos"
-            class="rounded-full h-20 w-20"
+            class="rounded-full h-10 w-10 lg:h-20 lg:w-20"
           />
           <div class="flex gap-1 items-center">
             <div class="h-3 w-3 bg-primary-600 rounded-full shadow" />
+
             {#key carlosStatus}
               <p
                 in:fade={{ duration: prefersReducedMotion() ? 0 : 500 }}
@@ -231,36 +232,68 @@
             {/key}
           </div>
         </div>
-        <button
-          type="button"
-          aria-label="Fermer la discussion"
-          on:click={() => {
-            dispatch('close');
-          }}
-        >
-          <svg
-            class="w-6 h-6 text-gray-500"
-            aria-hidden="true"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 14 14"
+        <div class="flex gap-2.5">
+          {#if (messages.length || $page.data.carlosContext?.prompt) && messages.length}
+            <button
+              aria-label="Supprimer les messages"
+              type="button"
+              disabled={carlosStatus !== 'available'}
+              class="btn | p-2.5"
+              aria-controls="message-container"
+              on:click={clearMessages}
+            >
+              <svg
+                class="w-5 h-5"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 18 20"
+              >
+                <path
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M16 1v5h-5M2 19v-5h5m10-4a8 8 0 0 1-14.947 3.97M1 10a8 8 0 0 1 14.947-3.97"
+                />
+              </svg>
+            </button>
+          {/if}
+
+          <button
+            type="button"
+            aria-label="Fermer la discussion"
+            on:click={() => {
+              dispatch('close');
+            }}
           >
-            <path
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
-            />
-          </svg>
-        </button>
+            <svg
+              class="w-5 h-5 text-gray-500"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 14 14"
+            >
+              <path
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
+              />
+            </svg>
+          </button>
+        </div>
       </div>
       <div
-        class="max-h-[50vh] overflow-auto sm:p-1 p-0.5 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-primary-600 scrollbar-thumb-rounded-full scrollbar-track-rounded-full flex-grow"
+        class="
+          max-h-[33vh] overflow-auto sm:p-1 p-0.5 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-primary-600
+          scrollbar-thumb-rounded-full scrollbar-track-rounded-full flex-grow
+        "
       >
         {#if messages.length === 0}
           <div
-            class="max-w-[25ch] mb-3 text-gray-500 sm:max-w-sm md:max-w-md lg:max-w-lg flex flex-col gap-2"
+            class="mb-3 text-gray-500 sm:max-w-sm md:max-w-md lg:max-w-lg flex flex-col gap-2"
             id="carlos-description"
             in:fade={{ duration: prefersReducedMotion() ? 0 : 500 }}
           >
@@ -271,6 +304,7 @@
             </p>
           </div>
         {/if}
+
         <ul
           id="message-container"
           aria-label="Conversation avec l'assistant personnel"
@@ -291,11 +325,13 @@
               in:scale={{ duration: prefersReducedMotion() ? 0 : 500 }}
             >
               <div
-                class="rounded-lg p-2.5"
-                class:bg-gray-100={message.role === 'user'}
+                class="rounded-lg px-4 py-2.5"
+                class:bg-primary-700={message.role === 'user'}
+                class:font-medium={message.role === 'user'}
+                class:text-white={message.role === 'user'}
                 class:bg-gray-200={message.role === 'assistant'}
               >
-                <p class="text-gray-800" id={messageId}>
+                <p id={messageId}>
                   {message.content}
                 </p>
               </div>
@@ -303,58 +339,53 @@
           {/each}
         </ul>
       </div>
-      {#if messages.length > 0 || $page.data.carlosContext?.prompt}
-        <div class="grid grid-cols-2 gap-2">
-          <div class="text-sm text-gray-500">
-            {#if $page.data.carlosContext?.prompt}
-              <p>Carlos a accès à cette page et peut vous aider à trouver ce que vous cherchez.</p>
-            {/if}
-          </div>
-          <div>
-            {#if messages.length > 0}
-              <button
-                type="button"
-                disabled={carlosStatus !== 'available'}
-                class="btn text-sm"
-                aria-controls="message-container"
-                on:click={clearMessages}
-              >
-                Supprimer les messages
-              </button>
-            {/if}
-          </div>
-        </div>
-      {/if}
       <form class="form" on:submit|preventDefault={handleFormSubmit}>
         <div>
-          <label for="carlos-question">
+          <label class="text-sm font-medium text-gray-900" for="carlos-question">
             {#if messages.length > 0 && messages.some((message) => message.role === 'user')}
               Ma réponse
             {:else}
               Ma question
             {/if}
           </label>
-          <div class="gap-3 grid sm:flex">
+          <div class="relative">
             <input
-              bind:this={chatInput}
-              bind:value={inputValue}
-              type="text"
-              name="question"
+              class="!p-4"
               id="carlos-question"
               maxlength="255"
+              name="question"
               required
+              type="text"
+              bind:this={chatInput}
+              bind:value={inputValue}
             />
             <button
-              type="submit"
-              class="btn | sm:w-fit disabled:saturate-50 bg-primary-600 enabled:hover:bg-primary-700 disabled:bg-primary-400"
               aria-controls="message-container"
+              aria-label="Envoyer"
+              class="btn | p-2.5 absolute end-2.5 bottom-2.5"
               disabled={carlosStatus !== 'available' || inputValue.trim() === ''}
+              type="submit"
             >
-              Envoyer
+              <svg
+                class="w-[18px] h-[18px]"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="currentColor"
+                viewBox="0 0 18 20"
+              >
+                <path
+                  d="m17.914 18.594-8-18a1 1 0 0 0-1.828 0l-8 18a1 1 0 0 0 1.157 1.376L8 18.281V9a1 1 0 0 1 2 0v9.281l6.758 1.689a1 1 0 0 0 1.156-1.376Z"
+                />
+              </svg>
             </button>
           </div>
         </div>
       </form>
+      {#if $page.data.carlosContext?.prompt}
+        <p class="text-xs text-gray-500">
+          Carlos a accès à cette page et peut vous aider à trouver ce que vous cherchez.
+        </p>
+      {/if}
     </Card>
   </div>
 {/if}
