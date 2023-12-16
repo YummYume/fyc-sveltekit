@@ -18,6 +18,7 @@
   import type { Review, User } from '@prisma/client';
 
   import { enhance } from '$app/forms';
+  import { page } from '$app/stores';
 
   export let data: PageData;
   export let form: ActionData;
@@ -34,9 +35,9 @@
   let noMoreReviews = false;
 
   const shoppingList = (data.recipe.shoppingList as string[]).join('\n');
-  const facebook = `https://www.facebook.com/sharer/sharer.php?u=${window.location.href}&quote=${shoppingList}&hashtag=recette,listedecourse`;
-  const reddit = `https://www.reddit.com/submit?url=${window.location.href}&title=${data.recipe.dish}&text=${shoppingList}`;
-  const twitter = `https://twitter.com/intent/tweet?url=${window.location.href}&text=${shoppingList}&hashtags=recette,listedecourse`;
+  const facebook = `https://www.facebook.com/sharer/sharer.php?u=${$page.url}&quote=${shoppingList}&hashtag=recette,listedecourse`;
+  const reddit = `https://www.reddit.com/submit?url=${$page.url}&title=${data.recipe.dish}&text=${shoppingList}`;
+  const twitter = `https://twitter.com/intent/tweet?url=${$page.url}&text=${shoppingList}&hashtags=recette,listedecourse`;
 
   // Computed
   $: starKey = data.isFavourite ? 'full' : 'empty';
@@ -83,6 +84,7 @@
   const clipBoard = () => {
     navigator.clipboard.writeText(shoppingList);
   };
+
 </script>
 
 <div class="flex gap-2 items-center justify-center">
@@ -121,10 +123,18 @@
       <StarFull class="w-5 h-5 text-yellow-500" />
     </div>
   {/if}
-  <a href={facebook} target="_blank" rel="external"><Facebook /></a>
-  <a href={reddit} target="_blank" rel="external"><Reddit /></a>
-  <a href={twitter} target="_blank" rel="external"><Twitter /></a>
-  <button on:click={clipBoard}><Clipboard /></button>
+  <a href={facebook} target="_blank" rel="noopener noreferrer" aria-label="Partager sur Facebook"
+    ><Facebook /></a
+  >
+  <a href={reddit} target="_blank" rel="noopener noreferrer" aria-label="Partager sur Reddit"
+    ><Reddit /></a
+  >
+  <a href={twitter} target="_blank" rel="noopener noreferrer" aria-label="Partager sur Twitter (X)"
+    ><Twitter /></a
+  >
+  <button type="button" on:click={clipBoard} aria-label="Copier dans le presse-papier"
+    ><Clipboard /></button
+  >
 </div>
 
 <section class="container mx-auto">

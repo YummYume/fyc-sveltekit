@@ -1,11 +1,11 @@
 <svg
   class="w-7 h-7"
   fill="#000000"
-  id="Capa_1"
   xmlns="http://www.w3.org/2000/svg"
   xmlns:xlink="http://www.w3.org/1999/xlink"
   viewBox="0 0 606.816 606.816"
   xml:space="preserve"
+  {...$$restProps}
 >
   <g>
     <g>
