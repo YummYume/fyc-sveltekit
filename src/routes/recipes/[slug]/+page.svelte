@@ -3,9 +3,13 @@
   import { crossfade, fade } from 'svelte/transition';
 
   import Card from '$lib/components/Card.svelte';
+  import Clipboard from '$lib/svg/Clipboard.svelte';
+  import Facebook from '$lib/svg/Facebook.svelte';
+  import Reddit from '$lib/svg/Reddit.svelte';
   import Spinner from '$lib/svg/Spinner.svelte';
   import StarEmpty from '$lib/svg/StarEmpty.svelte';
   import StarFull from '$lib/svg/StarFull.svelte';
+  import Twitter from '$lib/svg/Twitter.svelte';
   import { infiniteScrollSubmit } from '$lib/utils/infinite-scroll';
   import { prefersReducedMotion } from '$lib/utils/preferences';
   import { toasts } from '$lib/utils/toats';
@@ -14,10 +18,6 @@
   import type { Review, User } from '@prisma/client';
 
   import { enhance } from '$app/forms';
-  import Reddit from '$lib/svg/Reddit.svelte';
-  import Facebook from '$lib/svg/Facebook.svelte';
-  import X from '$lib/svg/X.svelte';
-  import Clipboard from '$lib/svg/Clipboard.svelte';
 
   export let data: PageData;
   export let form: ActionData;
@@ -32,6 +32,11 @@
   let reviews: (Review & { user: User })[] = [];
   let loading = false;
   let noMoreReviews = false;
+
+  const shoppingList = (data.recipe.shoppingList as string[]).join('\n');
+  const facebook = `https://www.facebook.com/sharer/sharer.php?u=${window.location.href}&quote=${shoppingList}&hashtag=recette,listedecourse`;
+  const reddit = `https://www.reddit.com/submit?url=${window.location.href}&title=${data.recipe.dish}&text=${shoppingList}`;
+  const twitter = `https://twitter.com/intent/tweet?url=${window.location.href}&text=${shoppingList}&hashtags=recette,listedecourse`;
 
   // Computed
   $: starKey = data.isFavourite ? 'full' : 'empty';
@@ -76,24 +81,7 @@
   }
 
   const clipBoard = () => {
-    let shoppingList = data.recipe.shoppingList as string[];
-    navigator.clipboard.writeText(shoppingList.join('\n'));
-  };
-
-  const postOnSocialMedia = () => {
-    window.open(
-      `https://www.facebook.com/sharer/sharer.php?u=${window.location.href}`,
-      'facebook-share-dialog',
-      'width=626,height=436'
-    );
-  };
-
-  const postOnReddit = () => {
-    window.open(
-      `https://www.reddit.com/submit?url=${window.location.href}&title=${data.recipe.dish}`,
-      'reddit-share-dialog',
-      'width=626,height=436'
-    );
+    navigator.clipboard.writeText(shoppingList);
   };
 </script>
 
@@ -133,10 +121,10 @@
       <StarFull class="w-5 h-5 text-yellow-500" />
     </div>
   {/if}
-  <button on:click={clipBoard}><Clipboard/></button>
-  <button on:click={postOnSocialMedia}><Facebook/></button>
-  <button on:click={postOnReddit}><Reddit/></button>
-  <button on:click={postOnReddit}><X/></button>
+  <a href={facebook} target="_blank" rel="external"><Facebook /></a>
+  <a href={reddit} target="_blank" rel="external"><Reddit /></a>
+  <a href={twitter} target="_blank" rel="external"><Twitter /></a>
+  <button on:click={clipBoard}><Clipboard /></button>
 </div>
 
 <section class="container mx-auto">

@@ -47,7 +47,7 @@ export const MAKE_RECIPE = `
   If you cannot find a recipe, output "null" and ignore the rest of my message.
   Otherwise give me recipe, and format your output in JSON like this:
   {
-    "description": string(255),
+    "description": string,
     "dish": string,
     "ingredients": string[],
     "shoppingList": string[], 

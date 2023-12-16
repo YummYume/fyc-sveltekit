@@ -42,7 +42,7 @@ model UserKey {
 
 model Recipe {
   id           Int       @id @default(autoincrement())
-  description  String
+  description  String    @db.Text
   dish         String    @db.Text
   shoppingList Json
   ingredients  Json
