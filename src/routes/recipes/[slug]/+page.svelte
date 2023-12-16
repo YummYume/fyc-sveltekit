@@ -3,9 +3,13 @@
   import { crossfade, fade } from 'svelte/transition';
 
   import Card from '$lib/components/Card.svelte';
+  import Clipboard from '$lib/svg/Clipboard.svelte';
+  import Facebook from '$lib/svg/Facebook.svelte';
+  import Reddit from '$lib/svg/Reddit.svelte';
   import Spinner from '$lib/svg/Spinner.svelte';
   import StarEmpty from '$lib/svg/StarEmpty.svelte';
   import StarFull from '$lib/svg/StarFull.svelte';
+  import Twitter from '$lib/svg/Twitter.svelte';
   import { infiniteScrollSubmit } from '$lib/utils/infinite-scroll';
   import { prefersReducedMotion } from '$lib/utils/preferences';
   import { toasts } from '$lib/utils/toats';
@@ -14,6 +18,7 @@
   import type { Review, User } from '@prisma/client';
 
   import { enhance } from '$app/forms';
+  import { page } from '$app/stores';
 
   export let data: PageData;
   export let form: ActionData;
@@ -28,6 +33,11 @@
   let reviews: (Review & { user: User })[] = [];
   let loading = false;
   let noMoreReviews = false;
+
+  const shoppingList = (data.recipe.shoppingList as string[]).join('\n');
+  const facebook = `https://www.facebook.com/sharer/sharer.php?u=${$page.url}&quote=${shoppingList}&hashtag=recette,listedecourse`;
+  const reddit = `https://www.reddit.com/submit?url=${$page.url}&title=${data.recipe.dish}&text=${shoppingList}`;
+  const twitter = `https://twitter.com/intent/tweet?url=${$page.url}&text=${shoppingList}&hashtags=recette,listedecourse`;
 
   // Computed
   $: starKey = data.isFavourite ? 'full' : 'empty';
@@ -70,6 +80,11 @@
   } else if (form?.removeReviewError) {
     toasts.error(form.removeReviewError);
   }
+
+  const clipBoard = () => {
+    navigator.clipboard.writeText(shoppingList);
+  };
+
 </script>
 
 <div class="flex gap-2 items-center justify-center">
@@ -108,6 +123,18 @@
       <StarFull class="w-5 h-5 text-yellow-500" />
     </div>
   {/if}
+  <a href={facebook} target="_blank" rel="noopener noreferrer" aria-label="Partager sur Facebook"
+    ><Facebook /></a
+  >
+  <a href={reddit} target="_blank" rel="noopener noreferrer" aria-label="Partager sur Reddit"
+    ><Reddit /></a
+  >
+  <a href={twitter} target="_blank" rel="noopener noreferrer" aria-label="Partager sur Twitter (X)"
+    ><Twitter /></a
+  >
+  <button type="button" on:click={clipBoard} aria-label="Copier dans le presse-papier"
+    ><Clipboard /></button
+  >
 </div>
 
 <section class="container mx-auto">

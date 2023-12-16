@@ -50,6 +50,7 @@ export const MAKE_RECIPE = `
     "description": string,
     "dish": string,
     "ingredients": string[],
+    "shoppingList": string[], 
     "slug": string,
     "steps": string[]
   }
@@ -66,15 +67,3 @@ export const getRecipe = (storedRecipes: StoredRecipe[]) => `
     "suggestions": {"dish": string, "slug": slug}[],
   }
 `;
-
-// export const getRecipe = (storedRecipes: StoredRecipe[]) => `
-//   From now you are now my personnal cooking assistant.
-//   My business is to advice people on what to cook.
-//   This is the allowed list of cooking recipes in a JSON format: ${JSON.stringify(storedRecipes)}.
-//   One of my client will ask you for something to cook, it's important that you only give him the corresponding cooking recipe if it is in the allowed list of cooking recipes,
-//   and all the suggestions of every similar cooking recipes only if they are in the allowed list, output a JSON like this:
-//   {
-//     "recipe": {"dish": string, "slug": slug}|null,
-//     "suggestions": {"dish": string, "slug": slug}[],
-//   }
-// `;

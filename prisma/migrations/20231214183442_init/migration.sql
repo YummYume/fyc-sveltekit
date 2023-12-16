@@ -35,6 +35,7 @@ CREATE TABLE `Recipe` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `description` VARCHAR(191) NOT NULL,
     `dish` TEXT NOT NULL,
+    `shoppingList` JSON NOT NULL,
     `ingredients` JSON NOT NULL,
     `steps` JSON NOT NULL,
     `slug` VARCHAR(191) NOT NULL,
