@@ -16,7 +16,7 @@
       <tbody>
         <tr class="border-b">
           <th class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap">Nom d'utilisateur</th>
-          <td class="px-4 py-3 flex items-center justify-end">{data.user.username}</td>
+          <td class="px-4 py-3 flex items-center justify-end">{data?.user?.username}</td>
         </tr>
       </tbody>
     </table>
@@ -26,12 +26,9 @@
     <form action="" method="POST" class="form" use:enhance>
       <div>
         <label for="username">Votre nom d'utilisateur</label>
-        <input type="text" name="username" id="username" required={true} />
+        <input type="text" name="username" id="username" />
       </div>
-      <button type="submit" class="btn | xl:w-max">Sauvegarder</button>
-    </form>
-    <hr />
-    <form action="" method="POST" class="form" use:enhance>
+      <hr />
       <div>
         <label for="ingredients">Ingrédients à ne pas utiliser</label>
         <input
@@ -39,7 +36,7 @@
           name="ingredients"
           id="ingredients"
           placeholder="arachides, viande, lait, etc."
-          required={true}
+          value="{data?.user?.ingredients}"
         />
       </div>
       <button type="submit" class="btn | xl:w-max">Sauvegarder</button>

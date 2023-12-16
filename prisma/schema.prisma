@@ -12,8 +12,9 @@ datasource db {
 }
 
 model User {
-  id       String @id @unique
-  username String
+  id           String @id @unique
+  username     String
+  ingredients  String? @db.Text
 
   auth_session Session[]
   auth_key     UserKey[]

@@ -1,6 +1,12 @@
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { redirect } from '@sveltejs/kit';
 
 import type { PageServerLoad } from './$types';
+
+type UserData = {
+  username?: string;
+  ingredients?: string;
+};
 
 export const load = (({ locals }) => {
   const { session } = locals;
@@ -26,3 +32,42 @@ export const load = (({ locals }) => {
     },
   };
 }) satisfies PageServerLoad;
+
+export const actions = {
+  default: async ({ locals, request }) => {
+    const { db, session } = locals;
+    const data = await request.formData();
+
+    if (!session) {
+      redirect(303, '/login');
+    }
+
+    const userData: UserData = {};
+
+    const username = data.get('username') as string;
+    const ingredients = data.get('ingredients') as string;
+
+    if (username && username !== '') {
+      userData.username = username;
+    }
+
+    if (ingredients) {
+      userData.ingredients = ingredients;
+    }
+
+    try {
+      await db.user.update({
+        where: {
+          id: session?.user.userId,
+        },
+        data: userData,
+      });
+    } catch (e) {
+      if (e instanceof PrismaClientKnownRequestError && e.code === 'P2002') {
+        throw new Error("le nom d'utilisateur est déjà utilisé.");
+      }
+
+      throw e;
+    }
+  },
+};
