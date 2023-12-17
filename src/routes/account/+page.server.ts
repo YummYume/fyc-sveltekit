@@ -1,5 +1,5 @@
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
-import { redirect } from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
 
 import type { PageServerLoad } from './$types';
 
@@ -14,6 +14,8 @@ export const load = (({ locals }) => {
   if (!session) {
     redirect(303, '/login');
   }
+
+  console.log(session);
 
   return {
     user: session.user,
@@ -48,10 +50,27 @@ export const actions = {
     const ingredients = data.get('ingredients') as string;
 
     if (username && username !== '') {
+      if (!/^[A-Za-z]+$/g.test(username)) {
+        return fail(400, {
+          error: "Le nom d'utilisateur ne doit contenir que des lettres.",
+        });
+      }
+
+      if (username.length > 20) {
+        return fail(400, {
+          error: "Le nom d'utilisateur ne doit pas dépasser 20 caractères.",
+        });
+      }
       userData.username = username;
     }
 
     if (ingredients) {
+      if (!/[a-zA-Z,]/.test(ingredients)) {
+        return fail(400, {
+          error: 'Les ingrédients ne doivent contenir que des lettres et des virgules.',
+        });
+      }
+
       userData.ingredients = ingredients;
     }
 
@@ -64,10 +83,12 @@ export const actions = {
       });
     } catch (e) {
       if (e instanceof PrismaClientKnownRequestError && e.code === 'P2002') {
-        throw new Error("le nom d'utilisateur est déjà utilisé.");
+        return fail(400, { error: "le nom d'utilisateur est déjà utilisé." });
       }
 
-      throw e;
+      return fail(500, {
+        error: "Oops... Quelque chose s'est mal passé. Veuillez réessayer plus tard.",
+      });
     }
   },
 };

@@ -1,11 +1,18 @@
 <script lang="ts">
   import Card from '$lib/components/Card.svelte';
 
-  import type { PageData } from './$types';
+  import type { ActionData, PageData } from './$types';
 
   import { enhance } from '$app/forms';
+  import { toasts } from '$lib/utils/toats';
 
   export let data: PageData;
+  export let form: ActionData;
+
+  $: if (form?.error) {
+    toasts.error(form.error);
+  }
+  let text = "";
 </script>
 
 <h1 class="h1">Profil</h1>
@@ -16,17 +23,21 @@
       <tbody>
         <tr class="border-b">
           <th class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap">Nom d'utilisateur</th>
-          <td class="px-4 py-3 flex items-center justify-end">{data?.user?.username}</td>
+          <td class="px-4 py-3 flex items-center justify-end">{data.user.username}</td>
         </tr>
       </tbody>
     </table>
   </Card>
   <Card>
     <h2 class="h2">Editer le profil</h2>
-    <form action="" method="POST" class="form" use:enhance>
+    <form action="" method="POST" class="form" use:enhance={() => {
+      return async ({ update }) => {
+        await update({ reset: false });
+      };
+    }}>
       <div>
         <label for="username">Votre nom d'utilisateur</label>
-        <input type="text" name="username" id="username" />
+        <input type="text" name="username" id="username" value={data.user.username ?? ""}/>
       </div>
       <hr />
       <div>
@@ -36,7 +47,7 @@
           name="ingredients"
           id="ingredients"
           placeholder="arachides, viande, lait, etc."
-          value="{data?.user?.ingredients}"
+          value={data.user.ingredients ?? ""}
         />
       </div>
       <button type="submit" class="btn | xl:w-max">Sauvegarder</button>
