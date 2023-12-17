@@ -1,7 +1,7 @@
 <script lang="ts">
   import Card from '$lib/components/Card.svelte';
-  import Loader from '$lib/components/Loader.svelte';
   import Search from '$lib/components/Search.svelte';
+  import ArrowRight from '$lib/svg/ArrowRight.svelte';
   import Spinner from '$lib/svg/Spinner.svelte';
 
   import type { ActionData, PageData } from './$types';
@@ -18,24 +18,35 @@
 <h1 class="h1">Recherche</h1>
 
 <div class="max-w-xl mb-4 mx-auto w-full">
-  <Search value={data.query} />
+  <Search value={data.query} disabled={isLoading} />
 </div>
 
 <div class="max-w-xl mx-auto space-y-6 w-full" role="region" aria-live="polite">
   {#await data.result}
-    <Loader />
+    <div class="flex flex-col gap-1 items-center justify-center w-full">
+      <Spinner size="h-8 w-8" color="text-primary-600" />
+      <p role="status" class="text-gray-500 text-center">Recherche de "{data.query}"...</p>
+    </div>
   {:then value}
     {#if !value.recipe}
       <Card>
-        <p class="text-gray-500 text-center" role="status">Aucun résulat pour "{data.query}"</p>
+        <p class="text-gray-500 text-center" role="status">Aucun résulat pour "{data.query}".</p>
         <form
           method="POST"
           action="?/generate"
           class="form"
-          use:enhance={() => {
+          use:enhance={({ cancel }) => {
+            if (isLoading) {
+              cancel();
+
+              return;
+            }
+
             isLoading = true;
+
             return async ({ update }) => {
               await update();
+
               isLoading = false;
             };
           }}
@@ -51,44 +62,34 @@
         </form>
       </Card>
     {:else}
+      <p class="sr-only" role="status">Recette trouvée.</p>
       <a href="/recipes/{value.recipe.slug}" class="btn | w-full">
         {value.recipe.dish}
-        <svg
-          class="rtl:rotate-180 w-3.5 h-3.5 ms-2"
-          aria-hidden="true"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 14 10"
-        >
-          <path
-            stroke="currentColor"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M1 5h12m0 0L9 1m4 4L9 9"
-          />
-        </svg></a
-      >
+        <ArrowRight class="rtl:rotate-180 w-3.5 h-3.5 ms-2" aria-hidden="true" />
+      </a>
     {/if}
 
     {#if value.suggestions.length}
       <Card>
         <h2 class="h2">Suggestions</h2>
-        <ul class="text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg">
-          {#each value.suggestions as suggestion, i}
-            <li>
-              <a
-                href="/recipes/{suggestion.slug}"
-                class="block w-full px-4 py-2 border-b border-gray-200 cursor-pointer hover:bg-gray-100 hover:text-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-700 focus:text-primary-700
-                {i === 0 ? 'rounded-t-lg' : ''} {i === value.suggestions.length - 1
-                  ? 'rounded-b-lg'
-                  : ''}"
-              >
-                {suggestion.dish}
-              </a>
-            </li>
-          {/each}
-        </ul>
+
+        <nav aria-label="Suggestions">
+          <ul class="text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg">
+            {#each value.suggestions as suggestion, i}
+              <li>
+                <a
+                  href="/recipes/{suggestion.slug}"
+                  class="block w-full px-4 py-2 border-b border-gray-200 cursor-pointer hover:bg-gray-100 hover:text-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-700 focus:text-primary-700
+                  {i === 0 ? 'rounded-t-lg' : ''} {i === value.suggestions.length - 1
+                    ? 'rounded-b-lg'
+                    : ''}"
+                >
+                  {suggestion.dish}
+                </a>
+              </li>
+            {/each}
+          </ul>
+        </nav>
       </Card>
     {/if}
   {:catch}

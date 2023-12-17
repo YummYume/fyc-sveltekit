@@ -1,6 +1,8 @@
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library.js';
 import { error, fail, redirect } from '@sveltejs/kit';
 
+import { CARLOS_DEFAULT_ERROR_PROMPT } from '$lib/server/GPT.js';
+
 import type { PageServerLoad } from './$types.js';
 
 const ALLOWED_RATINGS = [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5];
@@ -56,7 +58,22 @@ export const load = (async ({ locals, params }) => {
 
     return {
       isFavourite: !!favourite,
-      recipe,
+      recipe: {
+        ...recipe,
+        ingredients: Array.isArray(recipe.ingredients)
+          ? recipe.ingredients.filter<string>(
+              (ingredient): ingredient is string => typeof ingredient === 'string',
+            )
+          : [],
+        steps: Array.isArray(recipe.steps)
+          ? recipe.steps.filter<string>((step): step is string => typeof step === 'string')
+          : [],
+        shoppingList: Array.isArray(recipe.shoppingList)
+          ? recipe.shoppingList
+              .filter<string>((item): item is string => typeof item === 'string')
+              .join('\n')
+          : '',
+      },
       userReview,
       user: session.user,
       allowedRatings: ALLOWED_RATINGS,
@@ -92,7 +109,17 @@ export const load = (async ({ locals, params }) => {
   } catch (e) {
     if (e instanceof PrismaClientKnownRequestError) {
       if (e.code === 'P2025') {
-        error(404, "Cette recette n'existe pas.");
+        error(404, {
+          message: "Cette recette n'existe pas.",
+          carlosContext: {
+            prompt: `
+              L'utilisateur se trouve actuellement sur une page d'erreur 404.
+              Si l'utilisateur te sollicite, indique lui que la recette demandée n'existe pas.
+              Demande à l'utilisateur de vérifier l'URL ou de retourner sur la page d'accueil.
+              ${CARLOS_DEFAULT_ERROR_PROMPT}
+            `,
+          },
+        });
       }
     }
 
