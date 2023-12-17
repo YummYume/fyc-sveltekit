@@ -201,27 +201,31 @@
     <div class="grid gap-6 sm:grid-cols-2">
       <div>
         <h2 class="mb-2 text-lg font-semibold text-gray-900">Ingrédients nécessaires</h2>
-        <ol class="space-y-1 text-gray-500 list-decimal list-inside">
-          {#if Array.isArray(data.recipe.ingredients)}
+        {#if data.recipe.ingredients.length > 0}
+          <ol class="space-y-1 text-gray-500 list-decimal list-inside">
             {#each data.recipe.ingredients as ingredient}
               <li>
                 <span class="text-gray-900">{ingredient}</span>
               </li>
             {/each}
-          {/if}
-        </ol>
+          </ol>
+        {:else}
+          <p class="text-gray-500">Aucun ingrédient pour cette recette.</p>
+        {/if}
       </div>
       <div>
         <h2 class="mb-2 text-lg font-semibold text-gray-900">Etapes de la recette</h2>
-        <ol class="space-y-1 text-gray-500 list-decimal list-inside">
-          {#if Array.isArray(data.recipe.steps)}
+        {#if data.recipe.steps.length > 0}
+          <ol class="space-y-1 text-gray-500 list-decimal list-inside">
             {#each data.recipe.steps as step}
               <li>
                 <span class="text-gray-900">{step}</span>
               </li>
             {/each}
-          {/if}
-        </ol>
+          </ol>
+        {:else}
+          <p class="text-gray-500">Aucune étape pour cette recette.</p>
+        {/if}
       </div>
     </div>
   </section>

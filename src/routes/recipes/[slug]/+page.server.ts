@@ -60,6 +60,14 @@ export const load = (async ({ locals, params }) => {
       isFavourite: !!favourite,
       recipe: {
         ...recipe,
+        ingredients: Array.isArray(recipe.ingredients)
+          ? recipe.ingredients.filter<string>(
+              (ingredient): ingredient is string => typeof ingredient === 'string',
+            )
+          : [],
+        steps: Array.isArray(recipe.steps)
+          ? recipe.steps.filter<string>((step): step is string => typeof step === 'string')
+          : [],
         shoppingList: Array.isArray(recipe.shoppingList)
           ? recipe.shoppingList
               .filter<string>((item): item is string => typeof item === 'string')
