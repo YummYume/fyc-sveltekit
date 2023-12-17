@@ -1,7 +1,7 @@
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library.js';
 import { error, fail, redirect } from '@sveltejs/kit';
 
-import { CARLOS_DEFAULT_ERROR_PROMPT } from '$lib/server/GPT.js';
+import { openai, CARLOS_DEFAULT_ERROR_PROMPT } from '$lib/server/GPT.js';
 
 import type { PageServerLoad } from './$types.js';
 
@@ -56,7 +56,44 @@ export const load = (async ({ locals, params }) => {
         return `${ingredientIndex}. ${ingredient},\n`;
       });
 
+    const getSimilarRecipes = async () => {
+      const recipes = await db.recipe.findMany({
+        select: {
+          dish: true,
+          slug: true,
+          description: true,
+        },
+        where: {
+          slug: {
+            not: {
+              equals: recipe.slug,
+            },
+          },
+        },
+      });
+
+      const prompt = `
+        You are Carlos, a cooking assistant from the "CookConnect" website.
+        The recipe you are currently viewing is "${recipe.dish}".
+        I am going to give you a list of recipes and your job is to give me the recipes that are the best suited to be recommended as "similar recipes".
+        You can give me between 0 and 3 recipes.
+        I want the result in JSON format, as follows: ["slug1", "slug2", "slug3"].
+        Here is the list of recipes : ${JSON.stringify(recipes)}.
+      `;
+
+      const result = await openai.chat.completions.create({
+        model: 'gpt-3.5-turbo',
+        messages: [{ role: 'system', content: prompt }],
+        stream: false,
+      });
+
+      const slugs = JSON.parse(result.choices[0].message.content ?? '');
+
+      return recipes.filter((similarRecipe) => slugs.includes(similarRecipe.slug));
+    };
+
     return {
+      similarRecipes: getSimilarRecipes(),
       isFavourite: !!favourite,
       recipe: {
         ...recipe,
@@ -258,7 +295,9 @@ export const actions = {
       },
     });
 
-    return { review: newReview };
+    return {
+      review: newReview,
+    };
   },
   removeReview: async ({ locals, request }) => {
     const { db, session } = locals;

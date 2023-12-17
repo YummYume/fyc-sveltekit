@@ -35,9 +35,11 @@
 </script>
 
 <svelte:head>
-  {#if $page.data.seo?.title}
-    <title>{$page.data.seo.title}</title>
-  {/if}
+  {#key $page.data.seo}
+    {#if $page.data.seo?.title}
+      <title>{$page.data.seo.title}</title>
+    {/if}
+  {/key}
   {#if $page.data.seo?.meta}
     {#each Object.entries($page.data.seo.meta) as [name, content] (name)}
       <meta {name} {content} />
