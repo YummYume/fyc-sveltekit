@@ -82,7 +82,7 @@ export const actions = {
       console.error('Error registering:', e);
 
       return fail(500, {
-        error: "Oops... Quelque chose s'est mal passé. Veuillez réessayer plus tard.",
+        error: "Oups... Quelque chose s'est mal passé. Veuillez réessayer plus tard.",
       });
     }
 

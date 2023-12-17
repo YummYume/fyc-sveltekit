@@ -6,7 +6,12 @@ import type { AuthRequest, Session } from 'lucia';
 // for information about these interfaces
 declare global {
   namespace App {
-    // interface Error {}
+    interface Error {
+      message: string;
+      carlosContext?: {
+        prompt: string;
+      };
+    }
     interface Locals {
       db: PrismaClient;
       auth: AuthRequest;

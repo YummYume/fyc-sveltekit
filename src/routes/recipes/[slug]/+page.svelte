@@ -9,6 +9,7 @@
   import Spinner from '$lib/svg/Spinner.svelte';
   import StarEmpty from '$lib/svg/StarEmpty.svelte';
   import StarFull from '$lib/svg/StarFull.svelte';
+  import Trash from '$lib/svg/Trash.svelte';
   import Twitter from '$lib/svg/Twitter.svelte';
   import { infiniteScrollSubmit } from '$lib/utils/infinite-scroll';
   import { prefersReducedMotion } from '$lib/utils/preferences';
@@ -17,6 +18,7 @@
   import type { ActionData, PageData } from './$types';
   import type { Review, User } from '@prisma/client';
 
+  import { browser } from '$app/environment';
   import { enhance } from '$app/forms';
   import { page } from '$app/stores';
 
@@ -28,16 +30,14 @@
     duration: 700,
     easing: quintOut,
   });
+  const facebook = `https://www.facebook.com/sharer/sharer.php?u=${$page.url}&quote=${data.recipe.shoppingList}&hashtag=recette,listedecourse`;
+  const reddit = `https://www.reddit.com/submit?url=${$page.url}&title=${data.recipe.dish}&text=${data.recipe.shoppingList}`;
+  const twitter = `https://twitter.com/intent/tweet?url=${$page.url}&text=${data.recipe.shoppingList}&hashtags=recette,listedecourse`;
 
   // Variables
   let reviews: (Review & { user: User })[] = [];
   let loading = false;
   let noMoreReviews = false;
-
-  const shoppingList = (data.recipe.shoppingList as string[]).join('\n');
-  const facebook = `https://www.facebook.com/sharer/sharer.php?u=${$page.url}&quote=${shoppingList}&hashtag=recette,listedecourse`;
-  const reddit = `https://www.reddit.com/submit?url=${$page.url}&title=${data.recipe.dish}&text=${shoppingList}`;
-  const twitter = `https://twitter.com/intent/tweet?url=${$page.url}&text=${shoppingList}&hashtags=recette,listedecourse`;
 
   // Computed
   $: starKey = data.isFavourite ? 'full' : 'empty';
@@ -81,8 +81,55 @@
     toasts.error(form.removeReviewError);
   }
 
-  const clipBoard = () => {
-    navigator.clipboard.writeText(shoppingList);
+  const copyToClipboard = () => {
+    if (!browser || !navigator.clipboard) {
+      toasts.error('Votre navigateur ne supporte pas le presse-papier.');
+
+      return;
+    }
+
+    navigator.permissions
+      // @ts-expect-error Clipboard permission API is not yet supported by TS
+      .query({ name: 'clipboard-write' })
+      .then((result) => {
+        if (result.state === 'granted' || result.state === 'prompt') {
+          navigator.clipboard.writeText(data.recipe.shoppingList).then(
+            () => {
+              toasts.success('Liste de course copiée dans le presse-papier.');
+            },
+            () => {
+              toasts.error('Impossible de copier la liste de course dans le presse-papier.');
+            },
+          );
+
+          return;
+        }
+
+        toasts.error(
+          "Vous devez autoriser l'accès au presse-papier pour copier la liste de course.",
+        );
+      })
+      .catch((e) => {
+        try {
+          // This probably means 'clipboard-write' permission is not supported (e.g. Firefox)
+          if (e.name === 'TypeError') {
+            navigator.clipboard.writeText(data.recipe.shoppingList).then(
+              () => {
+                toasts.success('Liste de course copiée dans le presse-papier.');
+              },
+              () => {
+                toasts.error('Impossible de copier la liste de course dans le presse-papier.');
+              },
+            );
+
+            return;
+          }
+
+          throw e;
+        } catch (error) {
+          toasts.error('Impossible de copier la liste de course dans le presse-papier.');
+        }
+      });
   };
 </script>
 
@@ -114,32 +161,42 @@
       {/if}
     </button>
   </form>
-
-  <a href={facebook} target="_blank" rel="noopener noreferrer" aria-label="Partager sur Facebook"
-    ><Facebook /></a
-  >
-  <a href={reddit} target="_blank" rel="noopener noreferrer" aria-label="Partager sur Reddit"
-    ><Reddit /></a
-  >
-  <a href={twitter} target="_blank" rel="noopener noreferrer" aria-label="Partager sur Twitter (X)"
-    ><Twitter /></a
-  >
-  <button type="button" on:click={clipBoard} aria-label="Copier dans le presse-papier"
-    ><Clipboard /></button
-  >
 </div>
-<div class="space-y-5">
+
+<div class="space-y-4">
   {#if data.reviewCount > 0}
     <div class="flex gap-2.5 items-center justify-center">
       <span class="text-gray-500">Note moyenne des utilisateurs :</span>
-      <div class="flex">
+      <p class="flex" aria-label="{data.reviewAverage} sur 5">
         <span class="text-gray-900 text-lg font-semibold">{data.reviewAverage}</span>
         <StarFull class="w-4 h-4 text-yellow-500" />
-      </div>
+      </p>
     </div>
   {/if}
 
-  <section class="container mx-auto">
+  <div
+    class="flex gap-2.5 items-center justify-center"
+    role="group"
+    aria-label="Partager ou copier la liste de course"
+  >
+    <a href={facebook} target="_blank" rel="noopener noreferrer" aria-label="Partager sur Facebook"
+      ><Facebook /></a
+    >
+    <a href={reddit} target="_blank" rel="noopener noreferrer" aria-label="Partager sur Reddit"
+      ><Reddit /></a
+    >
+    <a
+      href={twitter}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="Partager sur Twitter (X)"><Twitter /></a
+    >
+    <button type="button" on:click={copyToClipboard} aria-label="Copier dans le presse-papier"
+      ><Clipboard /></button
+    >
+  </div>
+
+  <section class="container mx-auto space-y-4">
     <p class="mb-3 text-lg text-gray-500 text-center md:text-xl">{data.recipe.description}</p>
     <div class="grid gap-6 sm:grid-cols-2">
       <div>
@@ -168,12 +225,13 @@
       </div>
     </div>
   </section>
+
   <section class="container mx-auto space-y-5">
     <h2 class="h2">Avis ({data.reviewCount})</h2>
     <form
       action="?/review"
       method="post"
-      class="space-y-2.5"
+      class="space-y-2.5 border border-primary-600 bg-white rounded-md p-5"
       use:enhance={() => {
         return async ({ update }) => {
           await update({ reset: false });
@@ -197,48 +255,40 @@
               type="submit"
               class="btn | bg-red-600 mx-0 p-2.5 hover:!bg-red-700"
             >
-              <svg
-                class="w-5 h-5"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="currentColor"
-                viewBox="0 0 18 20"
-              >
-                <path
-                  d="M17 4h-4V2a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v2H1a1 1 0 0 0 0 2h1v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6h1a1 1 0 1 0 0-2ZM7 2h4v2H7V2Zm1 14a1 1 0 1 1-2 0V8a1 1 0 0 1 2 0v8Zm4 0a1 1 0 0 1-2 0V8a1 1 0 0 1 2 0v8Z"
-                />
-              </svg>
+              <Trash aria-hidden="true" />
             </button>
           </form>
         {/if}
       </div>
-      <label class="flex flex-col gap-1">
-        <span>Votre commentaire</span>
-        <textarea
-          id="content"
-          name="content"
-          rows="5"
-          required
-          placeholder="J'adore cette recette..."
-          class="w-full px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-600 focus:border-green-600 resize-y"
-          >{data.userReview?.content ?? ''}</textarea
-        >
-      </label>
-      <label class="flex flex-col gap-1">
-        <span>Votre note</span>
-        <select
-          id="rating"
-          name="rating"
-          required
-          class="w-full px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-600 focus:border-green-600"
-        >
-          {#each data.allowedRatings as rating}
-            <option value={rating} selected={rating === data.userReview?.rating}>
-              {rating}
-            </option>
-          {/each}
-        </select>
-      </label>
+      <div class="grid gap-2.5 sm:grid-cols-3">
+        <label class="flex flex-col gap-1 sm:col-span-2">
+          <span>Votre commentaire</span>
+          <textarea
+            id="content"
+            name="content"
+            rows="5"
+            required
+            placeholder="J'adore cette recette..."
+            class="w-full px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-600 focus:border-primary-600 resize-y"
+            >{data.userReview?.content ?? ''}</textarea
+          >
+        </label>
+        <label class="flex flex-col gap-1">
+          <span>Votre note</span>
+          <select
+            id="rating"
+            name="rating"
+            required
+            class="w-full px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-600 focus:border-primary-600"
+          >
+            {#each data.allowedRatings as rating}
+              <option value={rating} selected={rating === data.userReview?.rating}>
+                {rating}
+              </option>
+            {/each}
+          </select>
+        </label>
+      </div>
 
       {#if form?.reviewError}
         <p
@@ -250,7 +300,7 @@
         </p>
       {/if}
 
-      <button type="submit" class="btn | justify-center w-full" aria-controls="reviews"
+      <button type="submit" class="btn | justify-center w-full sm:max-w-xs" aria-controls="reviews"
         >Envoyer</button
       >
     </form>
@@ -263,13 +313,16 @@
 
         <Card
           tabindex="0"
-          containerClass={isAuthor ? 'border border-green-600' : ''}
+          containerClass={isAuthor ? 'border border-primary-600' : 'border border-gray-300'}
           aria-labelledby={titleId}
           aria-describedby={contentId}
         >
           <div class="flex gap-1 justify-between">
             <div class="flex flex-col gap-1">
-              <h3 class="h3" id={titleId}>Avis de {review.user.username} ({review.rating}/5)</h3>
+              <h3 class="h3" id={titleId}>
+                Avis de {review.user.username}
+                <span aria-label="{review.rating} sur 5">({review.rating}/5)</span>
+              </h3>
               <p id={contentId}>{review.content}</p>
               <p class="text-sm text-gray-500 mt-auto">
                 Le {review.createdAt.toLocaleDateString('fr-FR', {
@@ -287,17 +340,7 @@
                 form="remove-review"
                 type="submit"
               >
-                <svg
-                  class="w-6 h-6"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="currentColor"
-                  viewBox="0 0 18 20"
-                >
-                  <path
-                    d="M17 4h-4V2a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v2H1a1 1 0 0 0 0 2h1v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6h1a1 1 0 1 0 0-2ZM7 2h4v2H7V2Zm1 14a1 1 0 1 1-2 0V8a1 1 0 0 1 2 0v8Zm4 0a1 1 0 0 1-2 0V8a1 1 0 0 1 2 0v8Z"
-                  />
-                </svg>
+                <Trash aria-hidden="true" />
               </button>
             {/if}
           </div>
@@ -312,7 +355,7 @@
     {#if !noMoreReviews}
       {#if loading}
         <div class="flex flex-col gap-1 items-center justify-center w-full">
-          <Spinner size="h-8 w-8" color="text-green-600" />
+          <Spinner size="h-8 w-8" color="text-primary-600" />
           <p role="status" class="text-gray-500 text-center">Chargement des avis...</p>
         </div>
       {:else}

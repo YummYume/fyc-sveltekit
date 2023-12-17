@@ -38,7 +38,9 @@ export const load = (async ({ url, locals }) => {
     result.recipe = recipes.find((r) => r.slug === result.recipe?.slug) ?? null;
 
     result.suggestions = recipes.reduce<Recipe[]>((acc, curr) => {
-      const suggestion = recipes.find((r) => r.slug === curr.slug);
+      const suggestion = recipes.find(
+        (r) => r.slug === curr.slug && !acc.includes(r) && r.slug !== result.recipe?.slug,
+      );
 
       if (suggestion) {
         acc.push(suggestion);
@@ -51,6 +53,7 @@ export const load = (async ({ url, locals }) => {
   };
 
   return {
+    result: getResult(),
     query,
     seo: {
       title: 'Recherche de recettes',
@@ -67,7 +70,6 @@ export const load = (async ({ url, locals }) => {
         La recherche de l'utilisateur est : ${query}.
       `,
     },
-    result: getResult(),
   };
 }) satisfies PageServerLoad;
 
@@ -81,7 +83,7 @@ export const actions = {
     const recipe = JSON.parse(result.choices[0].message.content ?? '');
 
     if (!recipe) {
-      return fail(404, { error: "Votre demande n'est pas valide. Veuillez réessayer." });
+      return fail(400, { error: "Votre demande n'est pas valide. Veuillez réessayer." });
     }
 
     try {
@@ -103,7 +105,7 @@ export const actions = {
       console.error('Error creating recipe:', e);
 
       return fail(500, {
-        error: "Oops... Quelque chose s'est mal passé. Veuillez réessayer plus tard.",
+        error: "Oups... Quelque chose s'est mal passé. Veuillez réessayer plus tard.",
       });
     }
 

@@ -4,6 +4,7 @@
   import Card from '$lib/components/Card.svelte';
   import Pagination from '$lib/components/Pagination.svelte';
   import { assistantOpen } from '$lib/stores/assistant';
+  import Trash from '$lib/svg/Trash.svelte';
   import { inputDebounce } from '$lib/utils/debounce';
   import { prefersReducedMotion } from '$lib/utils/preferences';
 
@@ -37,7 +38,7 @@
       >
         Aucun favori pour le moment ! Peut-être que <button
           type="button"
-          class="text-green-700 hover:text-green-800 focus-visible:text-green-800 transition-colors motion-reduce:transition-none"
+          class="text-primary-700 hover:text-primary-800 focus-visible:text-primary-800 transition-colors motion-reduce:transition-none"
           aria-label="Carlos (ouvrir l'assistant)"
           aria-haspopup="dialog"
           on:click={() => {
@@ -61,7 +62,7 @@
           type="search"
           name="query"
           placeholder="Titre de la recette"
-          class="w-full px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-600 focus:border-green-600"
+          class="w-full px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-600 focus:border-primary-600"
           bind:value={inputValue}
           use:inputDebounce={{
             value: inputValue,
@@ -79,7 +80,7 @@
         <span>Trier par</span>
         <select
           name="order"
-          class="w-full px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-600 focus:border-green-600"
+          class="w-full px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-600 focus:border-primary-600"
           on:change={() => {
             if (perPageForm) {
               perPageForm.requestSubmit();
@@ -109,7 +110,7 @@
               <div class="flex-grow flex flex-col gap-1">
                 <a
                   href="/recipes/{favourite.recipe.slug}"
-                  class="hover:text-green-600 focus-visible:text-green-600 transition-colors motion-reduce:transition-none"
+                  class="hover:text-primary-600 focus-visible:text-primary-600 transition-colors motion-reduce:transition-none"
                 >
                   <h2 class="h2">{favourite.recipe.dish}</h2>
                 </a>
@@ -130,9 +131,10 @@
                 >
                   <button
                     type="submit"
-                    class="flex items-center justify-center w-fit h-10 text-gray-600 hover:text-red-600 focus-visible:text-red-600 transition-colors motion-reduce:transition-none"
+                    class="btn | bg-red-600 mx-0 p-2.5 hover:!bg-red-700"
+                    aria-label="Retirer des favoris"
                   >
-                    Retirer des favoris
+                    <Trash aria-hidden="true" class="h-6 w-6" />
                   </button>
                 </form>
               </div>
@@ -143,7 +145,7 @@
             <p role="status">On dirait que vous vous êtes perdus ! Cette page n'existe pas.</p>
             <p>
               <a
-                class="text-green-600 hover:text-green-800 focus-visible:text-green-800 transition-colors motion-reduce:transition-none"
+                class="text-primary-600 hover:text-primary-800 focus-visible:text-primary-800 transition-colors motion-reduce:transition-none"
                 href={`/account/favourites?page=${data.totalPages}`}>Retourner à la dernière page</a
               >
             </p>
@@ -161,7 +163,7 @@
             name="perPage"
             form="favourites-form"
             aria-label="Nombre de résultats par page"
-            class="block px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-600 focus:border-green-600 w-56 ml-auto"
+            class="block px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-600 focus:border-primary-600 w-56 ml-auto"
             aria-controls="favourites-results"
             on:change={() => {
               if (perPageForm) {

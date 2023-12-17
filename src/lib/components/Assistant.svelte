@@ -21,13 +21,16 @@
   import { bounceOut } from 'svelte/easing';
   import { fade, fly, scale } from 'svelte/transition';
 
+  import Close from '$lib/svg/Close.svelte';
+  import Refresh from '$lib/svg/Refresh.svelte';
+  import Send from '$lib/svg/Send.svelte';
   import { prefersReducedMotion } from '$lib/utils/preferences';
   import { requestAnimationFrame } from '$lib/utils/request-animation-frame';
   import { toasts } from '$lib/utils/toats';
 
   import Card from './Card.svelte';
 
-  import type { ChatCompletionChunk } from 'openai/resources';
+  import type { ChatCompletionChunk } from 'openai/resources/index.mjs';
 
   import { page } from '$app/stores';
 
@@ -128,7 +131,7 @@
     ];
 
     const context = {
-      prompt: $page.data.carlosContext?.prompt,
+      prompt: $page.data.carlosContext?.prompt ?? $page.error?.carlosContext?.prompt,
     };
 
     abortController = new AbortController();
@@ -219,7 +222,7 @@
             class="rounded-full h-10 w-10 lg:h-20 lg:w-20"
           />
           <div class="flex gap-1 items-center">
-            <div class="h-3 w-3 bg-primary-600 rounded-full shadow" />
+            <div class="h-3 w-3 bg-primary-700 rounded-full shadow" />
 
             {#key carlosStatus}
               <p
@@ -233,7 +236,7 @@
           </div>
         </div>
         <div class="flex gap-2.5">
-          {#if (messages.length || $page.data.carlosContext?.prompt) && messages.length}
+          {#if messages.length > 0}
             <button
               aria-label="Supprimer les messages"
               type="button"
@@ -242,21 +245,7 @@
               aria-controls="message-container"
               on:click={clearMessages}
             >
-              <svg
-                class="w-5 h-5"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 18 20"
-              >
-                <path
-                  stroke="currentColor"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M16 1v5h-5M2 19v-5h5m10-4a8 8 0 0 1-14.947 3.97M1 10a8 8 0 0 1 14.947-3.97"
-                />
-              </svg>
+              <Refresh aria-hidden="true" />
             </button>
           {/if}
 
@@ -267,27 +256,13 @@
               dispatch('close');
             }}
           >
-            <svg
-              class="w-5 h-5 text-gray-500"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 14 14"
-            >
-              <path
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
-              />
-            </svg>
+            <Close aria-hidden="true" />
           </button>
         </div>
       </div>
       <div
         class="
-          max-h-[33vh] overflow-auto sm:p-1 p-0.5 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-primary-600
+          max-h-[33vh] overflow-auto sm:p-1 p-0.5 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-primary-700
           scrollbar-thumb-rounded-full scrollbar-track-rounded-full flex-grow
         "
       >
@@ -350,7 +325,7 @@
           </label>
           <div class="relative">
             <input
-              class="!p-4"
+              class="!p-4 border-primary-700"
               id="carlos-question"
               maxlength="255"
               name="question"
@@ -366,22 +341,12 @@
               disabled={carlosStatus !== 'available' || inputValue.trim() === ''}
               type="submit"
             >
-              <svg
-                class="w-[18px] h-[18px]"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="currentColor"
-                viewBox="0 0 18 20"
-              >
-                <path
-                  d="m17.914 18.594-8-18a1 1 0 0 0-1.828 0l-8 18a1 1 0 0 0 1.157 1.376L8 18.281V9a1 1 0 0 1 2 0v9.281l6.758 1.689a1 1 0 0 0 1.156-1.376Z"
-                />
-              </svg>
+              <Send aria-hidden="true" />
             </button>
           </div>
         </div>
       </form>
-      {#if $page.data.carlosContext?.prompt}
+      {#if $page.data.carlosContext?.prompt || $page.error?.carlosContext?.prompt}
         <p class="text-xs text-gray-500">
           Carlos a accès à cette page et peut vous aider à trouver ce que vous cherchez.
         </p>

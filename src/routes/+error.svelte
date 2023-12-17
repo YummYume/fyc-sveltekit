@@ -23,7 +23,7 @@
       <p class="mb-4 text-lg font-light text-gray-800">
         Besoin d'aide ? <button
           type="button"
-          class="text-green-700 hover:text-green-800 focus-visible:text-green-800 transition-colors motion-reduce:transition-none"
+          class="text-primary-700 hover:text-primary-800 focus-visible:text-primary-800 transition-colors motion-reduce:transition-none"
           aria-label="Carlos (ouvrir l'assistant)"
           aria-haspopup="dialog"
           on:click={() => {
