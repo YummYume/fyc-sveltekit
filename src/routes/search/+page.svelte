@@ -24,7 +24,7 @@
 
 <div class="max-w-xl mx-auto space-y-6 w-full" role="region" aria-live="polite">
   {#await data.result}
-    <Loader message={`Recherche de "{data.query}"...`} />
+    <Loader message={`Recherche de "${data.query}"...`} />
   {:then value}
     {#if !value.recipe}
       <Card>
