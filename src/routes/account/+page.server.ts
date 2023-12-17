@@ -61,6 +61,13 @@ export const actions = {
           error: "Le nom d'utilisateur ne doit pas dépasser 20 caractères.",
         });
       }
+
+      if (username.length < 3) {
+        return fail(400, {
+          error: "Le nom d'utilisateur doit contenir au moins 3 caractères.",
+        });
+      }
+
       userData.username = username;
     }
 
