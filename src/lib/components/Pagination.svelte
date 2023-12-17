@@ -1,4 +1,9 @@
 <script lang="ts">
+  import Back from '$lib/svg/Back.svelte';
+  import First from '$lib/svg/First.svelte';
+  import Forward from '$lib/svg/Forward.svelte';
+  import Last from '$lib/svg/Last.svelte';
+
   /**
    * The current page number.
    */
@@ -50,26 +55,12 @@
         <a
           class="
           flex items-center justify-center px-4 h-10 leading-tight text-gray-500 bg-white border border-gray-300
-          hover:bg-gray-100 hover:text-gray-700
+          hover:bg-gray-100 hover:text-gray-700 focus-visible:bg-gray-100 focus-visible:text-gray-700
         "
           class:rounded-s-lg={canGoBack}
           href={getUrlForPage(1)}
         >
-          <svg
-            class="w-4 h-4"
-            aria-hidden="true"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 12 16"
-          >
-            <path
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M1 1v14m8.336-.479-6.5-5.774a1 1 0 0 1 0-1.494l6.5-5.774A1 1 0 0 1 11 2.227v11.546a1 1 0 0 1-1.664.748Z"
-            />
-          </svg>
+          <First aria-hidden="true" />
           <span class="sr-only">Page 1 (première page)</span>
         </a>
       </li>
@@ -81,31 +72,22 @@
         aria-label={`Page précédente (page ${canGoBack ? previousPage : 'actuelle'})`}
         class="
           flex items-center justify-center px-4 h-10 ms-0 leading-tight text-gray-500 bg-white border border-e-0
-          border-gray-300 hover:bg-gray-100 hover:text-gray-700
+          border-gray-300 hover:bg-gray-100 hover:text-gray-700 focus-visible:bg-gray-100 focus-visible:text-gray-700
         "
         class:rounded-s-lg={!canGoBack}
         href={getUrlForPage(previousPage)}
       >
-        <svg
-          class="w-4 h-4"
-          aria-hidden="true"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 8 14"
-        >
-          <path
-            stroke="currentColor"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M7 1 1.3 6.326a.91.91 0 0 0 0 1.348L7 13"
-          />
-        </svg>
+        <Back aria-hidden="true" />
       </a>
     </li>
 
     {#if (previousPages.at(0) ?? 1) > 2}
-      <li aria-hidden="true">&#8230;</li>
+      <li
+        class="flex items-center justify-center px-4 h-10 leading-tight text-gray-500 bg-white border border-gray-300"
+        aria-hidden="true"
+      >
+        &#8230;
+      </li>
     {/if}
 
     {#each previousPages as previousPageNumber}
@@ -113,7 +95,7 @@
         <a
           class="
             flex items-center justify-center px-4 h-10 leading-tight text-gray-500 bg-white border border-gray-300
-            hover:bg-gray-100 hover:text-gray-700
+            hover:bg-gray-100 hover:text-gray-700 focus-visible:bg-gray-100 focus-visible:text-gray-700
           "
           href={getUrlForPage(previousPageNumber)}
         >
@@ -127,7 +109,7 @@
         aria-current="page"
         class="
           flex items-center justify-center px-4 h-10 leading-tight text-primary-600 border border-primary-300
-          bg-primary-50 hover:bg-primary-100 hover:text-primary-700
+          bg-primary-50 hover:bg-primary-100 hover:text-primary-700 focus-visible:bg-primary-100
         "
         href={getUrlForPage(currentPage)}
       >
@@ -140,7 +122,7 @@
         <a
           class="
             flex items-center justify-center px-4 h-10 leading-tight text-gray-500 bg-white border border-gray-300
-            hover:bg-gray-100 hover:text-gray-700
+            hover:bg-gray-100 hover:text-gray-700 focus-visible:bg-gray-100 focus-visible:text-gray-700
           "
           href={getUrlForPage(nextPageNumber)}
         >
@@ -150,7 +132,12 @@
     {/each}
 
     {#if (nextPages.at(-1) ?? totalPages) < totalPages - 1}
-      <li aria-hidden="true">&#8230;</li>
+      <li
+        class="flex items-center justify-center px-4 h-10 leading-tight text-gray-500 bg-white border border-gray-300"
+        aria-hidden="true"
+      >
+        &#8230;
+      </li>
     {/if}
 
     <li>
@@ -159,26 +146,12 @@
         aria-label={`Page suivante (page ${canGoForward ? nextPage : 'actuelle'})`}
         class="
           flex items-center justify-center px-4 h-10 leading-tight text-gray-500 bg-white border border-gray-300
-          hover:bg-gray-100 hover:text-gray-700
+          hover:bg-gray-100 hover:text-gray-700 focus-visible:bg-gray-100 focus-visible:text-gray-700
         "
         class:rounded-e-lg={!canGoForward}
         href={getUrlForPage(totalPages)}
       >
-        <svg
-          class="w-4 h-4"
-          aria-hidden="true"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 8 14"
-        >
-          <path
-            stroke="currentColor"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="m1 13 5.7-5.326a.909.909 0 0 0 0-1.348L1 1"
-          />
-        </svg>
+        <Forward aria-hidden="true" />
       </a>
     </li>
 
@@ -187,26 +160,12 @@
         <a
           class="
           flex items-center justify-center px-4 h-10 leading-tight text-gray-500 bg-white border border-gray-300
-          hover:bg-gray-100 hover:text-gray-700
+          hover:bg-gray-100 hover:text-gray-700 focus-visible:bg-gray-100 focus-visible:text-gray-700
         "
           class:rounded-e-lg={canGoForward}
           href={getUrlForPage(totalPages)}
         >
-          <svg
-            class="w-4 h-4"
-            aria-hidden="true"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 12 16"
-          >
-            <path
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M11 1v14m-8.336-.479 6.5-5.774a1 1 0 0 0 0-1.494l-6.5-5.774A1 1 0 0 0 1 2.227v11.546a1 1 0 0 0 1.664.748Z"
-            />
-          </svg>
+          <Last aria-hidden="true" />
           <span class="sr-only">Page {totalPages} (dernière page)</span>
         </a>
       </li>
