@@ -77,6 +77,8 @@
 
     <li>
       <a
+        aria-current={canGoBack ? undefined : 'page'}
+        aria-label={`Page précédente (page ${canGoBack ? previousPage : 'actuelle'})`}
         class="
           flex items-center justify-center px-4 h-10 ms-0 leading-tight text-gray-500 bg-white border border-e-0
           border-gray-300 hover:bg-gray-100 hover:text-gray-700
@@ -99,7 +101,6 @@
             d="M7 1 1.3 6.326a.91.91 0 0 0 0 1.348L7 13"
           />
         </svg>
-        <span class="sr-only">Page précedente</span>
       </a>
     </li>
 
@@ -154,6 +155,8 @@
 
     <li>
       <a
+        aria-current={canGoForward ? undefined : 'page'}
+        aria-label={`Page suivante (page ${canGoForward ? nextPage : 'actuelle'})`}
         class="
           flex items-center justify-center px-4 h-10 leading-tight text-gray-500 bg-white border border-gray-300
           hover:bg-gray-100 hover:text-gray-700
@@ -176,7 +179,6 @@
             d="m1 13 5.7-5.326a.909.909 0 0 0 0-1.348L1 1"
           />
         </svg>
-        <span class="sr-only">Page suivante</span>
       </a>
     </li>
 
@@ -205,7 +207,7 @@
               d="M11 1v14m-8.336-.479 6.5-5.774a1 1 0 0 0 0-1.494l-6.5-5.774A1 1 0 0 0 1 2.227v11.546a1 1 0 0 0 1.664.748Z"
             />
           </svg>
-          <span class="sr-only">Page {totalPages}(dernière page)</span>
+          <span class="sr-only">Page {totalPages} (dernière page)</span>
         </a>
       </li>
     {/if}
