@@ -39,4 +39,28 @@
   .section {
     @apply mx-auto flex w-full grow items-center px-6 py-8 md:w-[28rem] lg:py-0;
   }
+
+  .modal {
+    @apply fixed inset-0 z-50 flex items-center justify-center;
+
+    &__overlay {
+      @apply fixed inset-0 bg-black opacity-50;
+    }
+
+    &__content {
+      @apply relative mx-auto w-full max-w-[28rem] rounded-lg bg-white p-6;
+    }
+
+    &__close {
+      @apply absolute right-1 top-1 text-gray-500 transition-colors hover:text-gray-700 focus-visible:text-gray-700 motion-reduce:transition-none;
+    }
+
+    &__title {
+      @apply mb-4 text-center text-2xl font-bold;
+    }
+
+    &__description {
+      @apply mb-4 text-gray-500;
+    }
+  }
 }

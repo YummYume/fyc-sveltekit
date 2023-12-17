@@ -1,5 +1,6 @@
 <script lang="ts">
   import Card from '$lib/components/Card.svelte';
+  import Loader from '$lib/components/Loader.svelte';
   import Search from '$lib/components/Search.svelte';
   import ArrowRight from '$lib/svg/ArrowRight.svelte';
   import Spinner from '$lib/svg/Spinner.svelte';
@@ -23,10 +24,7 @@
 
 <div class="max-w-xl mx-auto space-y-6 w-full" role="region" aria-live="polite">
   {#await data.result}
-    <div class="flex flex-col gap-1 items-center justify-center w-full">
-      <Spinner size="h-8 w-8" color="text-primary-600" />
-      <p role="status" class="text-gray-500 text-center">Recherche de "{data.query}"...</p>
-    </div>
+    <Loader message={`Recherche de "{data.query}"...`} />
   {:then value}
     {#if !value.recipe}
       <Card>
@@ -64,7 +62,7 @@
     {:else}
       <p class="sr-only" role="status">Recette trouvée.</p>
       <a href="/recipes/{value.recipe.slug}" class="btn | w-full">
-        {value.recipe.dish}
+        <span style="view-transition-name: {value.recipe.slug};">{value.recipe.dish}</span>
         <ArrowRight class="rtl:rotate-180 w-3.5 h-3.5 ms-2" aria-hidden="true" />
       </a>
     {/if}
@@ -83,6 +81,7 @@
                   {i === 0 ? 'rounded-t-lg' : ''} {i === value.suggestions.length - 1
                     ? 'rounded-b-lg'
                     : ''}"
+                  style="view-transition-name: {suggestion.slug};"
                 >
                   {suggestion.dish}
                 </a>

@@ -1,4 +1,6 @@
 import type { Auth as AuthType } from '$lib/server/auth';
+import type { PageData as AccompanimentsPageData } from './routes/recipes/[slug]/accompaniments/$types';
+import type { PageData as SimilarRecipesPageData } from './routes/recipes/[slug]/similar/$types';
 import type { PrismaClient } from '@prisma/client';
 import type { AuthRequest, Session } from 'lucia';
 
@@ -27,6 +29,14 @@ declare global {
       };
       carlosContext?: {
         prompt: string;
+      };
+    }
+    interface PageState {
+      accompaniments?: Omit<AccompanimentsPageData, 'accompaniments'> & {
+        accompaniments: Awaited<AccompanimentsPageData['accompaniments']>;
+      };
+      similarRecipes?: Omit<SimilarRecipesPageData, 'similarRecipes'> & {
+        similarRecipes: Awaited<SimilarRecipesPageData['similarRecipes']>;
       };
     }
     // interface Platform {}

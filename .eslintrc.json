@@ -130,7 +130,8 @@
     "prettier/prettier": ["warn"],
     "no-restricted-syntax": ["off"],
     "@typescript-eslint/naming-convention": ["off"],
-    "consistent-return": ["off"]
+    "consistent-return": ["off"],
+    "no-undef-init": ["off"]
   },
   "settings": {
     "import/parsers": {
