@@ -3,6 +3,8 @@
   import { crossfade, fade } from 'svelte/transition';
 
   import Card from '$lib/components/Card.svelte';
+  import Loader from '$lib/components/Loader.svelte';
+  import Modal from '$lib/components/Modal.svelte';
   import Clipboard from '$lib/svg/Clipboard.svelte';
   import Facebook from '$lib/svg/Facebook.svelte';
   import Reddit from '$lib/svg/Reddit.svelte';
@@ -11,15 +13,23 @@
   import StarFull from '$lib/svg/StarFull.svelte';
   import Trash from '$lib/svg/Trash.svelte';
   import Twitter from '$lib/svg/Twitter.svelte';
+  import { copyToClipboard } from '$lib/utils/clipboard';
   import { infiniteScrollSubmit } from '$lib/utils/infinite-scroll';
   import { prefersReducedMotion } from '$lib/utils/preferences';
   import { toasts } from '$lib/utils/toats';
 
+  import AccompanimentsResult from './accompaniments/Result.svelte';
+  import SimilarRecipesResult from './similar/Result.svelte';
+
+  import type { PreloadedPageData } from '$lib/types/preload';
   import type { ActionData, PageData } from './$types';
+  import type { PageData as AccompanimentsPageData } from './accompaniments/$types';
+  import type { PageData as SimilarRecipesPageData } from './similar/$types';
   import type { Review, User } from '@prisma/client';
 
   import { browser } from '$app/environment';
   import { enhance } from '$app/forms';
+  import { goto, preloadData, pushState } from '$app/navigation';
   import { page } from '$app/stores';
 
   export let data: PageData;
@@ -38,6 +48,8 @@
   let reviews: (Review & { user: User })[] = [];
   let loading = false;
   let noMoreReviews = false;
+  let accompanimentsLoading = false;
+  let similarRecipesLoading = false;
 
   // Computed
   $: starKey = data.isFavourite ? 'full' : 'empty';
@@ -81,61 +93,132 @@
     toasts.error(form.removeReviewError);
   }
 
-  const copyToClipboard = () => {
-    if (!browser || !navigator.clipboard) {
-      toasts.error('Votre navigateur ne supporte pas le presse-papier.');
-
+  // Functions
+  const showAccompaniments = async (e: MouseEvent & { currentTarget: HTMLAnchorElement }) => {
+    if (e.metaKey || e.ctrlKey || accompanimentsLoading) {
       return;
     }
 
-    navigator.permissions
-      // @ts-expect-error Clipboard permission API is not yet supported by TS
-      .query({ name: 'clipboard-write' })
-      .then((result) => {
-        if (result.state === 'granted' || result.state === 'prompt') {
-          navigator.clipboard.writeText(data.recipe.shoppingList).then(
-            () => {
-              toasts.success('Liste de course copiée dans le presse-papier.');
-            },
-            () => {
-              toasts.error('Impossible de copier la liste de course dans le presse-papier.');
-            },
-          );
+    e.preventDefault();
 
-          return;
-        }
+    accompanimentsLoading = true;
 
-        toasts.error(
-          "Vous devez autoriser l'accès au presse-papier pour copier la liste de course.",
-        );
-      })
-      .catch((e) => {
-        try {
-          // This probably means 'clipboard-write' permission is not supported (e.g. Firefox)
-          if (e.name === 'TypeError') {
-            navigator.clipboard.writeText(data.recipe.shoppingList).then(
-              () => {
-                toasts.success('Liste de course copiée dans le presse-papier.');
-              },
-              () => {
-                toasts.error('Impossible de copier la liste de course dans le presse-papier.');
-              },
-            );
+    const { href } = e.currentTarget;
+    const result = (await preloadData(href)) as PreloadedPageData<AccompanimentsPageData>;
 
-            return;
-          }
-
-          throw e;
-        } catch (error) {
-          toasts.error('Impossible de copier la liste de course dans le presse-papier.');
-        }
+    if (result.type === 'loaded' && result.status === 200) {
+      pushState(href, {
+        accompaniments: {
+          ...result.data,
+          accompaniments: await result.data.accompaniments,
+        },
       });
+    } else {
+      goto(href);
+    }
+
+    accompanimentsLoading = false;
+  };
+
+  const showSimilarRecipes = async (e: MouseEvent & { currentTarget: HTMLAnchorElement }) => {
+    if (e.metaKey || e.ctrlKey || similarRecipesLoading) {
+      return;
+    }
+
+    e.preventDefault();
+
+    similarRecipesLoading = true;
+
+    const { href } = e.currentTarget;
+    const result = (await preloadData(href)) as PreloadedPageData<SimilarRecipesPageData>;
+
+    if (result.type === 'loaded' && result.status === 200) {
+      pushState(href, {
+        similarRecipes: {
+          ...result.data,
+          similarRecipes: await result.data.similarRecipes,
+        },
+      });
+    } else {
+      goto(href);
+    }
+
+    similarRecipesLoading = false;
+  };
+
+  const closeCurrentModal = () => {
+    if (!browser) {
+      return;
+    }
+
+    window.history.back();
   };
 </script>
 
+<Modal
+  id="accompaniments"
+  title="Accompagnements"
+  description="Liste des accompagnements proposés pour cette recette."
+  open={!!$page.state.accompaniments}
+  on:close={closeCurrentModal}
+>
+  {#if !!$page.state.accompaniments}
+    <AccompanimentsResult
+      dish={data.recipe.dish}
+      accompaniments={$page.state.accompaniments.accompaniments}
+    />
+
+    <div class="flex gap-2 justify-end mt-4">
+      {#if $page.state.accompaniments.accompaniments.length > 0}
+        <button
+          type="button"
+          class="btn mx-0"
+          on:click={() => {
+            if (!$page.state.accompaniments) {
+              return;
+            }
+
+            copyToClipboard($page.state.accompaniments.accompaniments.join('\n'), {
+              successMessage: 'Liste des accompagnements copiée dans le presse-papier.',
+              failureMessage:
+                'Impossible de copier la liste des accompagnements dans le presse-papier.',
+              accessDeniedMessage:
+                "Vous devez autoriser l'accès au presse-papier pour copier la liste des accompagnements.",
+            });
+          }}
+        >
+          Copier la liste
+        </button>
+      {/if}
+      <button type="button" class="btn mx-0" on:click={closeCurrentModal}>Fermer</button>
+    </div>
+  {/if}
+</Modal>
+
+<Modal
+  id="similar"
+  title="Recettes similaires"
+  description="Liste des recettes similaires à celle-ci."
+  open={!!$page.state.similarRecipes}
+  on:close={closeCurrentModal}
+>
+  {#if !!$page.state.similarRecipes}
+    <SimilarRecipesResult
+      dish={data.recipe.dish}
+      similarRecipes={$page.state.similarRecipes.similarRecipes}
+    />
+
+    <div class="flex gap-2 justify-end mt-4">
+      <button type="button" class="btn mx-0" on:click={closeCurrentModal}>Fermer</button>
+    </div>
+  {/if}
+</Modal>
+
 <div class="flex gap-2 items-center justify-center">
   <form method="POST" action="?/favourite" class="relative" use:enhance>
-    <h1 class="h1 first-letter:capitalize">{data.recipe.dish}</h1>
+    <h1 class="h1 first-letter:capitalize" style="view-transition-name: {data.recipe.slug};">
+      {data.recipe.dish}
+    </h1>
     <button
       aria-label={data.isFavourite
         ? 'Retirer la recette des favoris'
@@ -177,30 +260,49 @@
   <div
     class="flex gap-2.5 items-center justify-center"
     role="group"
-    aria-label="Partager ou copier la liste de course"
+    aria-label="Partager la recette"
   >
-    <a href={facebook} target="_blank" rel="noopener noreferrer" aria-label="Partager sur Facebook"
-      ><Facebook /></a
-    >
-    <a href={reddit} target="_blank" rel="noopener noreferrer" aria-label="Partager sur Reddit"
-      ><Reddit /></a
-    >
+    <a href={facebook} target="_blank" rel="noopener noreferrer" aria-label="Partager sur Facebook">
+      <Facebook />
+    </a>
+    <a href={reddit} target="_blank" rel="noopener noreferrer" aria-label="Partager sur Reddit">
+      <Reddit />
+    </a>
     <a
       href={twitter}
       target="_blank"
       rel="noopener noreferrer"
-      aria-label="Partager sur Twitter (X)"><Twitter /></a
+      aria-label="Partager sur Twitter (X)"
     >
-    <button type="button" on:click={copyToClipboard} aria-label="Copier dans le presse-papier"
-      ><Clipboard /></button
-    >
+      <Twitter />
+    </a>
   </div>
 
   <section class="container mx-auto space-y-4">
     <p class="mb-3 text-lg text-gray-500 text-center md:text-xl">{data.recipe.description}</p>
-    <div class="grid gap-6 sm:grid-cols-2">
+    <div class="grid gap-6 md:grid-cols-3">
       <div>
-        <h2 class="mb-2 text-lg font-semibold text-gray-900">Ingrédients nécessaires</h2>
+        <div class="mb-2 text-lg font-semibold text-gray-900 flex gap-1 items-center">
+          <h2>Ingrédients nécessaires</h2>
+          <button
+            type="button"
+            aria-label="Copier les ingrédients dans le presse-papier"
+            disabled={data.recipe.ingredients.length === 0}
+            class:opacity-50={data.recipe.ingredients.length === 0}
+            class:cursor-not-allowed={data.recipe.ingredients.length === 0}
+            on:click={() => {
+              copyToClipboard(data.recipe.ingredients.join('\n'), {
+                successMessage: 'Liste des ingrédients copiée dans le presse-papier.',
+                failureMessage:
+                  'Impossible de copier la liste des ingrédients dans le presse-papier.',
+                accessDeniedMessage:
+                  "Vous devez autoriser l'accès au presse-papier pour copier la liste des ingrédients.",
+              });
+            }}
+          >
+            <Clipboard />
+          </button>
+        </div>
         {#if data.recipe.ingredients.length > 0}
           <ol class="space-y-1 text-gray-500 list-decimal list-inside">
             {#each data.recipe.ingredients as ingredient}
@@ -213,8 +315,28 @@
           <p class="text-gray-500">Aucun ingrédient pour cette recette.</p>
         {/if}
       </div>
+
       <div>
-        <h2 class="mb-2 text-lg font-semibold text-gray-900">Etapes de la recette</h2>
+        <div class="mb-2 text-lg font-semibold text-gray-900 flex gap-1 items-center">
+          <h2>Etapes de la recette</h2>
+          <button
+            type="button"
+            aria-label="Copier les étapes dans le presse-papier"
+            disabled={data.recipe.steps.length === 0}
+            class:opacity-50={data.recipe.steps.length === 0}
+            class:cursor-not-allowed={data.recipe.steps.length === 0}
+            on:click={() => {
+              copyToClipboard(data.recipe.steps.join('\n'), {
+                successMessage: 'Liste des étapes copiée dans le presse-papier.',
+                failureMessage: 'Impossible de copier la liste des étapes dans le presse-papier.',
+                accessDeniedMessage:
+                  "Vous devez autoriser l'accès au presse-papier pour copier la liste des étapes.",
+              });
+            }}
+          >
+            <Clipboard />
+          </button>
+        </div>
         {#if data.recipe.steps.length > 0}
           <ol class="space-y-1 text-gray-500 list-decimal list-inside">
             {#each data.recipe.steps as step}
@@ -227,11 +349,91 @@
           <p class="text-gray-500">Aucune étape pour cette recette.</p>
         {/if}
       </div>
+
+      <div>
+        <div class="mb-2 text-lg font-semibold text-gray-900 flex gap-1 items-center">
+          <h2>Liste de course</h2>
+          <button
+            type="button"
+            aria-label="Copier la liste de course dans le presse-papier"
+            disabled={data.recipe.shoppingList.length === 0}
+            class:opacity-50={data.recipe.shoppingList.length === 0}
+            class:cursor-not-allowed={data.recipe.shoppingList.length === 0}
+            on:click={() => {
+              copyToClipboard(data.recipe.shoppingList.join('\n'), {
+                successMessage: 'Liste de course copiée dans le presse-papier.',
+                failureMessage: 'Impossible de copier la liste de course dans le presse-papier.',
+                accessDeniedMessage:
+                  "Vous devez autoriser l'accès au presse-papier pour copier la liste de course.",
+              });
+            }}
+          >
+            <Clipboard />
+          </button>
+        </div>
+        {#if data.recipe.shoppingList.length > 0}
+          <ol class="space-y-1 text-gray-500 list-decimal list-inside">
+            {#each data.recipe.shoppingList as item}
+              <li>
+                <span class="text-gray-900">{item}</span>
+              </li>
+            {/each}
+          </ol>
+        {:else}
+          <p class="text-gray-500">Aucune liste de course pour cette recette.</p>
+        {/if}
+      </div>
     </div>
   </section>
 
-  <section class="container mx-auto space-y-5">
+  <section class="container mx-auto space-y-4">
+    <h2 class="h2 text-center">Aller plus loin</h2>
+
+    <div class="flex gap-2.5 items-center justify-center">
+      <a
+        href="/recipes/{data.recipe.slug}/accompaniments"
+        class="btn"
+        class:opacity-50={accompanimentsLoading}
+        class:cursor-not-allowed={accompanimentsLoading}
+        aria-disabled={accompanimentsLoading ? 'true' : 'false'}
+        on:click={showAccompaniments}
+      >
+        {#if accompanimentsLoading}
+          <Spinner />
+        {/if}
+
+        Demander des accompagnements personnalisés
+      </a>
+      <a
+        href="/recipes/{data.recipe.slug}/similar"
+        class="btn"
+        class:opacity-50={similarRecipesLoading}
+        class:cursor-not-allowed={similarRecipesLoading}
+        aria-disabled={similarRecipesLoading ? 'true' : 'false'}
+        on:click={showSimilarRecipes}
+      >
+        {#if similarRecipesLoading}
+          <Spinner />
+        {/if}
+
+        Trouver des recettes similaires
+      </a>
+    </div>
+  </section>
+
+  <section class="container mx-auto space-y-4">
     <h2 class="h2">Avis ({data.reviewCount})</h2>
+
+    {#if data.userReview}
+      <form
+        class="contents"
+        method="post"
+        action="?/removeReview"
+        id="remove-review"
+        use:enhance
+      ></form>
+    {/if}
+
     <form
       action="?/review"
       method="post"
@@ -246,22 +448,15 @@
         <h3 class="h3">Votre avis</h3>
 
         {#if data.userReview}
-          <form
-            class="contents"
-            method="post"
-            action="?/removeReview"
-            id="remove-review"
-            use:enhance
+          <input form="remove-review" type="hidden" name="id" value={data.userReview.id} />
+          <button
+            aria-label="Supprimer l'avis"
+            type="submit"
+            form="remove-review"
+            class="btn | bg-red-600 mx-0 p-2.5 hover:!bg-red-700"
           >
-            <input type="hidden" name="id" value={data.userReview.id} />
-            <button
-              aria-label="Supprimer l'avis"
-              type="submit"
-              class="btn | bg-red-600 mx-0 p-2.5 hover:!bg-red-700"
-            >
-              <Trash aria-hidden="true" />
-            </button>
-          </form>
+            <Trash aria-hidden="true" />
+          </button>
         {/if}
       </div>
       <div class="grid gap-2.5 sm:grid-cols-3">
@@ -304,9 +499,9 @@
         </p>
       {/if}
 
-      <button type="submit" class="btn | justify-center w-full sm:max-w-xs" aria-controls="reviews"
-        >Envoyer</button
-      >
+      <button type="submit" class="btn | justify-center w-full sm:max-w-xs" aria-controls="reviews">
+        Envoyer
+      </button>
     </form>
 
     <div class="flex flex-col gap-2" id="reviews" role="region" aria-live="polite">
@@ -358,10 +553,7 @@
 
     {#if !noMoreReviews}
       {#if loading}
-        <div class="flex flex-col gap-1 items-center justify-center w-full">
-          <Spinner size="h-8 w-8" color="text-primary-600" />
-          <p role="status" class="text-gray-500 text-center">Chargement des avis...</p>
-        </div>
+        <Loader message="Chargement des avis..." />
       {:else}
         <form
           action="?/loadReviews"
@@ -371,7 +563,7 @@
             loading = true;
 
             return async ({ update }) => {
-              await update();
+              await update({ invalidateAll: false });
 
               loading = false;
             };
@@ -380,7 +572,9 @@
           <input type="hidden" name="cursor" value={reviews.at(-1)?.id} />
 
           <noscript>
-            <button type="submit" class="btn | w-full">Charger plus d'avis</button>
+            <button type="submit" aria-controls="reviews" class="btn | w-full">
+              Charger plus d'avis
+            </button>
           </noscript>
         </form>
       {/if}

@@ -35,9 +35,11 @@
 </script>
 
 <svelte:head>
-  {#if $page.data.seo?.title}
-    <title>{$page.data.seo.title}</title>
-  {/if}
+  {#key $page.data.seo}
+    {#if $page.data.seo?.title}
+      <title>{$page.data.seo.title}</title>
+    {/if}
+  {/key}
   {#if $page.data.seo?.meta}
     {#each Object.entries($page.data.seo.meta) as [name, content] (name)}
       <meta {name} {content} />
@@ -53,7 +55,7 @@
   }}
 />
 
-<nav class="bg-white border-gray-200 px-4 lg:px-6 py-2.5">
+<header class="bg-white border-gray-200 px-4 lg:px-6 py-2.5" style="view-transition-name: header;">
   <div class="flex flex-wrap justify-between items-center mx-auto max-w-screen-xl">
     <a
       href="/"
@@ -66,32 +68,43 @@
     </a>
 
     {#if data.user}
-      <div class="flex items-center lg:order-2">
-        <form method="POST" action="/?/logout" use:enhance>
-          <button
-            type="submit"
-            class="
+      <nav class="flex items-center lg:order-2">
+        <ul class="contents">
+          <li>
+            <form method="POST" action="/?/logout" use:enhance>
+              <button
+                type="submit"
+                class="
+                text-gray-800 hover:bg-gray-50 focus:ring-4 focus:ring-gray-300 font-medium
+                rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 mr-2 focus:outline-none
+              "
+              >
+                Se déconnecter
+              </button>
+            </form>
+          </li>
+          <li>
+            <a
+              class="
               text-gray-800 hover:bg-gray-50 focus:ring-4 focus:ring-gray-300 font-medium
               rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 mr-2 focus:outline-none
             "
-          >
-            Se déconnecter
-          </button>
-        </form>
-        <a
-          class="
-            text-gray-800 hover:bg-gray-50 focus:ring-4 focus:ring-gray-300 font-medium
-            rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 mr-2 focus:outline-none
-          "
-          href="/account/favourites">Mes favoris</a
-        >
-        <a aria-label="Mon profil" href="/account">
-          <UserCircle />
-        </a>
-      </div>
+              href="/account/favourites"
+            >
+              Mes favoris
+            </a>
+          </li>
+          <li>
+            <a aria-label="Mon profil" href="/account">
+              <UserCircle aria-hidden="true" />
+            </a>
+          </li>
+        </ul>
+      </nav>
     {/if}
   </div>
-</nav>
+</header>
+
 <main class="flex flex-col grow p-5">
   <slot />
 

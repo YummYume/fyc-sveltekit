@@ -7,6 +7,7 @@
   import Trash from '$lib/svg/Trash.svelte';
   import { inputDebounce } from '$lib/utils/debounce';
   import { prefersReducedMotion } from '$lib/utils/preferences';
+  import { truncate } from '$lib/utils/string';
 
   import type { PageData } from './$types';
 
@@ -22,7 +23,9 @@
 <h1 class="h1">Mes favoris</h1>
 
 <div class="container flex flex-col gap-4 px-3 py-8 mx-auto">
-  <div class="contents" role="region" aria-live="polite" id="favourites-results">
+  <section class="contents" aria-live="polite" id="favourites-results">
+    <h2 class="sr-only">Liste des favoris</h2>
+
     {#if data.count > 0}
       <p class="text-center text-lg" role="status">
         {data.count} favori{data.count > 1 ? 's' : ''} trouvé{data.count > 1 ? 's' : ''}.
@@ -98,48 +101,52 @@
     </form>
 
     {#if data.count > 0}
-      <div
+      <ul
         class="flex flex-col gap-4"
         out:fade={{
           duration: prefersReducedMotion() ? 0 : 300,
         }}
       >
         {#each data.favourites as favourite (favourite.id)}
-          <Card>
-            <div class="flex gap-1">
-              <div class="flex-grow flex flex-col gap-1">
-                <a
-                  href="/recipes/{favourite.recipe.slug}"
-                  class="hover:text-primary-600 focus-visible:text-primary-600 transition-colors motion-reduce:transition-none"
-                >
-                  <h2 class="h2">{favourite.recipe.dish}</h2>
-                </a>
-                <p class="text-gray-600">{favourite.recipe.description}</p>
-                <p class="text-sm text-gray-500 mt-auto">
-                  Ajoutée le {favourite.createdAt.toLocaleDateString('fr-FR', {
-                    day: 'numeric',
-                    month: 'long',
-                    year: 'numeric',
-                  })}
-                </p>
-              </div>
-              <div class="my-auto">
-                <form
-                  method="post"
-                  action="/recipes/{favourite.recipe.slug}?/favourite"
-                  use:enhance
-                >
-                  <button
-                    type="submit"
-                    class="btn | bg-red-600 mx-0 p-2.5 hover:!bg-red-700"
-                    aria-label="Retirer des favoris"
+          <li class="contents">
+            <Card>
+              <div class="flex gap-1">
+                <div class="flex-grow flex flex-col gap-1">
+                  <a
+                    href="/recipes/{favourite.recipe.slug}"
+                    class="hover:text-primary-600 focus-visible:text-primary-600 transition-colors motion-reduce:transition-none"
                   >
-                    <Trash aria-hidden="true" class="h-6 w-6" />
-                  </button>
-                </form>
+                    <h3 class="h3">
+                      {favourite.recipe.dish}
+                    </h3>
+                  </a>
+                  <p class="text-gray-600">{truncate(favourite.recipe.description, 100)}</p>
+                  <p class="text-sm text-gray-500 mt-auto">
+                    Ajoutée le {favourite.createdAt.toLocaleDateString('fr-FR', {
+                      day: 'numeric',
+                      month: 'long',
+                      year: 'numeric',
+                    })}
+                  </p>
+                </div>
+                <div class="my-auto">
+                  <form
+                    method="post"
+                    action="/recipes/{favourite.recipe.slug}?/favourite"
+                    use:enhance
+                  >
+                    <button
+                      type="submit"
+                      class="btn | bg-red-600 mx-0 p-2.5 hover:!bg-red-700"
+                      aria-label="Retirer des favoris"
+                    >
+                      <Trash aria-hidden="true" class="h-6 w-6" />
+                    </button>
+                  </form>
+                </div>
               </div>
-            </div>
-          </Card>
+            </Card>
+          </li>
         {:else}
           <div class="flex flex-col gap-2 text-center text-lg">
             <p role="status">On dirait que vous vous êtes perdus ! Cette page n'existe pas.</p>
@@ -183,7 +190,7 @@
             >
           </noscript>
         </div>
-      </div>
+      </ul>
     {/if}
-  </div>
+  </section>
 </div>

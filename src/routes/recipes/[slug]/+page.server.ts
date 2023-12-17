@@ -2,6 +2,7 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library.js
 import { error, fail, redirect } from '@sveltejs/kit';
 
 import { CARLOS_DEFAULT_ERROR_PROMPT } from '$lib/server/GPT.js';
+import { jsonValueToArray } from '$lib/utils/json.js';
 
 import type { PageServerLoad } from './$types.js';
 
@@ -47,32 +48,13 @@ export const load = (async ({ locals, params }) => {
       }),
     ]);
 
-    const ingredients = recipe.ingredients
-      ?.toString()
-      .split(',')
-      .map((ingredient, index) => {
-        const ingredientIndex = index + 1;
-
-        return `${ingredientIndex}. ${ingredient},\n`;
-      });
-
     return {
       isFavourite: !!favourite,
       recipe: {
         ...recipe,
-        ingredients: Array.isArray(recipe.ingredients)
-          ? recipe.ingredients.filter<string>(
-              (ingredient): ingredient is string => typeof ingredient === 'string',
-            )
-          : [],
-        steps: Array.isArray(recipe.steps)
-          ? recipe.steps.filter<string>((step): step is string => typeof step === 'string')
-          : [],
-        shoppingList: Array.isArray(recipe.shoppingList)
-          ? recipe.shoppingList
-              .filter<string>((item): item is string => typeof item === 'string')
-              .join('\n')
-          : '',
+        ingredients: jsonValueToArray(recipe.ingredients),
+        steps: jsonValueToArray(recipe.steps),
+        shoppingList: jsonValueToArray(recipe.shoppingList),
       },
       userReview,
       user: session.user,
@@ -97,7 +79,7 @@ export const load = (async ({ locals, params }) => {
           L'utilisateur peut ajouter ou retirer la recette de ses favoris en cliquant sur l'étoile à droite du titre de la recette.
           La recette ${favourite ? 'est' : "n'est pas"} dans les favoris de l'utilisateur.
           Si une question porte sur une étape ou un ingrédient, focalise-toi sur cette étape ou cet ingrédient.
-          Voici les ingrédients de la recette : ${ingredients}. Chaque ingrédient est séparé par une virgule.
+          Voici les ingrédients de la recette : ${recipe.ingredients?.toString()}. Chaque ingrédient est séparé par une virgule.
           Voici les étapes de la recette : ${recipe.steps?.toString()}. Chaque étape est séparée par une virgule.
           Voici la description de la recette : ${recipe.description}.
           Voici la note moyenne de la recette : ${_avg.rating ?? '-'}/5 pour un total de ${
@@ -258,7 +240,9 @@ export const actions = {
       },
     });
 
-    return { review: newReview };
+    return {
+      review: newReview,
+    };
   },
   removeReview: async ({ locals, request }) => {
     const { db, session } = locals;
