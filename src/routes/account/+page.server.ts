@@ -49,20 +49,14 @@ export const actions = {
 
     if (username && username !== '') {
       if (!/^[A-Za-z]+$/g.test(username)) {
-        return fail(400, {
+        return fail(422, {
           error: "Le nom d'utilisateur ne doit contenir que des lettres.",
         });
       }
 
-      if (username.length > 20) {
+      if (username.length < 3 || username.length > 20) {
         return fail(400, {
-          error: "Le nom d'utilisateur ne doit pas dépasser 20 caractères.",
-        });
-      }
-
-      if (username.length < 3) {
-        return fail(400, {
-          error: "Le nom d'utilisateur doit contenir au moins 3 caractères.",
+          error: "Le nom d'utilisateur ne doit etre compris entre 3 et 20 caractères.",
         });
       }
 
@@ -71,7 +65,7 @@ export const actions = {
 
     if (ingredients) {
       if (!/[a-zA-Z,]/.test(ingredients)) {
-        return fail(400, {
+        return fail(422, {
           error: 'Les ingrédients ne doivent contenir que des lettres et des virgules.',
         });
       }
