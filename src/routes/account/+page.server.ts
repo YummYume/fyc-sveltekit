@@ -15,8 +15,6 @@ export const load = (({ locals }) => {
     redirect(303, '/login');
   }
 
-  console.log(session);
-
   return {
     user: session.user,
     seo: {
