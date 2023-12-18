@@ -44,13 +44,13 @@
       </div>
       <hr />
       <div>
-        <label for="ingredients">Ingrédients à ne pas utiliser</label>
+        <label for="disallowedIngredients">Ingrédients à ne pas utiliser</label>
         <input
           type="text"
-          name="ingredients"
-          id="ingredients"
+          name="disallowedIngredients"
+          id="disallowedIngredients"
           placeholder="arachides, viande, lait, etc."
-          value={data.user.ingredients}
+          value={data.user.disallowedIngredients ?? ''}
         />
       </div>
       <button type="submit" class="btn | xl:w-max">Sauvegarder</button>

@@ -1,11 +1,13 @@
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { fail, redirect } from '@sveltejs/kit';
 
+import { auth } from '$lib/server/auth';
+
 import type { PageServerLoad } from './$types';
 
 type UserData = {
   username?: string;
-  ingredients?: string;
+  disallowedIngredients?: string;
 };
 
 export const load = (({ locals }) => {
@@ -35,7 +37,7 @@ export const load = (({ locals }) => {
 
 export const actions = {
   default: async ({ locals, request }) => {
-    const { db, session } = locals;
+    const { session } = locals;
     const data = await request.formData();
 
     if (!session) {
@@ -45,7 +47,7 @@ export const actions = {
     const userData: UserData = {};
 
     const username = data.get('username') as string;
-    const ingredients = data.get('ingredients') as string;
+    const disallowedIngredients = data.get('disallowedIngredients') as string;
 
     if (username && username !== '') {
       if (!/^[A-Za-z]+$/g.test(username)) {
@@ -63,22 +65,20 @@ export const actions = {
       userData.username = username;
     }
 
-    if (ingredients) {
-      if (!/[a-zA-Z,]/.test(ingredients)) {
+    if (disallowedIngredients) {
+      if (!/[a-zA-Z,]/.test(disallowedIngredients)) {
         return fail(422, {
           error: 'Les ingrédients ne doivent contenir que des lettres et des virgules.',
         });
       }
 
-      userData.ingredients = ingredients;
+      userData.disallowedIngredients = disallowedIngredients;
     }
 
     try {
-      await db.user.update({
-        where: {
-          id: session?.user.userId,
-        },
-        data: userData,
+      await auth.updateUserAttributes(session.user.userId, {
+        username: userData.username,
+        disallowedIngredients: userData.disallowedIngredients,
       });
     } catch (e) {
       if (e instanceof PrismaClientKnownRequestError && e.code === 'P2002') {

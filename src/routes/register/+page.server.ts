@@ -1,3 +1,4 @@
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { fail, redirect } from '@sveltejs/kit';
 import { LuciaError } from 'lucia';
 
@@ -61,6 +62,7 @@ export const actions = {
         },
         attributes: {
           username,
+          disallowedIngredients: null,
         },
       });
       const newSession = await auth.createSession({
@@ -74,6 +76,10 @@ export const actions = {
         path: sessionCookie.attributes.path ?? '/',
       });
     } catch (e) {
+      if (e instanceof PrismaClientKnownRequestError && e.code === 'P2002') {
+        return fail(400, { error: "Ce nom d'utilisateur est déjà pris." });
+      }
+
       if (e instanceof LuciaError && e.message === `AUTH_DUPLICATE_KEY_ID`) {
         return fail(400, { error: "Ce nom d'utilisateur est déjà pris." });
       }

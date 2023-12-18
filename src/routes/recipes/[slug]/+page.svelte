@@ -230,7 +230,8 @@
       >
         <div>
           <span class="flex items-center"
-            ><span class="text-2xl mr-1"><Warning /></span> Contient des ingrédients à éviter, indiqué dans votre profil :</span
+            ><span class="text-2xl mr-1"><Warning /></span> Contient des ingrédients à éviter, indiqué
+            dans votre profil :</span
           >
           <ul class="list-disc list-inside capitalize ml-8">
             {#each disallowedIngredients as ingredient}

@@ -49,7 +49,7 @@ export const load = (async ({ locals, params }) => {
     ]);
 
     const checkDisallowedIngredients = async (): Promise<string[] | null> => {
-      if (session.user.ingredients && recipe.ingredients) {
+      if (session.user.disallowedIngredients && recipe.ingredients) {
         const result = await openai.chat.completions.create({
           model: 'gpt-3.5-turbo',
           stream: false,
@@ -57,10 +57,14 @@ export const load = (async ({ locals, params }) => {
             {
               role: 'system',
               content: `
-                Voici une liste d'ingrédients : ${session.user.ingredients}, si dans la recette que je te donne, il y a au moins un ingrédient de cette liste ou du même genre, tu me renvoies un JSON : 
+                Voici une liste d'ingrédients à éviter: ${session.user.disallowedIngredients}, 
+                si dans la recette que je te donne, il y a au moins un ingrédient de cette liste ou du même genre, 
+                tu me renvoies un objet JSON uniquement : 
                 {
                   "disallowedIngredients": string[],
                 }, 
+                disallowedIngredients contiendra la liste des ingrédients à éviter que tu as trouvé dans la recette.
+                Si tu ne trouves pas d'ingrédients à éviter, disallowedIngredients sera un tableau vide.
               `,
             },
             {

@@ -26,7 +26,11 @@ export const load = (async ({ locals, params }) => {
         La recette actuellement consultée est "${recipe.dish}".
         Ton travail consiste à me donner une liste d'accompagnements pour cette recette.
         Je veux le résultat au format JSON, comme suit : ["accompagnement1", "accompagnement2", "accompagnement3"].
-        Attention, tu dois me donner des accompagnements qui ne contiennent pas ce genre ingrédients : ${session.user.ingredients}.
+        ${
+          session.user.disallowedIngredients
+            ? `Attention, tu dois me donner des accompagnements qui ne contiennent pas ce genre ingrédients : ${session.user.disallowedIngredients}.`
+            : ''
+        }
         Tu peux me donner au maximum 10 accompagnements.
       `;
 
