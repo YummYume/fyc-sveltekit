@@ -30,7 +30,6 @@
   <Card>
     <h2 class="h2">Editer le profil</h2>
     <form
-      action=""
       method="POST"
       class="form"
       use:enhance={() => {
@@ -41,7 +40,7 @@
     >
       <div>
         <label for="username">Votre nom d'utilisateur</label>
-        <input type="text" name="username" id="username" value={data.user.username} />
+        <input type="text" name="username" id="username" value={data.user.username} required />
       </div>
       <hr />
       <div>

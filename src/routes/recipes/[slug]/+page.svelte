@@ -222,29 +222,33 @@
 </Modal>
 
 <div role="alert">
-  {#if data.IngredientsNotAllowed.isContainingIngredients && isIngredientsWarningOpen}
-    <div
-      class="flex items-center justify-between rounded-lg p-3 mb-4 bg-amber-600/30 border-2 border-amber-600/75 text-amber-600"
-      transition:blur
-    >
-      <div>
-        <span class="flex items-center"
-          ><span class="text-2xl mr-1"><Warning /></span> Contient des ingrédients interdits :</span
-        >
-        <ul class="list-disc list-inside capitalize ml-8">
-          {#each data.IngredientsNotAllowed.ingredientsInvolved as ingredient}
-            <li>{ingredient}</li>
-          {/each}
-        </ul>
-      </div>
-      <button
-        type="button"
-        class="mr-4"
-        aria-label="Fermer l'alert"
-        on:click={closeIngredientsWarning}><Close /></button
+  {#await data.disallowedIngredients then disallowedIngredients}
+    {#if disallowedIngredients && isIngredientsWarningOpen}
+      <div
+        class="flex items-center justify-between rounded-lg p-3 mb-4 bg-amber-600/30 border-2 border-amber-600/75 text-amber-600"
+        transition:blur
       >
-    </div>
-  {/if}
+        <div>
+          <span class="flex items-center"
+            ><span class="text-2xl mr-1"><Warning /></span> Contient des ingrédients à éviter, indiqué dans votre profil :</span
+          >
+          <ul class="list-disc list-inside capitalize ml-8">
+            {#each disallowedIngredients as ingredient}
+              <li>{ingredient}</li>
+            {/each}
+          </ul>
+        </div>
+        <button
+          type="button"
+          class="mr-4"
+          aria-label="Fermer cette alerte"
+          on:click={closeIngredientsWarning}><Close /></button
+        >
+      </div>
+    {/if}
+  {:catch error}
+    <p role="status" class="text-red-500 text-center">{error.message}</p>
+  {/await}
 </div>
 
 <div class="flex gap-2 items-center justify-center">

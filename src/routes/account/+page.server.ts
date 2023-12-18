@@ -56,7 +56,7 @@ export const actions = {
 
       if (username.length < 3 || username.length > 20) {
         return fail(400, {
-          error: "Le nom d'utilisateur ne doit etre compris entre 3 et 20 caractères.",
+          error: "Le nom d'utilisateur doit être compris entre 3 et 20 caractères.",
         });
       }
 

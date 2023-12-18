@@ -48,38 +48,38 @@ export const load = (async ({ locals, params }) => {
       }),
     ]);
 
-    let IngredientsNotAllowed = {
-      isContainingIngredients: false,
-      ingredientsInvolved: [],
+    const checkDisallowedIngredients = async (): Promise<string[] | null> => {
+      if (session.user.ingredients && recipe.ingredients) {
+        const result = await openai.chat.completions.create({
+          model: 'gpt-3.5-turbo',
+          stream: false,
+          messages: [
+            {
+              role: 'system',
+              content: `
+                Voici une liste d'ingrédients : ${session.user.ingredients}, si dans la recette que je te donne, il y a au moins un ingrédient de cette liste ou du même genre, tu me renvoies un JSON : 
+                {
+                  "disallowedIngredients": string[],
+                }, 
+              `,
+            },
+            {
+              role: 'user',
+              content: recipe.ingredients.toString(),
+            },
+          ],
+        });
+
+        const { disallowedIngredients } = JSON.parse(result.choices[0].message.content ?? '');
+
+        return disallowedIngredients.length > 0 ? disallowedIngredients : null;
+      }
+
+      return null;
     };
 
-    if (session.user.ingredients && recipe.ingredients) {
-      const result = await openai.chat.completions.create({
-        model: 'gpt-3.5-turbo',
-        stream: false,
-        messages: [
-          {
-            role: 'system',
-            content: `
-              Voici une liste d'ingrédients : ${session.user.ingredients}, si dans la recette que je te donne, il y a au moins un ingrédient de cette liste ou du même genre, tu me renvoies un JSON : 
-              {
-                "isContainingIngredients": boolean,
-                "ingredientsInvolved": string[],
-              }, 
-            `,
-          },
-          {
-            role: 'user',
-            content: recipe.ingredients.toString(),
-          },
-        ],
-      });
-
-      IngredientsNotAllowed = JSON.parse(result.choices[0].message.content ?? '');
-    }
-
     return {
-      IngredientsNotAllowed,
+      disallowedIngredients: checkDisallowedIngredients(),
       isFavourite: !!favourite,
       recipe: {
         ...recipe,
