@@ -61,7 +61,7 @@ export const load = (async ({ locals, params }) => {
           {
             role: 'system',
             content: `
-              Voici une liste d'ingrédients : ${session.user.ingredients}, si dans la recette que je te donne, il y a au moins un ingrédient de cette liste, tu me renvoies un JSON : 
+              Voici une liste d'ingrédients : ${session.user.ingredients}, si dans la recette que je te donne, il y a au moins un ingrédient de cette liste ou du même genre, tu me renvoies un JSON : 
               {
                 "isContainingIngredients": boolean,
                 "ingredientsInvolved": string[],

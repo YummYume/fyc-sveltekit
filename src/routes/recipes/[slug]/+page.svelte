@@ -224,7 +224,7 @@
 <div role="alert">
   {#if data.IngredientsNotAllowed.isContainingIngredients && isIngredientsWarningOpen}
     <div
-      class="flex items-center justify-between rounded-lg p-3 mb-2 bg-amber-600/30 border-2 border-amber-600/75 text-amber-600"
+      class="flex items-center justify-between rounded-lg p-3 mb-4 bg-amber-600/30 border-2 border-amber-600/75 text-amber-600"
       transition:blur
     >
       <div>
