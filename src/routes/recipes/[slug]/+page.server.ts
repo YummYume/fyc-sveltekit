@@ -1,7 +1,7 @@
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library.js';
 import { error, fail, redirect } from '@sveltejs/kit';
 
-import { CARLOS_DEFAULT_ERROR_PROMPT } from '$lib/server/GPT.js';
+import { CARLOS_DEFAULT_ERROR_PROMPT, openai } from '$lib/server/GPT.js';
 import { jsonValueToArray } from '$lib/utils/json.js';
 
 import type { PageServerLoad } from './$types.js';
@@ -48,7 +48,38 @@ export const load = (async ({ locals, params }) => {
       }),
     ]);
 
+    let IngredientsNotAllowed = {
+      isContainingIngredients: false,
+      ingredientsInvolved: [],
+    };
+
+    if (session.user.ingredients && recipe.ingredients) {
+      const result = await openai.chat.completions.create({
+        model: 'gpt-3.5-turbo',
+        stream: false,
+        messages: [
+          {
+            role: 'system',
+            content: `
+              Voici une liste d'ingrédients : ${session.user.ingredients}, si dans la recette que je te donne, il y a au moins un ingrédient de cette liste, tu me renvoies un JSON : 
+              {
+                "isContainingIngredients": boolean,
+                "ingredientsInvolved": string[],
+              }, 
+            `,
+          },
+          {
+            role: 'user',
+            content: recipe.ingredients.toString(),
+          },
+        ],
+      });
+
+      IngredientsNotAllowed = JSON.parse(result.choices[0].message.content ?? '');
+    }
+
     return {
+      IngredientsNotAllowed,
       isFavourite: !!favourite,
       recipe: {
         ...recipe,

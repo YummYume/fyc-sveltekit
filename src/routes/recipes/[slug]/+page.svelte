@@ -50,6 +50,7 @@
   let noMoreReviews = false;
   let accompanimentsLoading = false;
   let similarRecipesLoading = false;
+  let isIngredientsWarningOpen = true;
 
   // Computed
   $: starKey = data.isFavourite ? 'full' : 'empty';
@@ -118,6 +119,10 @@
     }
 
     accompanimentsLoading = false;
+  };
+
+  const closeIngredientsWarning = () => {
+    isIngredientsWarningOpen = false;
   };
 
   const showSimilarRecipes = async (e: MouseEvent & { currentTarget: HTMLAnchorElement }) => {
@@ -213,6 +218,24 @@
     </div>
   {/if}
 </Modal>
+
+
+<div 
+class="flex items-center justify-between rounded-lg p-3 mb-2 bg-amber-600/30 border-2 border-amber-600/75 text-amber-600"
+role="alert"
+>
+  {#if data.IngredientsNotAllowed.isContainingIngredients && isIngredientsWarningOpen}
+    <div>
+      <span><span class="align-sub text-2xl mr-1">&#9888;</span> Contient des ingrédients interdits :</span>
+      <ul class="list-disc list-inside capitalize">
+        {#each data.IngredientsNotAllowed.ingredientsInvolved as ingredient}
+          <li>{ingredient}</li>
+        {/each}
+      </ul>
+    </div>
+    <button class="text-2xl mr-1" type="button" aria-label="Fermer l'alert" on:click={closeIngredientsWarning}>&#10799;</button>
+  {/if}
+</div>
 
 <div class="flex gap-2 items-center justify-center">
   <form method="POST" action="?/favourite" class="relative" use:enhance>
