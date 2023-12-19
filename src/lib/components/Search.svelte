@@ -26,7 +26,7 @@
       required
       aria-label="Rechercher un plat"
       name="q"
-      class="!p-4 !pl-10"
+      class="!p-4 !pl-10 !pr-32"
       {value}
     />
     <button type="submit" class="btn | absolute right-2.5 bottom-2.5 px-4 py-2 w-fit" {disabled}>
