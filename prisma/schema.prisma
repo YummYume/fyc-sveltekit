@@ -12,13 +12,14 @@ datasource db {
 }
 
 model User {
-  id       String @id @unique
-  username String
+  id                     String @id @unique
+  username               String @unique
+  disallowedIngredients  String? @db.Text
 
-  auth_session Session[]
-  auth_key     UserKey[]
-  favourites   Favourite[]
-  reviews      Review[]
+  auth_session           Session[]
+  auth_key               UserKey[]
+  favourites             Favourite[]
+  reviews                Review[]
 }
 
 model Session {

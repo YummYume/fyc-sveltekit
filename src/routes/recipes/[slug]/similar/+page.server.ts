@@ -42,6 +42,11 @@ export const load = (async ({ locals, params }) => {
         Je vais te donner une liste de recettes et ton travail est de me donner les recettes qui sont les plus adaptées pour être recommandées en tant que "recettes similaires".
         Tu peux me donner entre 0 et 3 recettes.
         Je veux le résultat au format JSON, comme suit : ["slug1", "slug2", "slug3"].
+        ${
+          session.user.disallowedIngredients
+            ? `Attention, tu dois me donner des recettes qui ne contiennent pas ce genre d'ingrédients : ${session.user.disallowedIngredients}.`
+            : ''
+        }
         Voici la liste des recettes : ${JSON.stringify(recipes)}.
       `;
 

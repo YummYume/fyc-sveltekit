@@ -2,6 +2,7 @@
 CREATE TABLE `User` (
     `id` VARCHAR(191) NOT NULL,
     `username` VARCHAR(191) NOT NULL,
+    `disallowedIngredients` TEXT NULL,
 
     UNIQUE INDEX `User_id_key`(`id`),
     PRIMARY KEY (`id`)

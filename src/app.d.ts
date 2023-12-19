@@ -46,6 +46,7 @@ declare global {
     type Auth = AuthType;
     type DatabaseUserAttributes = {
       username: string;
+      disallowedIngredients: string | null;
     };
     // eslint-disable-next-line @typescript-eslint/ban-types
     type DatabaseSessionAttributes = {};

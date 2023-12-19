@@ -1,7 +1,7 @@
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library.js';
 import { error, fail, redirect } from '@sveltejs/kit';
 
-import { CARLOS_DEFAULT_ERROR_PROMPT } from '$lib/server/GPT.js';
+import { CARLOS_DEFAULT_ERROR_PROMPT, openai } from '$lib/server/GPT.js';
 import { jsonValueToArray } from '$lib/utils/json.js';
 
 import type { PageServerLoad } from './$types.js';
@@ -48,7 +48,42 @@ export const load = (async ({ locals, params }) => {
       }),
     ]);
 
+    const checkDisallowedIngredients = async (): Promise<string[] | null> => {
+      if (session.user.disallowedIngredients && recipe.ingredients) {
+        const result = await openai.chat.completions.create({
+          model: 'gpt-3.5-turbo',
+          stream: false,
+          messages: [
+            {
+              role: 'system',
+              content: `
+                Voici une liste d'ingrédients à éviter: ${session.user.disallowedIngredients}, 
+                si dans la recette que je te donne, il y a au moins un ingrédient de cette liste ou du même genre, 
+                tu me renvoies un objet JSON uniquement : 
+                {
+                  "disallowedIngredients": string[],
+                }, 
+                disallowedIngredients contiendra la liste des ingrédients à éviter que tu as trouvé dans la recette.
+                Si tu ne trouves pas d'ingrédients à éviter, disallowedIngredients sera un tableau vide.
+              `,
+            },
+            {
+              role: 'user',
+              content: recipe.ingredients.toString(),
+            },
+          ],
+        });
+
+        const { disallowedIngredients } = JSON.parse(result.choices[0].message.content ?? '');
+
+        return disallowedIngredients.length > 0 ? disallowedIngredients : null;
+      }
+
+      return null;
+    };
+
     return {
+      disallowedIngredients: checkDisallowedIngredients(),
       isFavourite: !!favourite,
       recipe: {
         ...recipe,

@@ -1,11 +1,12 @@
 <script lang="ts">
   import { quintOut } from 'svelte/easing';
-  import { crossfade, fade } from 'svelte/transition';
+  import { blur, crossfade, fade } from 'svelte/transition';
 
   import Card from '$lib/components/Card.svelte';
   import Loader from '$lib/components/Loader.svelte';
   import Modal from '$lib/components/Modal.svelte';
   import Clipboard from '$lib/svg/Clipboard.svelte';
+  import Close from '$lib/svg/Close.svelte';
   import Facebook from '$lib/svg/Facebook.svelte';
   import Reddit from '$lib/svg/Reddit.svelte';
   import Spinner from '$lib/svg/Spinner.svelte';
@@ -13,6 +14,7 @@
   import StarFull from '$lib/svg/StarFull.svelte';
   import Trash from '$lib/svg/Trash.svelte';
   import Twitter from '$lib/svg/Twitter.svelte';
+  import Warning from '$lib/svg/Warning.svelte';
   import { copyToClipboard } from '$lib/utils/clipboard';
   import { infiniteScrollSubmit } from '$lib/utils/infinite-scroll';
   import { prefersReducedMotion } from '$lib/utils/preferences';
@@ -50,6 +52,7 @@
   let noMoreReviews = false;
   let accompanimentsLoading = false;
   let similarRecipesLoading = false;
+  let isIngredientsWarningOpen = true;
 
   // Computed
   $: starKey = data.isFavourite ? 'full' : 'empty';
@@ -118,6 +121,10 @@
     }
 
     accompanimentsLoading = false;
+  };
+
+  const closeIngredientsWarning = () => {
+    isIngredientsWarningOpen = false;
   };
 
   const showSimilarRecipes = async (e: MouseEvent & { currentTarget: HTMLAnchorElement }) => {
@@ -213,6 +220,41 @@
     </div>
   {/if}
 </Modal>
+
+<div role="alert">
+  {#await data.disallowedIngredients then disallowedIngredients}
+    {#if disallowedIngredients && isIngredientsWarningOpen}
+      <div
+        class="flex items-center justify-between rounded-lg p-3 mb-4 bg-amber-600/30 border-2 border-amber-600/75 text-amber-600"
+        transition:blur
+      >
+        <div>
+          <span class="flex items-center"
+            ><span class="text-2xl mr-1"><Warning /></span> Contient des ingrédients à éviter, indiqué
+            dans votre profil :</span
+          >
+          <ul class="list-disc list-inside capitalize ml-8">
+            {#each disallowedIngredients as ingredient}
+              <li>{ingredient}</li>
+            {/each}
+          </ul>
+        </div>
+        <button
+          type="button"
+          class="mr-4"
+          aria-label="Fermer cette alerte"
+          on:click={closeIngredientsWarning}><Close /></button
+        >
+      </div>
+    {/if}
+  {:catch error}
+    {#if error}
+      <p role="status" class="text-red-500 text-center">
+        Impossible de vérifier si la recette contient des ingrédients à ne pas utiliser...
+      </p>
+    {/if}
+  {/await}
+</div>
 
 <div class="flex gap-2 items-center justify-center">
   <form method="POST" action="?/favourite" class="relative" use:enhance>

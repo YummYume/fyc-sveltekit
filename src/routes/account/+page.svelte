@@ -1,11 +1,17 @@
 <script lang="ts">
   import Card from '$lib/components/Card.svelte';
+  import { toasts } from '$lib/utils/toats';
 
-  import type { PageData } from './$types';
+  import type { ActionData, PageData } from './$types';
 
   import { enhance } from '$app/forms';
 
   export let data: PageData;
+  export let form: ActionData;
+
+  $: if (form?.error) {
+    toasts.error(form.error);
+  }
 </script>
 
 <h1 class="h1">Profil</h1>
@@ -23,23 +29,31 @@
   </Card>
   <Card>
     <h2 class="h2">Editer le profil</h2>
-    <form action="" method="POST" class="form" use:enhance>
+    <form
+      method="POST"
+      class="form"
+      use:enhance={() => {
+        return async ({ update, result }) => {
+          await update({ reset: false });
+          if (result.type === 'success') {
+            toasts.success('Profil mis à jour');
+          }
+        };
+      }}
+    >
       <div>
         <label for="username">Votre nom d'utilisateur</label>
-        <input type="text" name="username" id="username" required={true} />
+        <input type="text" name="username" id="username" value={data.user.username} required />
       </div>
-      <button type="submit" class="btn | xl:w-max">Sauvegarder</button>
-    </form>
-    <hr />
-    <form action="" method="POST" class="form" use:enhance>
+      <hr />
       <div>
-        <label for="ingredients">Ingrédients à ne pas utiliser</label>
+        <label for="disallowedIngredients">Ingrédients à ne pas utiliser</label>
         <input
           type="text"
-          name="ingredients"
-          id="ingredients"
+          name="disallowedIngredients"
+          id="disallowedIngredients"
           placeholder="arachides, viande, lait, etc."
-          required={true}
+          value={data.user.disallowedIngredients ?? ''}
         />
       </div>
       <button type="submit" class="btn | xl:w-max">Sauvegarder</button>
