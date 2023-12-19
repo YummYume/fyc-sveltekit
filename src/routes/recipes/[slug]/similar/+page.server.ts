@@ -44,7 +44,10 @@ export const load = (async ({ locals, params }) => {
         Je veux le résultat au format JSON, comme suit : ["slug1", "slug2", "slug3"].
         ${
           session.user.disallowedIngredients
-            ? `Attention, tu dois me donner des recettes qui ne contiennent pas ce genre d'ingrédients : ${session.user.disallowedIngredients}.`
+            ? `
+              Attention, tu dois me donner des recettes qui ne contiennent pas ce genre d'ingrédients : ${session.user.disallowedIngredients}.
+              Les ingrédients à éviter sont séparés par une virgule. Si une valeur n'est pas un ingrédient valide, tu peux l'ignorer.
+            `
             : ''
         }
         Voici la liste des recettes : ${JSON.stringify(recipes)}.
@@ -95,6 +98,9 @@ export const load = (async ({ locals, params }) => {
         });
       }
     }
+
+    // eslint-disable-next-line no-console
+    console.error('Error while loading similar recipes page:', e);
 
     throw e;
   }

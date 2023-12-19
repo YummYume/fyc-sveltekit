@@ -77,6 +77,9 @@ export const actions = {
         return fail(400, { error: "le nom d'utilisateur est déjà utilisé." });
       }
 
+      // eslint-disable-next-line no-console
+      console.error('Error while updating user:', e);
+
       return fail(500, {
         error: "Oops... Quelque chose s'est mal passé. Veuillez réessayer plus tard.",
       });

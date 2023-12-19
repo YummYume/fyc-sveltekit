@@ -50,21 +50,18 @@
 
 <nav aria-label="Pagination" {...$$restProps}>
   <ul class="inline-flex -space-x-px text-base h-10">
-    {#if canGoBack}
-      <li>
-        <a
-          class="
+    <li>
+      <a
+        class="
           flex items-center justify-center px-4 h-10 leading-tight text-gray-500 bg-white border border-gray-300
-          hover:bg-gray-100 hover:text-gray-700 focus-visible:bg-gray-100 focus-visible:text-gray-700
+          hover:bg-gray-100 hover:text-gray-700 focus-visible:bg-gray-100 focus-visible:text-gray-700 rounded-s-lg
         "
-          class:rounded-s-lg={canGoBack}
-          href={getUrlForPage(1)}
-        >
-          <First aria-hidden="true" />
-          <span class="sr-only">Page 1 (première page)</span>
-        </a>
-      </li>
-    {/if}
+        href={getUrlForPage(1)}
+      >
+        <First aria-hidden="true" />
+        <span class="sr-only">Page 1 (première page)</span>
+      </a>
+    </li>
 
     <li>
       <a
@@ -74,7 +71,6 @@
           flex items-center justify-center px-4 h-10 ms-0 leading-tight text-gray-500 bg-white border border-e-0
           border-gray-300 hover:bg-gray-100 hover:text-gray-700 focus-visible:bg-gray-100 focus-visible:text-gray-700
         "
-        class:rounded-s-lg={!canGoBack}
         href={getUrlForPage(previousPage)}
       >
         <Back aria-hidden="true" />
@@ -148,27 +144,23 @@
           flex items-center justify-center px-4 h-10 leading-tight text-gray-500 bg-white border border-gray-300
           hover:bg-gray-100 hover:text-gray-700 focus-visible:bg-gray-100 focus-visible:text-gray-700
         "
-        class:rounded-e-lg={!canGoForward}
         href={getUrlForPage(totalPages)}
       >
         <Forward aria-hidden="true" />
       </a>
     </li>
 
-    {#if canGoForward}
-      <li>
-        <a
-          class="
+    <li>
+      <a
+        class="
           flex items-center justify-center px-4 h-10 leading-tight text-gray-500 bg-white border border-gray-300
-          hover:bg-gray-100 hover:text-gray-700 focus-visible:bg-gray-100 focus-visible:text-gray-700
+          hover:bg-gray-100 hover:text-gray-700 focus-visible:bg-gray-100 focus-visible:text-gray-700 rounded-e-lg
         "
-          class:rounded-e-lg={canGoForward}
-          href={getUrlForPage(totalPages)}
-        >
-          <Last aria-hidden="true" />
-          <span class="sr-only">Page {totalPages} (dernière page)</span>
-        </a>
-      </li>
-    {/if}
+        href={getUrlForPage(totalPages)}
+      >
+        <Last aria-hidden="true" />
+        <span class="sr-only">Page {totalPages} (dernière page)</span>
+      </a>
+    </li>
   </ul>
 </nav>

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { quintOut } from 'svelte/easing';
-  import { blur, crossfade, fade } from 'svelte/transition';
+  import { crossfade, fade } from 'svelte/transition';
 
   import Card from '$lib/components/Card.svelte';
   import Loader from '$lib/components/Loader.svelte';
@@ -242,37 +242,41 @@
   {/if}
 </Modal>
 
-<div role="alert">
+<div class="mb-4" role="alert">
   {#await data.disallowedIngredients then disallowedIngredients}
     {#if disallowedIngredients && isIngredientsWarningOpen}
       <div
-        class="flex items-center justify-between rounded-lg p-3 mb-4 bg-amber-600/30 border-2 border-amber-600/75 text-amber-600"
-        transition:blur
+        class="flex items-center rounded-lg gap-2 p-3 bg-amber-600/30 border-2 border-amber-600/75 text-amber-600"
+        transition:fade={{ duration: prefersReducedMotion() ? 0 : 250 }}
       >
-        <div>
-          <span class="flex items-center"
-            ><span class="text-2xl mr-1"><Warning /></span> Contient des ingrédients à éviter, indiqué
-            dans votre profil :</span
-          >
-          <ul class="list-disc list-inside capitalize ml-8">
+        <Warning class="w-7 h-7 flex-shrink-0" />
+        <div class="flex-grow">
+          <p>Contient des ingrédients à éviter, indiqués dans votre profil :</p>
+          <ul class="list-disc list-inside capitalize ml-4">
             {#each disallowedIngredients as ingredient}
               <li>{ingredient}</li>
             {/each}
           </ul>
         </div>
-        <button
-          type="button"
-          class="mr-4"
-          aria-label="Fermer cette alerte"
-          on:click={closeIngredientsWarning}><Close /></button
-        >
+        <button type="button" aria-label="Fermer cette alerte" on:click={closeIngredientsWarning}>
+          <Close />
+        </button>
       </div>
     {/if}
-  {:catch error}
-    {#if error}
-      <p role="status" class="text-red-500 text-center">
-        Impossible de vérifier si la recette contient des ingrédients à ne pas utiliser...
-      </p>
+  {:catch}
+    {#if isIngredientsWarningOpen}
+      <div
+        class="flex items-center rounded-lg gap-2 p-3 bg-amber-600/30 border-2 border-amber-600/75 text-amber-600"
+        transition:fade={{ duration: prefersReducedMotion() ? 0 : 250 }}
+      >
+        <Warning class="w-7 h-7 flex-shrink-0" />
+        <p class="flex-grow">
+          Impossible de vérifier si la recette contient des ingrédients à ne pas utiliser...
+        </p>
+        <button type="button" aria-label="Fermer cette alerte" on:click={closeIngredientsWarning}>
+          <Close />
+        </button>
+      </div>
     {/if}
   {/await}
 </div>

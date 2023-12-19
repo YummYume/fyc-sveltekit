@@ -57,14 +57,14 @@ export const load = (async ({ locals, params }) => {
             {
               role: 'system',
               content: `
-                Voici une liste d'ingrédients à éviter: ${session.user.disallowedIngredients}, 
-                si dans la recette que je te donne, il y a au moins un ingrédient de cette liste ou du même genre, 
-                tu me renvoies un objet JSON uniquement : 
+                Voici une liste d'ingrédients à éviter: ${session.user.disallowedIngredients}.
+                Les ingrédients à éviter sont séparés par une virgule. Si une valeur n'est pas un ingrédient valide, tu peux l'ignorer.
+                Si dans la recette que je te donne, il y a au moins un ingrédient de cette liste ou du même genre, tu me renvoies un objet JSON avec le format suivant :
                 {
                   "disallowedIngredients": string[],
-                }, 
-                disallowedIngredients contiendra la liste des ingrédients à éviter que tu as trouvé dans la recette.
-                Si tu ne trouves pas d'ingrédients à éviter, disallowedIngredients sera un tableau vide.
+                },
+                où "disallowedIngredients" contiendra la liste des ingrédients à éviter que tu as trouvé dans la recette.
+                Si tu ne trouves pas d'ingrédients à éviter, "disallowedIngredients" sera un tableau vide.
               `,
             },
             {
@@ -139,6 +139,9 @@ export const load = (async ({ locals, params }) => {
         });
       }
     }
+
+    // eslint-disable-next-line no-console
+    console.error('Error while loading recipe page:', e);
 
     throw e;
   }

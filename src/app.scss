@@ -52,7 +52,7 @@
     }
 
     &__close {
-      @apply absolute right-1 top-1 text-gray-500 transition-colors hover:text-gray-700 focus-visible:text-gray-700 motion-reduce:transition-none;
+      @apply absolute right-2 top-2 text-gray-500 transition-colors hover:text-gray-700 focus-visible:text-gray-700 motion-reduce:transition-none;
     }
 
     &__title {

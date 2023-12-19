@@ -65,7 +65,8 @@ export const POST = (async ({ request, locals }) => {
     locals.session.user.disallowedIngredients.length > 0
   ) {
     currentPrompt += `
-      L'utilisateur a indiqué préférer éviter les ingrédients suivants : "${locals.session.user.disallowedIngredients}".
+      L'utilisateur a indiqué préférer éviter les ingrédients suivants : ${locals.session.user.disallowedIngredients}.
+      Les ingrédients à éviter sont séparés par une virgule. Si une valeur n'est pas un ingrédient valide, tu peux l'ignorer.
     `;
   }
 

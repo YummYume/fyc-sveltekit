@@ -160,11 +160,13 @@
         {/each}
 
         <div class="flex flex-col-reverse md:flex-row justify-between items-center gap-4">
-          <Pagination
-            currentPage={data.currentPage}
-            totalPages={data.totalPages}
-            url={$page.url.href}
-          />
+          {#key $page.url}
+            <Pagination
+              currentPage={data.currentPage}
+              totalPages={data.totalPages}
+              url={$page.url.href}
+            />
+          {/key}
 
           <select
             name="perPage"

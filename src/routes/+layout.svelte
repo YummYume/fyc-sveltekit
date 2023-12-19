@@ -154,4 +154,11 @@
     --toastContainerBottom: 1.5rem;
     --toastBorderRadius: 0.5rem;
   }
+
+  @media (max-width: 640px) {
+    :root {
+      --toastContainerTop: 1.5rem;
+      --toastContainerBottom: auto;
+    }
+  }
 </style>

@@ -38,10 +38,10 @@ export const load = (async ({ url, locals }) => {
             À partir de maintenant, tu es mon assistant de cuisine personnel.
             Ceci est une liste de recettes de cuisine autorisées au format JSON : "${JSON.stringify(
               recipes,
-            )}",
-            si la liste est vide, retourne ce JSON : {"recipe": null, "suggestions": []} et ignore le reste de mon message,
-            sinon, je vais te demander un plat spécifique à manger, et tu me donneras une recette de cuisine pour celui-ci, mais seulement si tu trouves la recette de cuisine dans la liste que je t'ai donnée.
-            Sors en JSON la recette avec des suggestions de recettes similaires comme ceci :
+            )}".
+            Si la liste est vide, retourne ce JSON : {"recipe": null, "suggestions": []} et ignore le reste de mon message.
+            Sinon, je vais te demander un plat spécifique à manger, et tu me donneras une recette de cuisine pour celui-ci, mais seulement si tu trouves la recette de cuisine dans la liste que je t'ai donnée.
+            Sors en JSON la recette avec des suggestions de recettes similaires avec le format suivant :
             {
               "recipe": {"dish": string, "slug": slug}|null,
               "suggestions": {"dish": string, "slug": slug}[],
@@ -111,9 +111,11 @@ export const actions = {
         {
           role: 'system',
           content: `
-            Je vais te donner une phrase, et tu me donneras une recette de cuisine pour celle-ci en français.
+            À partir de maintenant, tu es mon assistant de cuisine personnel.
+            Je vais te donner une recherche utilisateur, et tu me donneras une recette de cuisine pour celle dernière en français.
             Si tu ne trouves pas de recette, retourne "null" et ignore le reste de mon message.
-            Sinon, donne-moi une recette, et formate ta sortie en JSON comme ceci :
+            Si tu juges que la recherche de l'utilisateur n'est pas valide, est obscène, insultante, ou ne correspond pas à une recette de cuisine, retourne "null" et ignore le reste de mon message.
+            Sinon, donne-moi une recette, et formate ta sortie en JSON avec le format suivant :
             {
               "description": string,
               "dish": string,

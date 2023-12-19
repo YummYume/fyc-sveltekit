@@ -78,6 +78,9 @@ export const load = (async ({ locals, params }) => {
       }
     }
 
+    // eslint-disable-next-line no-console
+    console.error('Error while loading accompaniments page:', e);
+
     throw e;
   }
 }) satisfies PageServerLoad;
