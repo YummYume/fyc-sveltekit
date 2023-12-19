@@ -41,7 +41,7 @@
   }
 
   .modal {
-    @apply fixed inset-0 z-50 flex items-center justify-center;
+    @apply fixed inset-0 z-50 flex items-end justify-center lg:items-center;
 
     &__overlay {
       @apply fixed inset-0 bg-black opacity-50;
