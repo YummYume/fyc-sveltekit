@@ -1,5 +1,5 @@
 <svg
-  class="w-5 h-5"
+  class="absolute h-5 right-2 top-2 w-5"
   xmlns="http://www.w3.org/2000/svg"
   fill="none"
   viewBox="0 0 14 14"

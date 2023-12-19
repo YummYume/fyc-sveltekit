@@ -24,10 +24,10 @@
   import SimilarRecipesResult from './similar/Result.svelte';
 
   import type { PreloadedPageData } from '$lib/types/preload';
+  import type { Review, User } from '@prisma/client';
   import type { ActionData, PageData } from './$types';
   import type { PageData as AccompanimentsPageData } from './accompaniments/$types';
   import type { PageData as SimilarRecipesPageData } from './similar/$types';
-  import type { Review, User } from '@prisma/client';
 
   import { browser } from '$app/environment';
   import { enhance } from '$app/forms';
@@ -42,9 +42,22 @@
     duration: 700,
     easing: quintOut,
   });
-  const facebook = `https://www.facebook.com/sharer/sharer.php?u=${$page.url}&quote=${data.recipe.shoppingList}&hashtag=recette,listedecourse`;
-  const reddit = `https://www.reddit.com/submit?url=${$page.url}&title=${data.recipe.dish}&text=${data.recipe.shoppingList}`;
-  const twitter = `https://twitter.com/intent/tweet?url=${$page.url}&text=${data.recipe.shoppingList}&hashtags=recette,listedecourse`;
+
+  const facebook = encodeURI(
+    `https://www.facebook.com/sharer/sharer.php?u=\n${
+      $page.url
+    }&quote=* ${data.recipe.shoppingList.join('\n* ')}&hashtag=recette,listedecourse`,
+  );
+  const reddit = encodeURI(
+    `https://www.reddit.com/submit?url=\n${$page.url}&title=${
+      data.recipe.dish
+    }&text=* ${data.recipe.shoppingList.join('\n* ')}`,
+  );
+  const twitter = encodeURI(
+    `https://twitter.com/intent/tweet?url=\n${$page.url}&text=* ${data.recipe.shoppingList.join(
+      '\n* ',
+    )}&hashtags=recette,listedecourse`,
+  );
 
   // Variables
   let reviews: (Review & { user: User })[] = [];
@@ -288,40 +301,47 @@
   </form>
 </div>
 
-<div class="space-y-4">
-  {#if data.reviewCount > 0}
-    <div class="flex gap-2.5 items-center justify-center">
-      <span class="text-gray-500">Note moyenne des utilisateurs :</span>
-      <p class="flex" aria-label="{data.reviewAverage} sur 5">
-        <span class="text-gray-900 text-lg font-semibold">{data.reviewAverage}</span>
-        <StarFull class="w-4 h-4 text-yellow-500" />
-      </p>
-    </div>
-  {/if}
+<div class="space-y-8">
+  <div class="space-y-2">
+    {#if data.reviewCount > 0}
+      <div class="flex gap-2.5 items-center justify-center">
+        <span class="text-gray-500">Note moyenne des utilisateurs :</span>
+        <p class="flex" aria-label="{data.reviewAverage} sur 5">
+          <span class="text-gray-900 text-lg font-semibold">{data.reviewAverage}</span>
+          <StarFull class="w-4 h-4 text-yellow-500" />
+        </p>
+      </div>
+    {/if}
 
-  <div
-    class="flex gap-2.5 items-center justify-center"
-    role="group"
-    aria-label="Partager la recette"
-  >
-    <a href={facebook} target="_blank" rel="noopener noreferrer" aria-label="Partager sur Facebook">
-      <Facebook />
-    </a>
-    <a href={reddit} target="_blank" rel="noopener noreferrer" aria-label="Partager sur Reddit">
-      <Reddit />
-    </a>
-    <a
-      href={twitter}
-      target="_blank"
-      rel="noopener noreferrer"
-      aria-label="Partager sur Twitter (X)"
+    <div
+      class="flex gap-2.5 items-center justify-center"
+      role="group"
+      aria-label="Partager la recette"
     >
-      <Twitter />
-    </a>
+      <a
+        href={facebook}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Partager sur Facebook"
+      >
+        <Facebook />
+      </a>
+      <a href={reddit} target="_blank" rel="noopener noreferrer" aria-label="Partager sur Reddit">
+        <Reddit />
+      </a>
+      <a
+        href={twitter}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Partager sur Twitter (X)"
+      >
+        <Twitter />
+      </a>
+    </div>
   </div>
 
   <section class="container mx-auto space-y-4">
-    <p class="mb-3 text-lg text-gray-500 text-center md:text-xl">{data.recipe.description}</p>
+    <p class="mb-8 text-lg text-gray-500 text-center md:text-xl">{data.recipe.description}</p>
     <div class="grid gap-6 md:grid-cols-3">
       <div>
         <div class="mb-2 text-lg font-semibold text-gray-900 flex gap-1 items-center">
@@ -431,10 +451,10 @@
   <section class="container mx-auto space-y-4">
     <h2 class="h2 text-center">Aller plus loin</h2>
 
-    <div class="flex gap-2.5 items-center justify-center">
+    <div class="gap-2.5 grid items-center justify-items-center">
       <a
         href="/recipes/{data.recipe.slug}/accompaniments"
-        class="btn"
+        class="btn | mx-0"
         class:opacity-50={accompanimentsLoading}
         class:cursor-not-allowed={accompanimentsLoading}
         aria-disabled={accompanimentsLoading ? 'true' : 'false'}
@@ -448,7 +468,7 @@
       </a>
       <a
         href="/recipes/{data.recipe.slug}/similar"
-        class="btn"
+        class="btn | mx-0"
         class:opacity-50={similarRecipesLoading}
         class:cursor-not-allowed={similarRecipesLoading}
         aria-disabled={similarRecipesLoading ? 'true' : 'false'}
@@ -501,8 +521,8 @@
           </button>
         {/if}
       </div>
-      <div class="grid gap-2.5 sm:grid-cols-3">
-        <label class="flex flex-col gap-1 sm:col-span-2">
+      <div class="grid gap-2.5 sm:grid-cols-4">
+        <label class="flex flex-col gap-1 sm:col-span-3">
           <span>Votre commentaire</span>
           <textarea
             id="content"
