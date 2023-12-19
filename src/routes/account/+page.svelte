@@ -35,8 +35,9 @@
       use:enhance={() => {
         return async ({ update, result }) => {
           await update({ reset: false });
+
           if (result.type === 'success') {
-            toasts.success('Profil mis à jour');
+            toasts.success('Profil mis à jour.');
           }
         };
       }}
