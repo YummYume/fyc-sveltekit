@@ -248,7 +248,11 @@
       </div>
     {/if}
   {:catch error}
-    <p role="status" class="text-red-500 text-center">{error.message}</p>
+    {#if error}
+      <p role="status" class="text-red-500 text-center">
+        Impossible de vérifier si la recette contient des ingrédients à ne pas utiliser...
+      </p>
+    {/if}
   {/await}
 </div>
 

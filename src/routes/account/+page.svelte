@@ -33,8 +33,11 @@
       method="POST"
       class="form"
       use:enhance={() => {
-        return async ({ update }) => {
+        return async ({ update, result }) => {
           await update({ reset: false });
+          if (result.type === 'success') {
+            toasts.success('Profil mis à jour');
+          }
         };
       }}
     >

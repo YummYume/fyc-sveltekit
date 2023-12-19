@@ -1,14 +1,7 @@
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { fail, redirect } from '@sveltejs/kit';
 
-import { auth } from '$lib/server/auth';
-
 import type { PageServerLoad } from './$types';
-
-type UserData = {
-  username?: string;
-  disallowedIngredients?: string;
-};
 
 export const load = (({ locals }) => {
   const { session } = locals;
@@ -37,32 +30,30 @@ export const load = (({ locals }) => {
 
 export const actions = {
   default: async ({ locals, request }) => {
-    const { session } = locals;
+    const { db, session } = locals;
     const data = await request.formData();
 
     if (!session) {
       redirect(303, '/login');
     }
 
-    const userData: UserData = {};
-
     const username = data.get('username') as string;
     const disallowedIngredients = data.get('disallowedIngredients') as string;
 
-    if (username && username !== '') {
-      if (!/^[A-Za-z]+$/g.test(username)) {
-        return fail(422, {
-          error: "Le nom d'utilisateur ne doit contenir que des lettres.",
-        });
-      }
+    if (!username) {
+      return fail(422, { error: "Le nom d'utilisateur ne peut pas être vide." });
+    }
 
-      if (username.length < 3 || username.length > 20) {
-        return fail(400, {
-          error: "Le nom d'utilisateur doit être compris entre 3 et 20 caractères.",
-        });
-      }
+    if (!/^[A-Za-z]+$/g.test(username)) {
+      return fail(422, {
+        error: "Le nom d'utilisateur ne doit contenir que des lettres.",
+      });
+    }
 
-      userData.username = username;
+    if (username.length < 3 || username.length > 20) {
+      return fail(400, {
+        error: "Le nom d'utilisateur doit être compris entre 3 et 20 caractères.",
+      });
     }
 
     if (disallowedIngredients) {
@@ -71,14 +62,15 @@ export const actions = {
           error: 'Les ingrédients ne doivent contenir que des lettres et des virgules.',
         });
       }
-
-      userData.disallowedIngredients = disallowedIngredients;
     }
 
     try {
-      await auth.updateUserAttributes(session.user.userId, {
-        username: userData.username,
-        disallowedIngredients: userData.disallowedIngredients,
+      await db.user.update({
+        where: { id: session.user.userId },
+        data: {
+          username,
+          disallowedIngredients,
+        },
       });
     } catch (e) {
       if (e instanceof PrismaClientKnownRequestError && e.code === 'P2002') {
