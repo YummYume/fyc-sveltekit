@@ -24,10 +24,10 @@
   import SimilarRecipesResult from './similar/Result.svelte';
 
   import type { PreloadedPageData } from '$lib/types/preload';
-  import type { Review, User } from '@prisma/client';
   import type { ActionData, PageData } from './$types';
   import type { PageData as AccompanimentsPageData } from './accompaniments/$types';
   import type { PageData as SimilarRecipesPageData } from './similar/$types';
+  import type { Review, User } from '@prisma/client';
 
   import { browser } from '$app/environment';
   import { enhance } from '$app/forms';
@@ -110,6 +110,10 @@
   }
 
   // Functions
+  const closeIngredientsWarning = () => {
+    isIngredientsWarningOpen = false;
+  };
+
   const showAccompaniments = async (e: MouseEvent & { currentTarget: HTMLAnchorElement }) => {
     if (e.metaKey || e.ctrlKey || accompanimentsLoading) {
       return;
@@ -119,25 +123,25 @@
 
     accompanimentsLoading = true;
 
-    const { href } = e.currentTarget;
-    const result = (await preloadData(href)) as PreloadedPageData<AccompanimentsPageData>;
+    try {
+      const { href } = e.currentTarget;
+      const result = (await preloadData(href)) as PreloadedPageData<AccompanimentsPageData>;
 
-    if (result.type === 'loaded' && result.status === 200) {
-      pushState(href, {
-        accompaniments: {
-          ...result.data,
-          accompaniments: await result.data.accompaniments,
-        },
-      });
-    } else {
-      goto(href);
+      if (result.type === 'loaded' && result.status === 200) {
+        pushState(href, {
+          accompaniments: {
+            ...result.data,
+            accompaniments: await result.data.accompaniments,
+          },
+        });
+      } else {
+        goto(href);
+      }
+    } catch (error) {
+      toasts.error('Impossible de charger les accompagnements. Veuillez réessayer.');
     }
 
     accompanimentsLoading = false;
-  };
-
-  const closeIngredientsWarning = () => {
-    isIngredientsWarningOpen = false;
   };
 
   const showSimilarRecipes = async (e: MouseEvent & { currentTarget: HTMLAnchorElement }) => {
@@ -149,18 +153,22 @@
 
     similarRecipesLoading = true;
 
-    const { href } = e.currentTarget;
-    const result = (await preloadData(href)) as PreloadedPageData<SimilarRecipesPageData>;
+    try {
+      const { href } = e.currentTarget;
+      const result = (await preloadData(href)) as PreloadedPageData<SimilarRecipesPageData>;
 
-    if (result.type === 'loaded' && result.status === 200) {
-      pushState(href, {
-        similarRecipes: {
-          ...result.data,
-          similarRecipes: await result.data.similarRecipes,
-        },
-      });
-    } else {
-      goto(href);
+      if (result.type === 'loaded' && result.status === 200) {
+        pushState(href, {
+          similarRecipes: {
+            ...result.data,
+            similarRecipes: await result.data.similarRecipes,
+          },
+        });
+      } else {
+        goto(href);
+      }
+    } catch (error) {
+      toasts.error('Impossible de charger les recettes similaires. Veuillez réessayer.');
     }
 
     similarRecipesLoading = false;

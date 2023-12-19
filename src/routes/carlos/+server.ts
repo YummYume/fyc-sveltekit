@@ -60,6 +60,15 @@ export const POST = (async ({ request, locals }) => {
     Le nom de l'utilisateur est ${locals.session.user.username}.
   `;
 
+  if (
+    locals.session.user.disallowedIngredients &&
+    locals.session.user.disallowedIngredients.length > 0
+  ) {
+    currentPrompt += `
+      L'utilisateur a indiqué préférer éviter les ingrédients suivants : "${locals.session.user.disallowedIngredients}".
+    `;
+  }
+
   if (!messages.some((message) => message.role === 'assistant')) {
     currentPrompt += `
      L'utilisateur n'a pas encore reçu de réponse de ta part.

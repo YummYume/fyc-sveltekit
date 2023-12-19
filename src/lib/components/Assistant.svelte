@@ -213,9 +213,12 @@
     class="absolute bottom-0 max-w-xl w-[calc(100vw-1.25rem)]"
     transition:fly={{ duration: prefersReducedMotion() ? 0 : 1000, y: 575, easing: bounceOut }}
   >
-    <Card innerContainerClass="min-h-[50vh] flex flex-col">
+    <Card
+      containerClass="border-2 border-primary-700"
+      innerContainerClass="sm:min-h-[50vh] min-h-[60vh] flex flex-col"
+    >
       <div class="flex justify-between items-start">
-        <div class="flex gap-2.5 items-center">
+        <div class="grid sm:flex gap-2.5 items-center">
           <enhanced:img
             src="$lib/assets/carlos.png"
             alt="Assistant personnel Carlos"
@@ -325,7 +328,7 @@
           </label>
           <div class="relative">
             <input
-              class="!p-4 border-primary-700"
+              class="!p-4 !pr-14 border-primary-700"
               id="carlos-question"
               maxlength="255"
               name="question"
