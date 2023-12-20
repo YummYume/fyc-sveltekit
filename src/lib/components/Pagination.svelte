@@ -31,12 +31,12 @@
     { length: pageDisplayRange },
     (_, index) => currentPage - (index + 1),
   )
-    .filter((page) => page > 1)
+    .filter((page) => page > 0 && page < currentPage)
     .reverse();
   $: nextPages = Array.from(
     { length: pageDisplayRange },
     (_, index) => currentPage + (index + 1),
-  ).filter((page) => page < totalPages);
+  ).filter((page) => page <= totalPages && page > currentPage);
   $: canGoBack = currentPage > 1;
   $: canGoForward = currentPage < totalPages;
 

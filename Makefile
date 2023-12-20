@@ -46,6 +46,10 @@ lint:
 format:
 	$(EXECSVELTEKIT) bun run format
 
+# Bun
+update:
+	$(EXECSVELTEKIT) bunx npm-check-updates -i
+
 # DB
 db: db-migrate
 

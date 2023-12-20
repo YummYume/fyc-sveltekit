@@ -42,21 +42,20 @@
     duration: 700,
     easing: quintOut,
   });
-
   const facebook = encodeURI(
-    `https://www.facebook.com/sharer/sharer.php?u=\n${
-      $page.url
-    }&quote=* ${data.recipe.shoppingList.join('\n* ')}&hashtag=recette,listedecourse`,
+    `https://www.facebook.com/sharer/sharer.php?u=\n\n${$page.url}&quote=${
+      data.recipe.dish
+    }\n\n* ${data.recipe.shoppingList.join('\n* ')}&hashtag=recette,listedecourse`,
   );
   const reddit = encodeURI(
-    `https://www.reddit.com/submit?url=\n${$page.url}&title=${
+    `https://www.reddit.com/submit?url=${$page.url}&title=${
       data.recipe.dish
     }&text=* ${data.recipe.shoppingList.join('\n* ')}`,
   );
   const twitter = encodeURI(
-    `https://twitter.com/intent/tweet?url=\n${$page.url}&text=* ${data.recipe.shoppingList.join(
-      '\n* ',
-    )}&hashtags=recette,listedecourse`,
+    `https://twitter.com/intent/tweet?url=\n\n${$page.url}&text=${
+      data.recipe.dish
+    }\n\n* ${data.recipe.shoppingList.join('\n* ')}&hashtags=recette,listedecourse`,
   );
 
   // Variables
