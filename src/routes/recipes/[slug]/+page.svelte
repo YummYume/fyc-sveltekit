@@ -246,7 +246,7 @@
   {#await data.disallowedIngredients then disallowedIngredients}
     {#if disallowedIngredients && isIngredientsWarningOpen}
       <div
-        class="flex items-center rounded-lg gap-2 p-3 bg-amber-600/30 border-2 border-amber-600/75 text-amber-600"
+        class="flex items-center rounded-lg gap-2 p-3 bg-amber-600/30 border-2 border-amber-600/75 text-amber-600 max-w-[106.25rem] mx-auto"
         transition:fade={{ duration: prefersReducedMotion() ? 0 : 250 }}
       >
         <Warning class="w-7 h-7 flex-shrink-0" />
@@ -266,7 +266,7 @@
   {:catch}
     {#if isIngredientsWarningOpen}
       <div
-        class="flex items-center rounded-lg gap-2 p-3 bg-amber-600/30 border-2 border-amber-600/75 text-amber-600"
+        class="flex items-center rounded-lg gap-2 p-3 bg-amber-600/30 border-2 border-amber-600/75 text-amber-600 max-w-[106.25rem] mx-auto"
         transition:fade={{ duration: prefersReducedMotion() ? 0 : 250 }}
       >
         <Warning class="w-7 h-7 flex-shrink-0" />
@@ -466,7 +466,7 @@
     <div class="gap-2.5 grid items-center justify-items-center">
       <a
         href="/recipes/{data.recipe.slug}/accompaniments"
-        class="btn | mx-0"
+        class="btn | mx-0 text-center"
         class:opacity-50={accompanimentsLoading}
         class:cursor-not-allowed={accompanimentsLoading}
         aria-disabled={accompanimentsLoading ? 'true' : 'false'}
@@ -480,7 +480,7 @@
       </a>
       <a
         href="/recipes/{data.recipe.slug}/similar"
-        class="btn | mx-0"
+        class="btn | mx-0 text-center"
         class:opacity-50={similarRecipesLoading}
         class:cursor-not-allowed={similarRecipesLoading}
         aria-disabled={similarRecipesLoading ? 'true' : 'false'}

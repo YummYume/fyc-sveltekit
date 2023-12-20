@@ -215,8 +215,11 @@
   >
     <Card
       containerClass="border-2 border-primary-700"
-      innerContainerClass="sm:min-h-[50vh] min-h-[60vh] flex flex-col"
+      innerContainerClass="sm:min-h-[50vh] min-h-[55vh] flex flex-col"
     >
+      {@const carlosHasContext =
+        $page.data.carlosContext?.prompt || $page.error?.carlosContext?.prompt}
+
       <div class="flex justify-between items-start">
         <div class="grid sm:flex gap-2.5 items-center">
           <enhanced:img
@@ -265,7 +268,7 @@
       </div>
       <div
         class="
-          max-h-[33vh] overflow-auto sm:p-1 p-0.5 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-primary-700
+          max-h-[40vh] sm:max-h-[33vh] overflow-auto sm:p-1 p-0.5 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-primary-700
           scrollbar-thumb-rounded-full scrollbar-track-rounded-full flex-grow
         "
       >
@@ -334,6 +337,7 @@
               name="question"
               required
               type="text"
+              aria-describedby={carlosHasContext ? 'carlos-help' : undefined}
               bind:this={chatInput}
               bind:value={inputValue}
             />
@@ -349,8 +353,8 @@
           </div>
         </div>
       </form>
-      {#if $page.data.carlosContext?.prompt || $page.error?.carlosContext?.prompt}
-        <p class="text-xs text-gray-500">
+      {#if carlosHasContext}
+        <p class="text-xs text-gray-500" id="carlos-help">
           Carlos a accès à cette page et peut vous aider à trouver ce que vous cherchez.
         </p>
       {/if}

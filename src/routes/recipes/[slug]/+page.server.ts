@@ -113,6 +113,7 @@ export const load = (async ({ locals, params }) => {
           }.
           L'utilisateur peut ajouter ou retirer la recette de ses favoris en cliquant sur l'étoile à droite du titre de la recette.
           La recette ${favourite ? 'est' : "n'est pas"} dans les favoris de l'utilisateur.
+          L'utilisateur peut aussi demander des recettes similaires et des accompagnements personnalisés pour la recette en cliquant sur les boutons correspondants. Ce n'est pas obligatoire et ce n'est pas toi qui gère ces fonctionnalités. Tu peux simplement indiquer leur présence à l'utilisateur s'il te pose une question sur des recettes similaires ou des accompagnements personnalisés.
           Si une question porte sur une étape ou un ingrédient, focalise-toi sur cette étape ou cet ingrédient.
           Voici les ingrédients de la recette : ${recipe.ingredients?.toString()}. Chaque ingrédient est séparé par une virgule.
           Voici les étapes de la recette : ${recipe.steps?.toString()}. Chaque étape est séparée par une virgule.

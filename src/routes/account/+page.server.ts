@@ -22,7 +22,7 @@ export const load = (({ locals }) => {
       prompt: `
         L'utilisateur se trouve actuellement sur la page "Profil" qui contient les informations de son profil.
         Sa question peut donc (ou non) porter sur cette page.
-        L'utilisateur peut modifier son nom d'utilisateur ainsi que les ingrédients qu'il souhaite ne pas utiliser.
+        L'utilisateur peut modifier son nom d'utilisateur ainsi que les ingrédients qu'il souhaite éviter.
       `,
     },
   };
@@ -62,6 +62,12 @@ export const actions = {
           error: 'Les ingrédients ne doivent contenir que des lettres et des virgules.',
         });
       }
+    }
+
+    if (disallowedIngredients.length > 255) {
+      return fail(400, {
+        error: 'La liste des ingrédients à éviter ne peut pas dépasser 255 caractères.',
+      });
     }
 
     try {
