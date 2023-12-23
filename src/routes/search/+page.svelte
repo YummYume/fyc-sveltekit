@@ -10,7 +10,6 @@
   import { enhance } from '$app/forms';
 
   export let data: PageData;
-
   export let form: ActionData;
 
   let isLoading = false;
@@ -28,36 +27,42 @@
   {:then value}
     {#if !value.recipe}
       <Card>
-        <p class="text-gray-500 text-center" role="status">Aucun résulat pour "{data.query}".</p>
-        <form
-          method="POST"
-          action="?/generate"
-          class="form"
-          use:enhance={({ cancel }) => {
-            if (isLoading) {
-              cancel();
+        {#if data.query.trim() !== ''}
+          <p class="text-gray-500 text-center" role="status">Aucun résulat pour "{data.query}".</p>
+          <form
+            method="POST"
+            action="?/generate"
+            class="form"
+            use:enhance={({ cancel }) => {
+              if (isLoading) {
+                cancel();
 
-              return;
-            }
+                return;
+              }
 
-            isLoading = true;
+              isLoading = true;
 
-            return async ({ update }) => {
-              await update();
+              return async ({ update }) => {
+                await update();
 
-              isLoading = false;
-            };
-          }}
-        >
-          <input type="hidden" name="dish" value={data.query} class="!hidden" />
-          <button type="submit" class="btn" disabled={isLoading}>
-            {#if isLoading}
-              <Spinner />
-            {/if}
+                isLoading = false;
+              };
+            }}
+          >
+            <input type="hidden" name="dish" value={data.query} class="!hidden" />
+            <button type="submit" class="btn" disabled={isLoading}>
+              {#if isLoading}
+                <Spinner />
+              {/if}
 
-            Générer la recette
-          </button>
-        </form>
+              Générer la recette
+            </button>
+          </form>
+        {:else}
+          <p class="text-gray-500 text-center" role="status">
+            Il va être compliqué de trouver une recette sans nom.
+          </p>
+        {/if}
       </Card>
     {:else}
       <p class="sr-only" role="status">Recette trouvée.</p>
@@ -93,7 +98,7 @@
     {/if}
   {:catch}
     <p class="text-sm font-light text-red-600 text-center" role="status">
-      Quelque chose s'est mal passé. Veuillez réessayer plus tard.
+      Oups! Quelque chose s'est mal passé. Veuillez réessayer plus tard.
     </p>
   {/await}
 

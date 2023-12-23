@@ -50,7 +50,7 @@ export const load = (async ({ locals, params }) => {
             `
             : ''
         }
-        Voici la liste des recettes : ${JSON.stringify(recipes)}.
+        Voici la liste des recettes : ${JSON.stringify(recipes)}
       `;
 
       const result = await openai.chat.completions.create({
@@ -61,7 +61,7 @@ export const load = (async ({ locals, params }) => {
 
       const slugs = jsonValueToArray(JSON.parse(result.choices[0].message.content ?? ''));
 
-      return recipes.filter((similarRecipe) => slugs.includes(similarRecipe.slug));
+      return recipes.filter((similarRecipe) => slugs.includes(similarRecipe.slug)).slice(0, 3);
     };
 
     return {

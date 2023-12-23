@@ -80,25 +80,27 @@
           id="username"
           value={data.user.username}
           required
-          aria-describedby="usernameHelp"
+          aria-describedby="username-help"
         />
-        <p id="usernameHelp" class="text-sm text-gray-500 mt-0.5 ml-0.5">
+        <p id="username-help" class="text-sm text-gray-500 mt-0.5 ml-0.5">
           Votre nom d'utilisateur doit être unique.
         </p>
       </div>
       <hr />
       <div>
-        <label for="disallowedIngredients">Ingrédients à éviter</label>
+        <label for="disallowed-ingredients">Ingrédients à éviter</label>
         <input
           type="text"
           name="disallowedIngredients"
-          id="disallowedIngredients"
+          id="disallowed-ingredients"
           placeholder="arachides, viande, lait, etc."
           value={data.user.disallowedIngredients ?? ''}
-          aria-describedby="disallowedIngredientsHelp"
+          aria-describedby="disallowed-ingredients-help"
         />
-        <p id="disallowedIngredientsHelp" class="text-sm text-gray-500 mt-0.5 ml-0.5">
-          Séparez les ingrédients par une virgule.
+        <p id="disallowed-ingredients-help" class="text-sm text-gray-500 mt-0.5 ml-0.5">
+          Séparez les ingrédients par une virgule. Ces ingrédients seront pris en compte lors de la
+          proposition de recettes similaires ou d'accompagnements personnalisés. Il vous sera
+          également indiqué si un de ces ingrédients est présent dans une recette.
         </p>
       </div>
       <button type="submit" class="btn | xl:w-max">Sauvegarder</button>

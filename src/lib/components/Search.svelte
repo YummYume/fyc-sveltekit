@@ -22,13 +22,18 @@
     <input
       type="search"
       id="q"
-      placeholder="Poulet-frites, Raclette, Pizza..."
+      name="q"
+      placeholder="Poulet-frites, Raclette, Pizza, Repas de Noël..."
       required
       aria-label="Rechercher un plat"
-      name="q"
+      aria-describedby="search-help"
       class="!p-4 !pl-10 !pr-32"
       {value}
     />
+    <p class="sr-only" id="search-help">
+      Votre recherche peut également contenir une demande, comme par exemple "Repas de Noël sans
+      gluten".
+    </p>
     <button type="submit" class="btn | absolute right-2.5 bottom-2.5 px-4 py-2 w-fit" {disabled}>
       Rechercher
     </button>

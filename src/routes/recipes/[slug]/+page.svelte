@@ -137,7 +137,7 @@
         goto(href);
       }
     } catch (error) {
-      toasts.error('Impossible de charger les accompagnements. Veuillez réessayer.');
+      toasts.error('Impossible de charger les accompagnements personnalisés. Veuillez réessayer.');
     }
 
     accompanimentsLoading = false;
@@ -185,7 +185,7 @@
 <Modal
   id="accompaniments"
   title="Accompagnements"
-  description="Liste des accompagnements proposés pour cette recette."
+  description="Liste des accompagnements personnalisés pour cette recette."
   open={!!$page.state.accompaniments}
   on:close={closeCurrentModal}
 >

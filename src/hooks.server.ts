@@ -17,7 +17,12 @@ export const handle: Handle = async ({ event, resolve }) => {
   return resolve(event);
 };
 
-export const handleError: HandleServerError = async ({ message, status }) => {
+export const handleError: HandleServerError = async ({ message, status, error }) => {
+  if (status >= 500) {
+    // eslint-disable-next-line no-console
+    console.log(`Unhandled error "${message}" with status ${status}:`, error);
+  }
+
   let prompt = `L'utilisateur se trouve actuellement sur une page d'erreur ${status}.`;
 
   if (CARLOS_ERROR_PROMPT[status.toString()]) {

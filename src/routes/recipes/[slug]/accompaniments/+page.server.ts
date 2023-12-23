@@ -28,7 +28,7 @@ export const load = (async ({ locals, params }) => {
         Je veux le résultat au format JSON, comme suit : ["accompagnement1", "accompagnement2", "accompagnement3"].
         ${
           session.user.disallowedIngredients
-            ? `Attention, tu dois me donner des accompagnements qui ne contiennent pas ce genre ingrédients : ${session.user.disallowedIngredients}.`
+            ? `Attention, tu dois me donner des accompagnements qui ne contiennent pas ce genre d'ingrédients : ${session.user.disallowedIngredients}.`
             : ''
         }
         Tu peux me donner au maximum 10 accompagnements.
@@ -40,16 +40,16 @@ export const load = (async ({ locals, params }) => {
         stream: false,
       });
 
-      return jsonValueToArray(JSON.parse(result.choices[0].message.content ?? ''));
+      return jsonValueToArray(JSON.parse(result.choices[0].message.content ?? '')).slice(0, 10);
     };
 
     return {
       accompaniments: getAccompaniments(),
       recipe,
       seo: {
-        title: `${recipe.dish}, accompagnements`,
+        title: `${recipe.dish}, accompagnements personnalisés`,
         meta: {
-          description: `Accompagnements proposés pour la recette "${recipe.dish}".`,
+          description: `Accompagnements personnalisés proposés pour la recette "${recipe.dish}".`,
         },
       },
       carlosContext: {

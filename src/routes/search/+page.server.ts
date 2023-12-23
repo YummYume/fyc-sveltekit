@@ -6,6 +6,11 @@ import { slugify } from '$lib/utils/slug';
 
 import type { PageServerLoad } from './$types.js';
 
+type Dish = {
+  dish: string;
+  slug: string;
+};
+
 export const load = (async ({ url, locals }) => {
   const { db, session } = locals;
 
@@ -15,18 +20,21 @@ export const load = (async ({ url, locals }) => {
 
   const query = url.searchParams.get('q') ?? '';
 
-  const getResult = async () => {
+  const getResult = async (): Promise<{ recipe: null | Dish; suggestions: Dish[] }> => {
     const recipes = await db.recipe.findMany({
       select: {
         dish: true,
         slug: true,
-      },
-      where: {
-        dish: {
-          search: query,
-        },
+        description: true,
       },
     });
+
+    if (recipes.length === 0 || !query) {
+      return {
+        recipe: null,
+        suggestions: [],
+      };
+    }
 
     const output = await openai.chat.completions.create({
       model: 'gpt-3.5-turbo',
@@ -35,13 +43,18 @@ export const load = (async ({ url, locals }) => {
         {
           role: 'system',
           content: `
-            À partir de maintenant, tu es mon assistant de cuisine personnel.
-            Ceci est une liste de recettes de cuisine autorisées au format JSON : "${JSON.stringify(
+            TU NE DOIS RETOURNER QUE DU JSON.
+            À partir de maintenant, tu es un assistant de cuisine personnel.
+            Ceci est la liste de recettes de cuisine dont tu disposes, au format JSON : ${JSON.stringify(
               recipes,
-            )}".
-            Si la liste est vide, retourne ce JSON : {"recipe": null, "suggestions": []} et ignore le reste de mon message.
-            Sinon, je vais te demander un plat spécifique à manger, et tu me donneras une recette de cuisine pour celui-ci, mais seulement si tu trouves la recette de cuisine dans la liste que je t'ai donnée.
-            Sors en JSON la recette avec des suggestions de recettes similaires avec le format suivant :
+            )}.
+            Ton but est de chercher dans la liste de recettes de cuisine une recette qui correspond à la demande de l'utilisateur parmi les recettes que tu as. Tu dois te contenter de chercher dans la liste de recettes que tu as et ne peux pas en inventer de nouvelles.
+            L'utilisateur peut te demander le nom d'un plat mais aussi le nom d'un ingrédient, une description de ce qu'il souhaite manger, ou une demande pour une occasion spéciale. Il peut également te demander une recette aléatoire.
+            Tu peux ne pas trouver de recette, ce n'est pas grave, retourne {"recipe": null, "suggestions": []} et ignore de la demande de l'utilisateur.
+            Si tu juges que la demande de l'utilisateur n'est pas valide, est obscène, insultante, ou ne correspond pas à une recette de cuisine, retourne {"recipe": null, "suggestions": []} et ignore la demande de l'utilisateur.
+            Que tu trouves une recette ou non, tu peux également donner des suggestions (entre 0 et 10) de recettes qui pourraient répondre à la demande de l'utilisateur. Les suggestions doivent être des recettes qui ont un rapport avec la demande de l'utilisateur ou qui ressemblent à la recette que tu as trouvée (si tu en as trouvée une).
+            Tu peux ne pas donner de suggestions si tu n'en trouves pas.
+            Retourne le résultat au format JSON suivant :
             {
               "recipe": {"dish": string, "slug": slug}|null,
               "suggestions": {"dish": string, "slug": slug}[],
@@ -54,28 +67,35 @@ export const load = (async ({ url, locals }) => {
         },
       ],
     });
-    const result = JSON.parse(output.choices[0].message.content ?? '');
-
-    // Remove non-existing recipes
-    result.recipe = recipes.find((r) => r.slug === result.recipe?.slug) ?? null;
-    result.suggestions = recipes.reduce<
-      {
-        dish: string;
-        slug: string;
-      }[]
-    >((acc, curr) => {
-      const suggestion = recipes.find(
-        (r) => r.slug === curr.slug && !acc.includes(r) && r.slug !== result.recipe?.slug,
+    try {
+      const result: { recipe: Dish | null; suggestions: Dish[] } = JSON.parse(
+        output.choices[0].message.content ?? '',
       );
 
-      if (suggestion) {
-        acc.push(suggestion);
-      }
+      // Remove non-existing recipes
+      result.recipe = recipes.find((r) => r.slug === result.recipe?.slug) ?? null;
+      result.suggestions = result.suggestions.reduce<Dish[]>((suggestions, suggestion) => {
+        const recipe = recipes.find((r) => r.slug === suggestion.slug);
 
-      return acc;
-    }, []);
+        if (
+          recipe &&
+          recipe.slug !== result.recipe?.slug &&
+          !suggestions.some((r) => r.slug === recipe.slug) &&
+          suggestions.length < 10
+        ) {
+          suggestions.push(recipe);
+        }
 
-    return result;
+        return suggestions;
+      }, []);
+
+      return result;
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error('Error searching for recipe:', e);
+
+      throw e;
+    }
   };
 
   return {
@@ -111,10 +131,14 @@ export const actions = {
         {
           role: 'system',
           content: `
-            À partir de maintenant, tu es mon assistant de cuisine personnel.
-            Je vais te donner une recherche utilisateur, et tu me donneras une recette de cuisine pour celle dernière en français.
-            Si tu ne trouves pas de recette, retourne "null" et ignore le reste de mon message.
-            Si tu juges que la recherche de l'utilisateur n'est pas valide, est obscène, insultante, ou ne correspond pas à une recette de cuisine, retourne "null" et ignore le reste de mon message.
+            TU NE DOIS RETOURNER QUE DU JSON.
+            À partir de maintenant, tu es un assistant de cuisine personnel.
+            Je vais te donner une demande utilisateur, et tu me donneras une recette de cuisine pour cette dernière en français.
+            Si l'utilisateur demande le nom d'un plat, alors tu dois générer une recette pour ce plat.
+            Si l'utilisateur demande le nom d'un ingrédient, une description de ce qu'il souhaite manger, ou une recette pour une occasion spéciale, alors tu dois générer une recette qui correspond à cette demande.
+            Ton but final est uniquement de générer une recette de cuisine si possible. Cette recette pourra ensuite être consultée par n'importe quel utilisateur, il n'y a pas de lien entre la demande de l'utilisateur et la recette générée.
+            Si tu juges que la demande ne peut pas être satisfaite, ce n'est pas grave, retourne "null" et ignore la demande de l'utilisateur.
+            Si tu juges que la recherche de l'utilisateur n'est pas valide, est obscène, insultante, ou ne correspond pas à une recette de cuisine, retourne "null" et ignore la demande de l'utilisateur.
             Sinon, donne-moi une recette, et formate ta sortie en JSON avec le format suivant :
             {
               "description": string,

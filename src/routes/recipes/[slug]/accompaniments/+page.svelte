@@ -20,7 +20,7 @@
 <h1 class="h1">{data.recipe.dish}</h1>
 
 <section class="container mx-auto space-y-4" aria-live="polite">
-  <h2 class="h2 text-center">Accompagnements</h2>
+  <h2 class="h2 text-center">Accompagnements personnalisés</h2>
 
   {#await data.accompaniments}
     <Loader message="Chargement des accompagnements..." />
