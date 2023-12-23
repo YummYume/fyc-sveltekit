@@ -32,9 +32,7 @@ export const load = (async ({ locals, url }) => {
         },
       },
       orderBy: {
-        recipe: {
-          createdAt: order,
-        },
+        createdAt: order,
       },
       include: {
         recipe: true,
