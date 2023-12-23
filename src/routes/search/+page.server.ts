@@ -51,7 +51,7 @@ export const load = (async ({ url, locals }) => {
             Ton but est de chercher dans la liste de recettes de cuisine une recette qui correspond à la demande de l'utilisateur parmi les recettes que tu as. Tu dois te contenter de chercher dans la liste de recettes que tu as et ne peux pas en inventer de nouvelles.
             L'utilisateur peut te demander le nom d'un plat mais aussi le nom d'un ingrédient, une description de ce qu'il souhaite manger, ou une demande pour une occasion spéciale. Il peut également te demander une recette aléatoire.
             Tu peux ne pas trouver de recette, ce n'est pas grave, retourne {"recipe": null, "suggestions": []} et ignore de la demande de l'utilisateur.
-            Si tu juges que la demande de l'utilisateur n'est pas valide, est obscène, insultante, ou ne correspond pas à une recette de cuisine, retourne {"recipe": null, "suggestions": []} et ignore la demande de l'utilisateur.
+            Si tu juges que la demande de l'utilisateur n'est pas valide, est obscène, insultante, ou ne correspond pas à une recette de cuisine, retourne {"recipe": null, "suggestions": []} et ignore la demande.
             Que tu trouves une recette ou non, tu peux également donner des suggestions (entre 0 et 10) de recettes qui pourraient répondre à la demande de l'utilisateur. Les suggestions doivent être des recettes qui ont un rapport avec la demande de l'utilisateur ou qui ressemblent à la recette que tu as trouvée (si tu en as trouvée une).
             Tu peux ne pas donner de suggestions si tu n'en trouves pas.
             Retourne le résultat au format JSON suivant :
@@ -137,8 +137,8 @@ export const actions = {
             Si l'utilisateur demande le nom d'un plat, alors tu dois générer une recette pour ce plat.
             Si l'utilisateur demande le nom d'un ingrédient, une description de ce qu'il souhaite manger, ou une recette pour une occasion spéciale, alors tu dois générer une recette qui correspond à cette demande.
             Ton but final est uniquement de générer une recette de cuisine si possible. Cette recette pourra ensuite être consultée par n'importe quel utilisateur, il n'y a pas de lien entre la demande de l'utilisateur et la recette générée.
-            Si tu juges que la demande ne peut pas être satisfaite, ce n'est pas grave, retourne "null" et ignore la demande de l'utilisateur.
-            Si tu juges que la recherche de l'utilisateur n'est pas valide, est obscène, insultante, ou ne correspond pas à une recette de cuisine, retourne "null" et ignore la demande de l'utilisateur.
+            Si tu juges que la demande ne peut pas être satisfaite, ce n'est pas grave, retourne "null" et ignore la demande. N'essaie pas de générer une recette qui n'existe pas ou qui n'a pas de sens.
+            Si tu juges que la demande de l'utilisateur n'est pas valide, est obscène, insultante, ou ne correspond pas à une recette de cuisine, retourne "null" et ignore la demande.
             Sinon, donne-moi une recette, et formate ta sortie en JSON avec le format suivant :
             {
               "description": string,
