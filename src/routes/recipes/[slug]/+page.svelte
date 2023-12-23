@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import { quintOut } from 'svelte/easing';
   import { crossfade, fade } from 'svelte/transition';
 
@@ -65,6 +66,8 @@
   let accompanimentsLoading = false;
   let similarRecipesLoading = false;
   let isIngredientsWarningOpen = true;
+  let accompanimentsButton: HTMLAnchorElement | null = null;
+  let similarRecipesButton: HTMLAnchorElement | null = null;
 
   // Computed
   $: starKey = data.isFavourite ? 'full' : 'empty';
@@ -180,6 +183,16 @@
 
     window.history.back();
   };
+
+  onMount(() => {
+    if (accompanimentsButton) {
+      accompanimentsButton.setAttribute('aria-haspopup', 'dialog');
+    }
+
+    if (similarRecipesButton) {
+      similarRecipesButton.setAttribute('aria-haspopup', 'dialog');
+    }
+  });
 </script>
 
 <Modal
@@ -469,6 +482,7 @@
         class:opacity-50={accompanimentsLoading}
         class:cursor-not-allowed={accompanimentsLoading}
         aria-disabled={accompanimentsLoading ? 'true' : 'false'}
+        bind:this={accompanimentsButton}
         on:click={showAccompaniments}
       >
         {#if accompanimentsLoading}
@@ -483,6 +497,7 @@
         class:opacity-50={similarRecipesLoading}
         class:cursor-not-allowed={similarRecipesLoading}
         aria-disabled={similarRecipesLoading ? 'true' : 'false'}
+        bind:this={similarRecipesButton}
         on:click={showSimilarRecipes}
       >
         {#if similarRecipesLoading}
