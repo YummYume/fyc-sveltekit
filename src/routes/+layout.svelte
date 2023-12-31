@@ -9,13 +9,13 @@
   import UserCircle from '$lib/svg/UserCircle.svelte';
   import { prefersReducedMotion } from '$lib/utils/preferences';
 
-  import type { PageData } from './$types';
+  import type { LayoutData } from './$types';
 
   import { enhance } from '$app/forms';
   import { onNavigate } from '$app/navigation';
   import { page } from '$app/stores';
 
-  export let data: PageData;
+  export let data: LayoutData;
 
   let assistantButton: HTMLButtonElement | null = null;
 
