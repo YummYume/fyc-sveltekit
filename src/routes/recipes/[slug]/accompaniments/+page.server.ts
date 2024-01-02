@@ -5,5 +5,6 @@ export const load = (async ({ parent }) => {
 
   return {
     recipe,
+    accompaniments: [] as string[],
   };
 }) satisfies PageServerLoad;

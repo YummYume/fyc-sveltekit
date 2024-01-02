@@ -12,6 +12,12 @@ export const load = (async ({ params }) => {
   }
 
   return {
-    recipe,
+    recipe: {
+      dish: recipe,
+      slug: recipe,
+      ingredients: [],
+      steps: [],
+      shoppingList: [],
+    },
   };
 }) satisfies LayoutServerLoad;
