@@ -87,7 +87,7 @@
   </div>
 
   <section class="container mx-auto space-y-4">
-    <p class="mb-8 text-lg text-gray-500 text-center md:text-xl">Description...</p>
+    <p class="mb-8 text-lg text-gray-500 text-center md:text-xl">{data.recipe.description}</p>
     <div class="grid gap-6 md:grid-cols-3">
       <div>
         <div class="mb-2 text-lg font-semibold text-gray-900 flex gap-1 items-center">
