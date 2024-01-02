@@ -8,7 +8,7 @@
   export type CarlosStatus = 'available' | 'thinking' | 'answering';
 
   // Constants
-  export const STATUS_MESSAGE: { [key in CarlosStatus]: string } = {
+  export const STATUS_MESSAGE = {
     available: 'Carlos est disponible',
     thinking: 'Carlos réfléchit...',
     answering: 'Carlos est en train de répondre...',
