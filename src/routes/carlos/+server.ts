@@ -21,8 +21,8 @@ export const POST = (async ({ request, locals }) => {
   }
 
   const body = await request.json();
-
   const context: { prompt?: string } | null = body.context || null;
+
   let messages: { content: string; role: 'user' | 'assistant' | 'system' }[] = body.messages || [];
 
   if (!Array.isArray(messages)) {
@@ -62,7 +62,7 @@ export const POST = (async ({ request, locals }) => {
 
   if (
     locals.session.user.disallowedIngredients &&
-    locals.session.user.disallowedIngredients.length > 0
+    locals.session.user.disallowedIngredients.trim() !== ''
   ) {
     currentPrompt += `
       L'utilisateur a indiqué préférer éviter les ingrédients suivants : ${locals.session.user.disallowedIngredients}.
