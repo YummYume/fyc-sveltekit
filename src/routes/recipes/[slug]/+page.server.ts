@@ -1,62 +1,55 @@
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library.js';
-import { error, fail, redirect } from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
 
-import { CARLOS_DEFAULT_ERROR_PROMPT, openai } from '$lib/server/GPT.js';
+import { openai } from '$lib/server/GPT.js';
 import { jsonValueToArray } from '$lib/utils/json.js';
 
 import type { PageServerLoad } from './$types.js';
 
 const ALLOWED_RATINGS = [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5];
 
-export const load = (async ({ locals, params }) => {
+export const load = (async ({ locals, parent }) => {
   const { db, session } = locals;
 
   if (!session) {
     redirect(303, '/login');
   }
 
-  try {
-    const recipe = await db.recipe.findUniqueOrThrow({
+  const { recipe } = await parent();
+  const [favourite, userReview, { _avg, _count }] = await Promise.all([
+    db.favourite.findFirst({
       where: {
-        slug: params.slug,
+        recipeId: recipe.id,
+        userId: locals.session?.user.userId,
       },
-    });
+    }),
+    db.review.findFirst({
+      where: {
+        recipeId: recipe.id,
+        userId: locals.session?.user.userId,
+      },
+    }),
+    db.review.aggregate({
+      _avg: {
+        rating: true,
+      },
+      _count: {
+        rating: true,
+      },
+      where: {
+        recipeId: recipe.id,
+      },
+    }),
+  ]);
 
-    const [favourite, userReview, { _avg, _count }] = await Promise.all([
-      db.favourite.findFirst({
-        where: {
-          recipeId: recipe.id,
-          userId: locals.session?.user.userId,
-        },
-      }),
-      db.review.findFirst({
-        where: {
-          recipeId: recipe.id,
-          userId: locals.session?.user.userId,
-        },
-      }),
-      db.review.aggregate({
-        _avg: {
-          rating: true,
-        },
-        _count: {
-          rating: true,
-        },
-        where: {
-          recipeId: recipe.id,
-        },
-      }),
-    ]);
-
-    const checkDisallowedIngredients = async (): Promise<string[] | null> => {
-      if (session.user.disallowedIngredients && recipe.ingredients) {
-        const result = await openai.chat.completions.create({
-          model: 'gpt-3.5-turbo',
-          stream: false,
-          messages: [
-            {
-              role: 'system',
-              content: `
+  const checkDisallowedIngredients = async (): Promise<string[] | null> => {
+    if (session.user.disallowedIngredients && recipe.ingredients) {
+      const result = await openai.chat.completions.create({
+        model: 'gpt-3.5-turbo',
+        stream: false,
+        messages: [
+          {
+            role: 'system',
+            content: `
                 Voici une liste d'ingrédients à éviter: ${session.user.disallowedIngredients}.
                 Les ingrédients à éviter sont séparés par une virgule. Si une valeur n'est pas un ingrédient valide, tu peux l'ignorer.
                 Si dans la recette que je te donne, il y a au moins un ingrédient de cette liste ou du même genre, tu me renvoies un objet JSON avec le format suivant :
@@ -66,86 +59,64 @@ export const load = (async ({ locals, params }) => {
                 où "disallowedIngredients" contiendra la liste des ingrédients à éviter que tu as trouvé dans la recette.
                 Si tu ne trouves pas d'ingrédients à éviter, "disallowedIngredients" sera un tableau vide.
               `,
-            },
-            {
-              role: 'user',
-              content: recipe.ingredients.toString(),
-            },
-          ],
-        });
-
-        const { disallowedIngredients } = JSON.parse(result.choices[0].message.content ?? '');
-
-        return disallowedIngredients.length > 0 ? disallowedIngredients : null;
-      }
-
-      return null;
-    };
-
-    return {
-      disallowedIngredients: checkDisallowedIngredients(),
-      isFavourite: !!favourite,
-      recipe: {
-        ...recipe,
-        ingredients: jsonValueToArray(recipe.ingredients),
-        steps: jsonValueToArray(recipe.steps),
-        shoppingList: jsonValueToArray(recipe.shoppingList),
-      },
-      userReview,
-      user: session.user,
-      allowedRatings: ALLOWED_RATINGS,
-      reviewCount: _count.rating,
-      reviewAverage: _avg.rating,
-      seo: {
-        title: recipe.dish,
-        meta: {
-          description: recipe.description,
-        },
-      },
-      carlosContext: {
-        prompt: `
-          L'utilisateur consulte actuellement la recette "${recipe.dish}".
-          Sa question peut donc (ou non) porter sur cette recette ou sur cette page.
-          L'utilisateur peut consulter les avis (avec notes) de la recette.
-          L'utilisateur peut ajouter, éditer ou supprimer son avis (avec une note) sur la recette.
-          L'utilisateur ${userReview ? 'a mis un avis' : "n'a pas mis d'avis"} sur la recette${
-            userReview ? ` : "${userReview.rating}/5"` : ''
-          }.
-          L'utilisateur peut ajouter ou retirer la recette de ses favoris en cliquant sur l'étoile à droite du titre de la recette.
-          La recette ${favourite ? 'est' : "n'est pas"} dans les favoris de l'utilisateur.
-          L'utilisateur peut aussi demander des recettes similaires et des accompagnements personnalisés pour la recette en cliquant sur les boutons correspondants. Ce n'est pas obligatoire et ce n'est pas toi qui gère ces fonctionnalités. Tu peux simplement indiquer leur présence à l'utilisateur s'il te pose une question sur des recettes similaires ou des accompagnements personnalisés.
-          Si une question porte sur une étape ou un ingrédient, focalise-toi sur cette étape ou cet ingrédient.
-          Voici les ingrédients de la recette : ${recipe.ingredients?.toString()}. Chaque ingrédient est séparé par une virgule.
-          Voici les étapes de la recette : ${recipe.steps?.toString()}. Chaque étape est séparée par une virgule.
-          Voici la description de la recette : ${recipe.description}.
-          Voici la note moyenne de la recette : ${_avg.rating ?? '-'}/5 pour un total de ${
-            _count.rating
-          } avis.
-        `,
-      },
-    };
-  } catch (e) {
-    if (e instanceof PrismaClientKnownRequestError) {
-      if (e.code === 'P2025') {
-        error(404, {
-          message: "Cette recette n'existe pas.",
-          carlosContext: {
-            prompt: `
-              L'utilisateur se trouve actuellement sur une page d'erreur 404.
-              Si l'utilisateur te sollicite, indique lui que la recette demandée n'existe pas.
-              Demande à l'utilisateur de vérifier l'URL ou de retourner sur la page d'accueil.
-              ${CARLOS_DEFAULT_ERROR_PROMPT}
-            `,
           },
-        });
-      }
+          {
+            role: 'user',
+            content: recipe.ingredients.toString(),
+          },
+        ],
+      });
+
+      const { disallowedIngredients } = JSON.parse(result.choices[0].message.content ?? '');
+
+      return disallowedIngredients.length > 0 ? disallowedIngredients : null;
     }
 
-    // eslint-disable-next-line no-console
-    console.error('Error while loading recipe page:', e);
+    return null;
+  };
 
-    throw e;
-  }
+  return {
+    disallowedIngredients: checkDisallowedIngredients(),
+    isFavourite: !!favourite,
+    recipe: {
+      ...recipe,
+      ingredients: jsonValueToArray(recipe.ingredients),
+      steps: jsonValueToArray(recipe.steps),
+      shoppingList: jsonValueToArray(recipe.shoppingList),
+    },
+    userReview,
+    user: session.user,
+    allowedRatings: ALLOWED_RATINGS,
+    reviewCount: _count.rating,
+    reviewAverage: _avg.rating,
+    seo: {
+      title: recipe.dish,
+      meta: {
+        description: recipe.description,
+      },
+    },
+    carlosContext: {
+      prompt: `
+        L'utilisateur consulte actuellement la recette "${recipe.dish}".
+        Sa question peut donc (ou non) porter sur cette recette ou sur cette page.
+        L'utilisateur peut consulter les avis (avec notes) de la recette.
+        L'utilisateur peut ajouter, éditer ou supprimer son avis (avec une note) sur la recette.
+        L'utilisateur ${userReview ? 'a mis un avis' : "n'a pas mis d'avis"} sur la recette${
+          userReview ? ` : "${userReview.rating}/5"` : ''
+        }.
+        L'utilisateur peut ajouter ou retirer la recette de ses favoris en cliquant sur l'étoile à droite du titre de la recette.
+        La recette ${favourite ? 'est' : "n'est pas"} dans les favoris de l'utilisateur.
+        L'utilisateur peut aussi demander des recettes similaires et des accompagnements personnalisés pour la recette en cliquant sur les boutons correspondants. Ce n'est pas obligatoire et ce n'est pas toi qui gère ces fonctionnalités. Tu peux simplement indiquer leur présence à l'utilisateur s'il te pose une question sur des recettes similaires ou des accompagnements personnalisés.
+        Si une question porte sur une étape ou un ingrédient, focalise-toi sur cette étape ou cet ingrédient.
+        Voici les ingrédients de la recette : ${recipe.ingredients?.toString()}. Chaque ingrédient est séparé par une virgule.
+        Voici les étapes de la recette : ${recipe.steps?.toString()}. Chaque étape est séparée par une virgule.
+        Voici la description de la recette : ${recipe.description}.
+        Voici la note moyenne de la recette : ${_avg.rating ?? '-'}/5 pour un total de ${
+          _count.rating
+        } avis.
+      `,
+    },
+  };
 }) satisfies PageServerLoad;
 
 export const actions = {
