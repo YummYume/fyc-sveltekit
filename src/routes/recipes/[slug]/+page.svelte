@@ -26,8 +26,8 @@
 </script>
 
 <div class="flex gap-2 items-center justify-center">
-  <form method="POST" class="relative">
-    <h1 class="h1 first-letter:capitalize">
+  <form method="POST" action="?/favourite" class="relative">
+    <h1 class="h1 first-letter:capitalize" style="view-transition-name: {data.recipe.slug};">
       {data.recipe.dish}
     </h1>
     <button
