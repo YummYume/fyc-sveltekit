@@ -96,6 +96,12 @@ export const load = (async ({ url }) => {
   return {
     result: getResult(),
     query,
+    seo: {
+      title: 'Recherche de recettes',
+      meta: {
+        description: 'Recherchez une recette sur CookConnect.',
+      },
+    },
   };
 }) satisfies PageServerLoad;
 

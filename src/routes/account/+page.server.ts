@@ -6,5 +6,11 @@ export const load = (async () => {
       username: 'Carlos',
       disallowedIngredients: 'chocolat',
     },
+    seo: {
+      title: 'Mon profil',
+      meta: {
+        description: 'Modifiez votre profil sur CookConnect.',
+      },
+    },
   };
 }) satisfies PageServerLoad;

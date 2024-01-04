@@ -46,5 +46,11 @@ export const load = (async ({ parent }) => {
   return {
     similarRecipes: getSimilarRecipes(),
     recipe,
+    seo: {
+      title: `${recipe.dish}, recettes similaires`,
+      meta: {
+        description: `Recettes similaires à la recette "${recipe.dish}".`,
+      },
+    },
   };
 }) satisfies PageServerLoad;

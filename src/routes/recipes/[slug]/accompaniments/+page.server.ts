@@ -27,5 +27,11 @@ export const load = (async ({ parent }) => {
   return {
     accompaniments: getAccompaniments(),
     recipe,
+    seo: {
+      title: `${recipe.dish}, accompagnements personnalisés`,
+      meta: {
+        description: `Accompagnements personnalisés proposés pour la recette "${recipe.dish}".`,
+      },
+    },
   };
 }) satisfies PageServerLoad;

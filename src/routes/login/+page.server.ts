@@ -6,7 +6,15 @@ import { auth } from '$lib/server/auth';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load = (async () => {
-  return {};
+  return {
+    seo: {
+      title: 'Se connecter',
+      meta: {
+        description:
+          'Connectez-vous à votre compte CookConnect pour accéder à toutes vos recettes.',
+      },
+    },
+  };
 }) satisfies PageServerLoad;
 
 export const actions = {

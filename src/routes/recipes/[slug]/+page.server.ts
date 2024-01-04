@@ -14,6 +14,12 @@ export const load = (async ({ parent }) => {
       shoppingList: jsonValueToArray(recipe.shoppingList),
     },
     isFavourite: false,
+    seo: {
+      title: recipe.dish,
+      meta: {
+        description: recipe.description,
+      },
+    },
   };
 }) satisfies PageServerLoad;
 
