@@ -3,8 +3,11 @@
 
   import Card from '$lib/components/Card.svelte';
   import { prefersReducedMotion } from '$lib/utils/preferences';
+  import { toasts } from '$lib/utils/toats';
 
   import type { PageData } from './$types';
+
+  import { enhance } from '$app/forms';
 
   export let data: PageData;
 </script>
@@ -51,7 +54,19 @@
   </Card>
   <Card>
     <h2 class="h2">Editer le profil</h2>
-    <form method="POST" class="form">
+    <form
+      method="POST"
+      class="form"
+      use:enhance={() => {
+        return async ({ update, result }) => {
+          await update({ reset: false });
+
+          if (result.type === 'success') {
+            toasts.success('Profil mis à jour.');
+          }
+        };
+      }}
+    >
       <div>
         <label for="username">Votre nom d'utilisateur</label>
         <input

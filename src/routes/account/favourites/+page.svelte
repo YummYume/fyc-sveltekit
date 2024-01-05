@@ -9,6 +9,7 @@
 
   import type { PageData } from './$types';
 
+  import { enhance } from '$app/forms';
   import { page } from '$app/stores';
 
   export let data: PageData;
@@ -97,7 +98,11 @@
                   </p>
                 </div>
                 <div class="my-auto">
-                  <form method="post" action="/recipes/{favourite.recipe.slug}?/favourite">
+                  <form
+                    method="post"
+                    action="/recipes/{favourite.recipe.slug}?/favourite"
+                    use:enhance
+                  >
                     <button
                       type="submit"
                       class="btn | bg-red-600 mx-0 p-2.5 hover:!bg-red-700"
