@@ -1,10 +1,17 @@
+import { redirect } from '@sveltejs/kit';
+
 import { openai } from '$lib/server/GPT';
-import { db } from '$lib/server/db';
 import { jsonValueToArray } from '$lib/utils/json';
 
 import type { PageServerLoad } from './$types';
 
-export const load = (async ({ parent }) => {
+export const load = (async ({ parent, locals }) => {
+  const { session, db } = locals;
+
+  if (!session) {
+    redirect(303, '/login');
+  }
+
   const { recipe } = await parent();
 
   const getSimilarRecipes = async () => {

@@ -5,11 +5,16 @@
   import { prefersReducedMotion } from '$lib/utils/preferences';
   import { toasts } from '$lib/utils/toats';
 
-  import type { PageData } from './$types';
+  import type { ActionData, PageData } from './$types';
 
   import { enhance } from '$app/forms';
 
   export let data: PageData;
+  export let form: ActionData;
+
+  $: if (form?.error) {
+    toasts.error(form.error);
+  }
 </script>
 
 <h1 class="h1">Profil</h1>

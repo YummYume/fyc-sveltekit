@@ -6,7 +6,13 @@ import { auth } from '$lib/server/auth';
 
 import type { Actions, PageServerLoad } from './$types';
 
-export const load = (async () => {
+export const load = (async ({ locals }) => {
+  const { session } = locals;
+
+  if (session) {
+    redirect(303, '/login');
+  }
+
   return {
     seo: {
       title: 'Créer un compte',
@@ -19,7 +25,13 @@ export const load = (async () => {
 }) satisfies PageServerLoad;
 
 export const actions = {
-  register: async ({ request, cookies }) => {
+  register: async ({ request, cookies, locals }) => {
+    const { session } = locals;
+
+    if (session) {
+      redirect(303, '/login');
+    }
+
     const data = await request.formData();
     const username = (data.get('username') ?? '') as string;
     const password = (data.get('password') ?? '') as string;
