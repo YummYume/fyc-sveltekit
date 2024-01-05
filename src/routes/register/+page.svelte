@@ -3,12 +3,14 @@
 
   import type { ActionData } from './$types';
 
+  import { enhance } from '$app/forms';
+
   export let form: ActionData;
 </script>
 
 <section class="section">
   <Card title="Créer un compte">
-    <form action="?/register" method="POST" class="form">
+    <form action="?/register" method="POST" class="form" use:enhance>
       <div>
         <label for="username">Votre nom d'utilisateur</label>
         <input type="text" name="username" id="username" required={true} />

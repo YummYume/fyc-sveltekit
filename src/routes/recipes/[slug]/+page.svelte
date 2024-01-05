@@ -12,6 +12,8 @@
 
   import type { PageData } from './$types';
 
+  import { enhance } from '$app/forms';
+
   export let data: PageData;
 
   const [send, receive] = crossfade({
@@ -26,7 +28,7 @@
 </script>
 
 <div class="flex gap-2 items-center justify-center">
-  <form method="POST" action="?/favourite" class="relative">
+  <form method="POST" action="?/favourite" class="relative" use:enhance>
     <h1 class="h1 first-letter:capitalize" style="view-transition-name: {data.recipe.slug};">
       {data.recipe.dish}
     </h1>
