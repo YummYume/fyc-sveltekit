@@ -4,5 +4,6 @@
 }
 
 ai.yam-yam.dev {
+    encode gzip
     reverse_proxy * svelte-kit:3000
 }
