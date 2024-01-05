@@ -3,6 +3,7 @@
     admin off
 }
 
-ai.yam-yam.dev {
+my-website.com {
+    encode gzip
     reverse_proxy * svelte-kit:3000
 }

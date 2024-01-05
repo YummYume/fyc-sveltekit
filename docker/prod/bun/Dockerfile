@@ -22,7 +22,7 @@ FROM oven/bun:alpine
 
 WORKDIR /home/bun/fyc-svelte-kit
 
-ENV ORIGIN=https://ai.yam-yam.dev
+ENV ORIGIN=https://my-website.com
 ENV PORT=3000
 ENV PROTOCOL_HEADER=x-forwarded-proto
 ENV HOST_HEADER=x-forwarded-host
