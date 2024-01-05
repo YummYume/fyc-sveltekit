@@ -2,8 +2,13 @@
   import '../app.scss';
 
   import { SvelteToast } from '@zerodevx/svelte-toast';
+  import { blur } from 'svelte/transition';
 
+  import Assistant from '$lib/components/Assistant.svelte';
+  import { assistantOpen } from '$lib/stores/assistant';
   import UserCircle from '$lib/svg/UserCircle.svelte';
+  import { prefersReducedMotion } from '$lib/utils/preferences';
+  import { requestAnimationFrame } from '$lib/utils/request-animation-frame';
 
   import type { LayoutData } from './$types';
 
@@ -11,6 +16,8 @@
   import { page } from '$app/stores';
 
   export let data: LayoutData;
+
+  let assistantButton: HTMLButtonElement | null = null;
 </script>
 
 <svelte:head>
@@ -86,6 +93,45 @@
 
 <main class="flex flex-col grow p-5">
   <slot />
+
+  {#if data.user}
+    <div class="bottom-0 left-0 p-2.5 fixed lg:p-5">
+      <div class="relative">
+        {#key $assistantOpen}
+          <button
+            aria-label="Discuter avec l'assistant personnel"
+            aria-haspopup="dialog"
+            aria-expanded={$assistantOpen ? 'true' : 'false'}
+            class="absolute bottom-0 h-10 w-10 sm:h-20 sm:w-20 bg-slate-400 rounded-full"
+            bind:this={assistantButton}
+            on:click={() => {
+              $assistantOpen = true;
+            }}
+            transition:blur={{ amount: 10, duration: prefersReducedMotion() ? 0 : 1000 }}
+          >
+            <enhanced:img
+              src="$lib/assets/carlos.png"
+              alt="Assistant personnel Carlos"
+              class="rounded-full shadow-2xl"
+            />
+          </button>
+        {/key}
+
+        <Assistant
+          open={$assistantOpen}
+          on:close={() => {
+            $assistantOpen = false;
+
+            requestAnimationFrame(() => {
+              if (assistantButton) {
+                assistantButton.focus();
+              }
+            });
+          }}
+        />
+      </div>
+    </div>
+  {/if}
 </main>
 
 <style>

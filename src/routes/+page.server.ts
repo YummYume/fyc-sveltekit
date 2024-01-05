@@ -19,6 +19,12 @@ export const load = (async ({ locals }) => {
           "CookConnect, le moteur de recherche de recettes de cuisine, alimenté par l'intelligence artificielle.",
       },
     },
+    carlosContext: {
+      prompt: `
+        L'utilisateur se trouve actuellement sur la page "Accueil". Sa question peut donc (ou non) porter sur cette page.
+        Cette page dispose d'une barre de recherche pour rechercher des recettes : si une recette est trouvée, l'utilisateur peut alors y accéder, sinon, l'utilisateur peut demander à générer la recette.
+      `,
+    },
   };
 }) satisfies PageServerLoad;
 

@@ -59,5 +59,13 @@ export const load = (async ({ parent, locals }) => {
         description: `Recettes similaires à la recette "${recipe.dish}".`,
       },
     },
+    carlosContext: {
+      prompt: `
+        L'utilisateur consulte actuellement les recettes similaires à la recette "${recipe.dish}".
+        Sa question peut donc (ou non) porter sur cette recette ou sur cette page.
+        Cette page est une page secondaire qui ne liste que les recettes similaires à la recette "${recipe.dish}".
+        Elle peut également s'ouvrir dans une modal. Si l'utilisateur te pose plus de questions sur cette page, tu peux lui demander de d'abord revenir sur la page principale de la recette "${recipe.dish}" pour plus d'informations.
+      `,
+    },
   };
 }) satisfies PageServerLoad;
