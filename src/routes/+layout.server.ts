@@ -1,11 +1,8 @@
 import type { LayoutServerLoad } from './$types';
 
-export const load = (async () => {
+export const load = (async ({ locals }) => {
   return {
-    user: {
-      username: 'Carlos',
-      disallowedIngredients: ['chocolat'],
-    },
+    user: locals.session?.user,
     seo: {
       title: 'CookConnect',
       meta: {

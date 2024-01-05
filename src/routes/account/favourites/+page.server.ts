@@ -1,12 +1,35 @@
+import { redirect } from '@sveltejs/kit';
+
 import type { PageServerLoad } from './$types';
-import type { Favourite, Recipe } from '@prisma/client';
 
 const ALLOWED_PER_PAGE = [10, 25, 50, 100];
 
-export const load = (async () => {
+export const load = (async ({ locals }) => {
+  const { session, db } = locals;
+
+  if (!session) {
+    redirect(303, '/login');
+  }
+
+  const [favourites, count] = await Promise.all([
+    db.favourite.findMany({
+      where: {
+        userId: session.user.userId,
+      },
+      include: {
+        recipe: true,
+      },
+    }),
+    db.favourite.count({
+      where: {
+        userId: session.user.userId,
+      },
+    }),
+  ]);
+
   return {
-    count: 0,
-    favourites: [] as (Favourite & { recipe: Recipe })[],
+    favourites,
+    count,
     allowedPerPage: ALLOWED_PER_PAGE,
     perPage: ALLOWED_PER_PAGE[0],
     totalPages: 1,
