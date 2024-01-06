@@ -68,7 +68,6 @@
           class="w-full px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-600 focus:border-primary-600"
           bind:value={inputValue}
           use:inputDebounce={{
-            value: inputValue,
             callback: () => {
               if (perPageForm) {
                 perPageForm.requestSubmit();
