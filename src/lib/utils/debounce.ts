@@ -2,10 +2,6 @@ import type { ActionReturn } from 'svelte/action';
 
 export type InputDebounceParams = {
   /**
-   * The value of the input
-   */
-  value: string;
-  /**
    * The delay in milliseconds for the debounce
    */
   delay: number;
@@ -25,16 +21,35 @@ export const inputDebounce = (
   node: HTMLInputElement,
   params: InputDebounceParams,
 ): ActionReturn<InputDebounceParams> => {
-  let timeout: number;
+  let timeout: number | null = null;
+  let eventParams = params;
+
+  const callback = ({ target }: Event<EventTarget>) => {
+    if (!(target instanceof HTMLInputElement)) {
+      return;
+    }
+
+    if (timeout) {
+      window.clearTimeout(timeout);
+    }
+
+    timeout = window.setTimeout(() => {
+      eventParams.callback(target.value, node);
+    }, eventParams.delay);
+  };
+
+  node.addEventListener('input', callback);
 
   return {
     update: (newParams) => {
-      timeout = window.setTimeout(() => {
-        params.callback(newParams.value, node);
-      }, params.delay);
+      eventParams = newParams;
     },
     destroy: () => {
-      window.clearTimeout(timeout);
+      node.removeEventListener('input', callback);
+
+      if (timeout) {
+        window.clearTimeout(timeout);
+      }
     },
   };
 };

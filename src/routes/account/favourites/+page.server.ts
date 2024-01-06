@@ -4,25 +4,50 @@ import type { PageServerLoad } from './$types';
 
 const ALLOWED_PER_PAGE = [10, 25, 50, 100];
 
-export const load = (async ({ locals }) => {
-  const { session, db } = locals;
+export const load = (async ({ locals, url }) => {
+  const { db, session } = locals;
 
   if (!session) {
     redirect(303, '/login');
+  }
+
+  const page = parseInt(url.searchParams.get('page') ?? '1', 10);
+  const query = url.searchParams.get('query') ?? '';
+  const order = url.searchParams.get('order') === 'asc' ? 'asc' : 'desc';
+
+  let perPage = parseInt(url.searchParams.get('perPage') ?? ALLOWED_PER_PAGE[0].toString(), 10);
+
+  if (!ALLOWED_PER_PAGE.includes(perPage)) {
+    [perPage] = ALLOWED_PER_PAGE;
   }
 
   const [favourites, count] = await Promise.all([
     db.favourite.findMany({
       where: {
         userId: session.user.userId,
+        recipe: {
+          dish: {
+            contains: query,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: order,
       },
       include: {
         recipe: true,
       },
+      skip: (page - 1) * perPage,
+      take: perPage,
     }),
     db.favourite.count({
       where: {
         userId: session.user.userId,
+        recipe: {
+          dish: {
+            contains: query,
+          },
+        },
       },
     }),
   ]);
@@ -54,9 +79,11 @@ export const load = (async ({ locals }) => {
     favourites,
     count,
     allowedPerPage: ALLOWED_PER_PAGE,
-    perPage: ALLOWED_PER_PAGE[0],
-    totalPages: 1,
-    currentPage: 1,
+    totalPages: Math.ceil(count / perPage),
+    currentPage: page,
+    perPage,
+    query,
+    order,
     seo: {
       title: 'Mes favoris',
       meta: {

@@ -3,7 +3,9 @@
 
   import Card from '$lib/components/Card.svelte';
   import Pagination from '$lib/components/Pagination.svelte';
+  import { assistantOpen } from '$lib/stores/assistant';
   import Trash from '$lib/svg/Trash.svelte';
+  import { inputDebounce } from '$lib/utils/debounce';
   import { prefersReducedMotion } from '$lib/utils/preferences';
   import { truncate } from '$lib/utils/string';
 
@@ -13,6 +15,9 @@
   import { page } from '$app/stores';
 
   export let data: PageData;
+
+  let perPageForm: HTMLFormElement | null = null;
+  let inputValue = data.query;
 </script>
 
 <h1 class="h1">Mes favoris</h1>
@@ -34,13 +39,25 @@
           delay: prefersReducedMotion() ? 0 : 300,
         }}
       >
-        Aucun favori pour le moment !
-      </p>{/if}
+        Aucun favori pour le moment ! Peut-être que <button
+          type="button"
+          class="text-primary-700 hover:text-primary-800 focus-visible:text-primary-800 transition-colors motion-reduce:transition-none"
+          aria-label="Carlos (ouvrir l'assistant)"
+          aria-haspopup="dialog"
+          on:click={() => {
+            $assistantOpen = true;
+          }}>Carlos</button
+        > peut vous aider ?
+      </p>
+    {/if}
 
     <form
       class="flex flex-col-reverse md:flex-row justify-between items-center gap-4"
       id="favourites-form"
       method="get"
+      bind:this={perPageForm}
+      novalidate
+      data-sveltekit-keepfocus
     >
       <label>
         <span>Rechercher un favori</span>
@@ -49,6 +66,15 @@
           name="query"
           placeholder="Titre de la recette"
           class="w-full px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-600 focus:border-primary-600"
+          bind:value={inputValue}
+          use:inputDebounce={{
+            callback: () => {
+              if (perPageForm) {
+                perPageForm.requestSubmit();
+              }
+            },
+            delay: 250,
+          }}
         />
       </label>
 
@@ -57,9 +83,14 @@
         <select
           name="order"
           class="w-full px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-600 focus:border-primary-600"
+          on:change={() => {
+            if (perPageForm) {
+              perPageForm.requestSubmit();
+            }
+          }}
         >
-          <option value="desc" selected>Plus récent</option>
-          <option value="asc">Plus ancien</option>
+          <option value="desc" selected={data.order === 'desc'}>Plus récent</option>
+          <option value="asc" selected={data.order === 'asc'}>Plus ancien</option>
         </select>
       </label>
 
@@ -142,6 +173,11 @@
             aria-label="Nombre de résultats par page"
             class="block px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-600 focus:border-primary-600 w-56 ml-auto"
             aria-controls="favourites-results"
+            on:change={() => {
+              if (perPageForm) {
+                perPageForm.requestSubmit();
+              }
+            }}
           >
             {#each data.allowedPerPage as perPage}
               <option value={perPage} selected={data.perPage === perPage}>{perPage} par page</option
