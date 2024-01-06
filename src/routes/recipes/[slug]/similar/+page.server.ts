@@ -1,11 +1,50 @@
+import { openai } from '$lib/server/GPT';
+import { db } from '$lib/server/db';
+import { jsonValueToArray } from '$lib/utils/json';
+
 import type { PageServerLoad } from './$types';
-import type { Recipe } from '@prisma/client';
 
 export const load = (async ({ parent }) => {
   const { recipe } = await parent();
 
+  const getSimilarRecipes = async () => {
+    const recipes = await db.recipe.findMany({
+      select: {
+        dish: true,
+        slug: true,
+        description: true,
+      },
+      where: {
+        slug: {
+          not: {
+            equals: recipe.slug,
+          },
+        },
+      },
+    });
+
+    const prompt = `
+      Tu es Carlos, un assistant culinaire du site "CookConnect".
+      La recette que tu consultes actuellement est "${recipe.dish}".
+      Je vais te donner une liste de recettes et ton travail est de me donner les recettes qui sont les plus adaptées pour être recommandées en tant que "recettes similaires".
+      Tu peux me donner entre 0 et 3 recettes.
+      Je veux le résultat au format JSON, comme suit : ["slug1", "slug2", "slug3"].
+      Voici la liste des recettes : ${JSON.stringify(recipes)}
+    `;
+
+    const result = await openai.chat.completions.create({
+      model: 'gpt-3.5-turbo',
+      messages: [{ role: 'system', content: prompt }],
+      stream: false,
+    });
+
+    const slugs = jsonValueToArray(JSON.parse(result.choices[0].message.content ?? ''));
+
+    return recipes.filter((similarRecipe) => slugs.includes(similarRecipe.slug)).slice(0, 3);
+  };
+
   return {
+    similarRecipes: getSimilarRecipes(),
     recipe,
-    similarRecipes: [] as Recipe[],
   };
 }) satisfies PageServerLoad;
