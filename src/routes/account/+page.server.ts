@@ -1,11 +1,17 @@
-import type { PageServerLoad } from './$types';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { fail, redirect } from '@sveltejs/kit';
 
-export const load = (async () => {
+import type { Actions, PageServerLoad } from './$types';
+
+export const load = (async ({ locals }) => {
+  const { session } = locals;
+
+  if (!session) {
+    redirect(303, '/login');
+  }
+
   return {
-    user: {
-      username: 'Carlos',
-      disallowedIngredients: 'chocolat',
-    },
+    user: session.user,
     seo: {
       title: 'Mon profil',
       meta: {
@@ -14,3 +20,68 @@ export const load = (async () => {
     },
   };
 }) satisfies PageServerLoad;
+
+export const actions = {
+  default: async ({ locals, request }) => {
+    const { db, session } = locals;
+    const data = await request.formData();
+
+    if (!session) {
+      redirect(303, '/login');
+    }
+
+    const username = data.get('username') as string;
+    const disallowedIngredients = data.get('disallowedIngredients') as string;
+
+    if (!username) {
+      return fail(422, { error: "Le nom d'utilisateur ne peut pas être vide." });
+    }
+
+    if (!/^[A-Za-z]+$/g.test(username)) {
+      return fail(422, {
+        error: "Le nom d'utilisateur ne doit contenir que des lettres.",
+      });
+    }
+
+    if (username.length < 3 || username.length > 20) {
+      return fail(400, {
+        error: "Le nom d'utilisateur doit être compris entre 3 et 20 caractères.",
+      });
+    }
+
+    if (disallowedIngredients) {
+      if (!/[a-zA-Z,]/.test(disallowedIngredients)) {
+        return fail(422, {
+          error: 'Les ingrédients ne doivent contenir que des lettres et des virgules.',
+        });
+      }
+    }
+
+    if (disallowedIngredients.length > 255) {
+      return fail(400, {
+        error: 'La liste des ingrédients à éviter ne peut pas dépasser 255 caractères.',
+      });
+    }
+
+    try {
+      await db.user.update({
+        where: { id: session.user.userId },
+        data: {
+          username,
+          disallowedIngredients,
+        },
+      });
+    } catch (e) {
+      if (e instanceof PrismaClientKnownRequestError && e.code === 'P2002') {
+        return fail(400, { error: "le nom d'utilisateur est déjà utilisé." });
+      }
+
+      // eslint-disable-next-line no-console
+      console.error('Error while updating user:', e);
+
+      return fail(500, {
+        error: "Oops... Quelque chose s'est mal passé. Veuillez réessayer plus tard.",
+      });
+    }
+  },
+} satisfies Actions;
