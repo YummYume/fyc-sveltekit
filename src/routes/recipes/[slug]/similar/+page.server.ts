@@ -1,12 +1,12 @@
 import { redirect } from '@sveltejs/kit';
 
-import { openai } from '$lib/server/GPT';
-import { jsonValueToArray } from '$lib/utils/json';
+import { openai } from '$lib/server/GPT.js';
+import { jsonValueToArray } from '$lib/utils/json.js';
 
-import type { PageServerLoad } from './$types';
+import type { PageServerLoad } from './$types.js';
 
-export const load = (async ({ parent, locals }) => {
-  const { session, db } = locals;
+export const load = (async ({ locals, parent }) => {
+  const { db, session } = locals;
 
   if (!session) {
     redirect(303, '/login');
@@ -36,6 +36,14 @@ export const load = (async ({ parent, locals }) => {
       Je vais te donner une liste de recettes et ton travail est de me donner les recettes qui sont les plus adaptées pour être recommandées en tant que "recettes similaires".
       Tu peux me donner entre 0 et 3 recettes.
       Je veux le résultat au format JSON, comme suit : ["slug1", "slug2", "slug3"].
+      ${
+        session.user.disallowedIngredients
+          ? `
+            Attention, tu dois me donner des recettes qui ne contiennent pas ce genre d'ingrédients : ${session.user.disallowedIngredients}.
+            Les ingrédients à éviter sont séparés par une virgule. Si une valeur n'est pas un ingrédient valide, tu peux l'ignorer.
+          `
+          : ''
+      }
       Voici la liste des recettes : ${JSON.stringify(recipes)}
     `;
 
