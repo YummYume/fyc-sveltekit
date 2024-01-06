@@ -1,10 +1,14 @@
 <script lang="ts">
   import Card from '$lib/components/Card.svelte';
+
+  import type { ActionData } from './$types';
+
+  export let form: ActionData;
 </script>
 
 <section class="section">
   <Card title="Créer un compte">
-    <form method="POST" class="form">
+    <form action="?/register" method="POST" class="form">
       <div>
         <label for="username">Votre nom d'utilisateur</label>
         <input type="text" name="username" id="username" required={true} />
@@ -29,6 +33,10 @@
           required={true}
         />
       </div>
+
+      {#if form?.error}
+        <p class="text-sm font-light text-red-600">{form.error}</p>
+      {/if}
 
       <button class="btn" type="submit">Créer un compte</button>
       <p class="text-sm font-light text-gray-500">

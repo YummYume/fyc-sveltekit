@@ -4,9 +4,10 @@
   import Search from '$lib/components/Search.svelte';
   import ArrowRight from '$lib/svg/ArrowRight.svelte';
 
-  import type { PageData } from './$types';
+  import type { PageData, ActionData } from './$types';
 
   export let data: PageData;
+  export let form: ActionData;
 </script>
 
 <h1 class="h1">Recherche</h1>
@@ -23,7 +24,7 @@
       <Card>
         {#if data.query.trim() !== ''}
           <p class="text-gray-500 text-center" role="status">Aucun résulat pour "{data.query}".</p>
-          <form method="POST" class="form">
+          <form method="POST" action="?/generate" class="form">
             <input type="hidden" name="dish" value={data.query} class="!hidden" />
             <button type="submit" class="btn"> Générer la recette </button>
           </form>
@@ -70,4 +71,8 @@
       Oups! Quelque chose s'est mal passé. Veuillez réessayer plus tard.
     </p>
   {/await}
+
+  {#if form?.error}
+    <p class="text-sm font-light text-red-600 text-center">{form.error}</p>
+  {/if}
 </div>

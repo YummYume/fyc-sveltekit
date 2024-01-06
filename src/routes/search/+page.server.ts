@@ -1,5 +1,9 @@
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { fail, redirect } from '@sveltejs/kit';
+
 import { openai } from '$lib/server/GPT';
 import { db } from '$lib/server/db';
+import { slugify } from '$lib/utils/slug';
 
 import type { PageServerLoad } from './$types';
 
@@ -94,3 +98,72 @@ export const load = (async ({ url }) => {
     query,
   };
 }) satisfies PageServerLoad;
+
+export const actions = {
+  generate: async ({ request }) => {
+    const data = await request.formData();
+    const dish = (data.get('dish') ?? '') as string;
+    const result = await openai.chat.completions.create({
+      model: 'gpt-3.5-turbo',
+      stream: false,
+      messages: [
+        {
+          role: 'system',
+          content: `
+            TU NE DOIS RETOURNER QUE DU JSON.
+            À partir de maintenant, tu es un assistant de cuisine personnel.
+            Je vais te donner une demande utilisateur, et tu me donneras une recette de cuisine pour cette dernière en français.
+            Si l'utilisateur demande le nom d'un plat, alors tu dois générer une recette pour ce plat.
+            Si l'utilisateur demande le nom d'un ingrédient, une description de ce qu'il souhaite manger, ou une recette pour une occasion spéciale, alors tu dois générer une recette qui correspond à cette demande.
+            Ton but final est uniquement de générer une recette de cuisine si possible. Cette recette pourra ensuite être consultée par n'importe quel utilisateur, il n'y a pas de lien entre la demande de l'utilisateur et la recette générée.
+            Si tu juges que la demande ne peut pas être satisfaite, ce n'est pas grave, retourne "null" et ignore la demande. N'essaie pas de générer une recette qui n'existe pas ou qui n'a pas de sens.
+            Si tu juges que la demande de l'utilisateur n'est pas valide, est obscène, insultante, ou ne correspond pas à une recette de cuisine, retourne "null" et ignore la demande.
+            Sinon, donne-moi une recette, et formate ta sortie en JSON avec le format suivant :
+            {
+              "description": string,
+              "dish": string,
+              "ingredients": string[],
+              "shoppingList": string[],
+              "slug": string,
+              "steps": string[]
+            }
+          `,
+        },
+        {
+          role: 'user',
+          content: dish,
+        },
+      ],
+    });
+    const recipe = JSON.parse(result.choices[0].message.content ?? '');
+
+    if (!recipe) {
+      return fail(400, { error: "Votre demande n'est pas valide. Veuillez réessayer." });
+    }
+
+    try {
+      await db.recipe.create({
+        select: {
+          slug: true,
+        },
+        data: {
+          ...recipe,
+          slug: slugify(recipe.dish),
+        },
+      });
+    } catch (e) {
+      if (e instanceof PrismaClientKnownRequestError && e.code === 'P2002') {
+        return fail(400, { error: 'Cette recette existe déjà.' });
+      }
+
+      // eslint-disable-next-line no-console
+      console.error('Error creating recipe:', e);
+
+      return fail(500, {
+        error: "Oups... Quelque chose s'est mal passé. Veuillez réessayer plus tard.",
+      });
+    }
+
+    redirect(303, `/recipes/${slugify(recipe.dish)}`);
+  },
+};
