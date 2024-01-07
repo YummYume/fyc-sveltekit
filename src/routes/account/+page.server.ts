@@ -18,6 +18,13 @@ export const load = (async ({ locals }) => {
         description: 'Modifiez votre profil sur CookConnect.',
       },
     },
+    carlosContext: {
+      prompt: `
+        L'utilisateur se trouve actuellement sur la page "Profil" qui contient les informations de son profil.
+        Sa question peut donc (ou non) porter sur cette page.
+        L'utilisateur peut modifier son nom d'utilisateur ainsi que les ingrédients qu'il souhaite éviter.
+      `,
+    },
   };
 }) satisfies PageServerLoad;
 
