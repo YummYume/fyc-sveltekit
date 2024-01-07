@@ -11,5 +11,11 @@ export const load = (async () => {
     perPage: ALLOWED_PER_PAGE[0],
     totalPages: 1,
     currentPage: 1,
+    seo: {
+      title: 'Mes favoris',
+      meta: {
+        description: 'Retrouvez vos recettes favorites sur CookConnect.',
+      },
+    },
   };
 }) satisfies PageServerLoad;

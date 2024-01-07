@@ -6,5 +6,11 @@ export const load = (async () => {
       username: 'Carlos',
       disallowedIngredients: ['chocolat'],
     },
+    seo: {
+      title: 'CookConnect',
+      meta: {
+        description: 'The CookConnect app.',
+      },
+    },
   };
 }) satisfies LayoutServerLoad;

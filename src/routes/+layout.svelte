@@ -7,8 +7,23 @@
 
   import type { LayoutData } from './$types';
 
+  import { page } from '$app/stores';
+
   export let data: LayoutData;
 </script>
+
+<svelte:head>
+  {#key $page.data.seo}
+    {#if $page.data.seo?.title}
+      <title>{$page.data.seo.title}</title>
+    {/if}
+  {/key}
+  {#if $page.data.seo?.meta}
+    {#each Object.entries($page.data.seo.meta) as [name, content] (name)}
+      <meta {name} {content} />
+    {/each}
+  {/if}
+</svelte:head>
 
 <SvelteToast
   options={{
