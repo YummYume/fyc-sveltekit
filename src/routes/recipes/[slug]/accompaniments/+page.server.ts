@@ -1,11 +1,11 @@
 import { redirect } from '@sveltejs/kit';
 
-import { openai } from '$lib/server/GPT';
-import { jsonValueToArray } from '$lib/utils/json';
+import { openai } from '$lib/server/GPT.js';
+import { jsonValueToArray } from '$lib/utils/json.js';
 
-import type { PageServerLoad } from './$types';
+import type { PageServerLoad } from './$types.js';
 
-export const load = (async ({ parent, locals }) => {
+export const load = (async ({ locals, parent }) => {
   const { session } = locals;
 
   if (!session) {
@@ -20,6 +20,11 @@ export const load = (async ({ parent, locals }) => {
       La recette actuellement consultée est "${recipe.dish}".
       Ton travail consiste à me donner une liste d'accompagnements pour cette recette.
       Je veux le résultat au format JSON, comme suit : ["accompagnement1", "accompagnement2", "accompagnement3"].
+      ${
+        session.user.disallowedIngredients
+          ? `Attention, tu dois me donner des accompagnements qui ne contiennent pas ce genre d'ingrédients : ${session.user.disallowedIngredients}.`
+          : ''
+      }
       Tu peux me donner au maximum 10 accompagnements.
     `;
 
