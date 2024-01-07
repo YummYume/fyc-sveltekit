@@ -8,7 +8,7 @@ type Url = {
 };
 
 export const GET = (async () => {
-  const baseUrl = 'https://ai.yam-yam.dev';
+  const baseUrl = 'https://my-website.com';
   const baseLastmod = '2023-12-04';
   const baseChangefreq = 'monthly';
   const basePriority = 0.5;
