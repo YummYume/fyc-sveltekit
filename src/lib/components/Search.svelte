@@ -1,6 +1,8 @@
 <script lang="ts">
   import { onDestroy, onMount } from 'svelte';
 
+  import Microphone from '$lib/svg/Microphone.svelte';
+  import MicrophoneFull from '$lib/svg/MicrophoneFull.svelte';
   import Search from '$lib/svg/Search.svelte';
   import { createSpeechRecognition } from '$lib/utils/speech';
   import { toasts } from '$lib/utils/toats';
@@ -25,7 +27,7 @@
       }
 
       recognition.start();
-    
+
       return;
     }
 
@@ -45,17 +47,15 @@
     recognition.lang = 'fr-FR';
 
     recognition.onstart = () => {
-      disabled = true;
       recognitionStarted = true;
       recognitionAborted = false;
     };
 
     recognition.onend = () => {
-      disabled = false;
       recognitionStarted = false;
 
       if (!recognitionAborted) {
-        if (form) {
+        if (form && input && input.value.trim() !== '') {
           form.requestSubmit();
         }
 
@@ -78,7 +78,7 @@
 
       input.value = transcript.trim();
 
-      const isFinal = event.results[0].isFinal;
+      const { isFinal } = event.results[0];
 
       if (!isFinal) {
         return;
@@ -120,18 +120,37 @@
       required
       aria-label="Rechercher un plat"
       aria-describedby="search-help"
-      class="!p-4 !pl-10 !pr-32"
+      class="!p-4 !pl-10 !pr-[10.5rem]"
       bind:this={input}
       {value}
     />
-    <button type="button" on:click={startOrStopRecognition} class:animate-pulse={recognitionStarted}>
-      Speech {#if recognitionStarted}(on){/if}
-    </button>
     <p class="sr-only" id="search-help">
       Votre recherche peut également contenir une demande, comme par exemple "Repas de Noël sans
       gluten".
     </p>
-    <button type="submit" class="btn | absolute right-2.5 bottom-2.5 px-4 py-2 w-fit" {disabled}>
+    <button
+      type="button"
+      class="btn | absolute right-[7.75rem] top-1/2 transform -translate-y-1/2 p-2"
+      class:bg-primary-800={recognitionStarted}
+      class:ring-4={recognitionStarted}
+      class:ring-primary-300={recognitionStarted}
+      aria-label={recognitionStarted
+        ? 'Arrêter la reconnaissance vocale'
+        : 'Démarrer la reconnaissance vocale'}
+      aria-controls="q"
+      on:click={startOrStopRecognition}
+    >
+      {#if recognitionStarted}
+        <MicrophoneFull class="w-5 h-5" aria-hidden="true" />
+      {:else}
+        <Microphone class="w-5 h-5" aria-hidden="true" />
+      {/if}
+    </button>
+    <button
+      type="submit"
+      class="btn | absolute right-2.5 bottom-2.5 px-4 py-2 w-fit"
+      disabled={disabled || recognitionStarted}
+    >
       Rechercher
     </button>
   </div>
