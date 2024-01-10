@@ -3,18 +3,33 @@
 
   import Search from '$lib/svg/Search.svelte';
   import { createSpeechRecognition } from '$lib/utils/speech';
+  import { toasts } from '$lib/utils/toats';
 
   export let value = '';
   export let disabled = false;
 
   let form: HTMLFormElement | null = null;
+  let input: HTMLInputElement | null = null;
   let recognition: ReturnType<typeof createSpeechRecognition> = null;
   let recognitionStarted = false;
+  let recognitionAborted = false;
 
-  const startRecognition = () => {
+  const startOrStopRecognition = () => {
     if (recognition) {
+      if (recognitionStarted) {
+        recognitionAborted = true;
+
+        recognition.stop();
+
+        return;
+      }
+
       recognition.start();
+    
+      return;
     }
+
+    toasts.error('Votre navigateur ne supporte pas la reconnaissance vocale.');
   };
 
   onMount(() => {
@@ -29,49 +44,49 @@
     recognition.maxAlternatives = 1;
     recognition.lang = 'fr-FR';
 
-    recognition.onaudiostart = (e) => {
-      console.log('onaudiostart', e);
-    };
-
-    recognition.onaudioend = (e) => {
-      console.log('onaudioend', e);
-    };
-
-    recognition.onsoundstart = (e) => {
-      console.log('onsoundstart', e);
-    };
-
-    recognition.onsoundend = (e) => {
-      console.log('onsoundend', e);
-    };
-
     recognition.onstart = () => {
       disabled = true;
       recognitionStarted = true;
+      recognitionAborted = false;
     };
 
     recognition.onend = () => {
       disabled = false;
       recognitionStarted = false;
+
+      if (!recognitionAborted) {
+        if (form) {
+          form.requestSubmit();
+        }
+
+        return;
+      }
+
+      recognitionAborted = false;
     };
 
     recognition.onresult = (event) => {
-      console.log('event', event);
+      if (!input || !recognitionStarted) {
+        return;
+      }
+
       const { transcript } = event.results[0][0];
 
       if (!transcript || transcript.trim() === '') {
         return;
       }
 
-      value = `${value} ${transcript}`.trim();
+      input.value = transcript.trim();
 
-      if (recognition) {
-        recognition.stop();
+      const isFinal = event.results[0].isFinal;
+
+      if (!isFinal) {
+        return;
       }
 
-      // if (form) {
-      //   form.requestSubmit();
-      // }
+      if (recognition && isFinal) {
+        recognition.stop();
+      }
     };
   });
 
@@ -106,9 +121,10 @@
       aria-label="Rechercher un plat"
       aria-describedby="search-help"
       class="!p-4 !pl-10 !pr-32"
+      bind:this={input}
       {value}
     />
-    <button type="button" on:click={startRecognition} disabled={disabled || recognitionStarted}>
+    <button type="button" on:click={startOrStopRecognition} class:animate-pulse={recognitionStarted}>
       Speech {#if recognitionStarted}(on){/if}
     </button>
     <p class="sr-only" id="search-help">
