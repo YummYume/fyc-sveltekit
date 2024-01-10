@@ -45,6 +45,9 @@ export const load = (async ({ locals, parent }) => {
     if (session.user.disallowedIngredients && recipe.ingredients) {
       const result = await openai.chat.completions.create({
         model: BASE_MODEL,
+        response_format: {
+          type: 'json_object',
+        },
         stream: false,
         messages: [
           {

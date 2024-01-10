@@ -35,7 +35,7 @@ export const load = (async ({ locals, parent }) => {
       La recette que tu consultes actuellement est "${recipe.dish}".
       Je vais te donner une liste de recettes et ton travail est de me donner les recettes qui sont les plus adaptées pour être recommandées en tant que "recettes similaires".
       Tu peux me donner entre 0 et 3 recettes.
-      Je veux le résultat au format JSON, comme suit : ["slug1", "slug2", "slug3"].
+      Je veux le résultat au format JSON, comme suit : {"recipes": ["slug1", "slug2", "slug3"]}.
       ${
         session.user.disallowedIngredients
           ? `
@@ -49,11 +49,14 @@ export const load = (async ({ locals, parent }) => {
 
     const result = await openai.chat.completions.create({
       model: BASE_MODEL,
+      response_format: {
+        type: 'json_object',
+      },
       messages: [{ role: 'system', content: prompt }],
       stream: false,
     });
 
-    const slugs = jsonValueToArray(JSON.parse(result.choices[0].message.content ?? ''));
+    const slugs = jsonValueToArray(JSON.parse(result.choices[0].message.content ?? '').recipes);
 
     return recipes.filter((similarRecipe) => slugs.includes(similarRecipe.slug)).slice(0, 3);
   };

@@ -19,7 +19,7 @@ export const load = (async ({ locals, parent }) => {
       Tu es Carlos, un assistant culinaire du site "CookConnect".
       La recette actuellement consultée est "${recipe.dish}".
       Ton travail consiste à me donner une liste d'accompagnements pour cette recette.
-      Je veux le résultat au format JSON, comme suit : ["accompagnement1", "accompagnement2", "accompagnement3"].
+      Je veux le résultat au format JSON, comme suit : {"accompaniments": ["accompagnement1", "accompagnement2", "accompagnement3"]}.
       ${
         session.user.disallowedIngredients
           ? `Attention, tu dois me donner des accompagnements qui ne contiennent pas ce genre d'ingrédients : ${session.user.disallowedIngredients}.`
@@ -30,11 +30,18 @@ export const load = (async ({ locals, parent }) => {
 
     const result = await openai.chat.completions.create({
       model: BASE_MODEL,
+      response_format: {
+        type: 'json_object',
+      },
       messages: [{ role: 'system', content: prompt }],
       stream: false,
     });
 
-    return jsonValueToArray(JSON.parse(result.choices[0].message.content ?? '')).slice(0, 10);
+    console.log('result', result.choices);
+
+    return jsonValueToArray(
+      JSON.parse(result.choices[0].message.content ?? '').accompaniments,
+    ).slice(0, 10);
   };
 
   return {

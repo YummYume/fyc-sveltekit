@@ -38,12 +38,14 @@ export const load = (async ({ url, locals }) => {
 
     const output = await openai.chat.completions.create({
       model: BASE_MODEL,
+      response_format: {
+        type: 'json_object',
+      },
       stream: false,
       messages: [
         {
           role: 'system',
           content: `
-            TU NE DOIS RETOURNER QUE DU JSON.
             À partir de maintenant, tu es un assistant de cuisine personnel.
             Ceci est la liste de recettes de cuisine dont tu disposes, au format JSON : ${JSON.stringify(
               recipes,
@@ -126,12 +128,14 @@ export const actions = {
     const dish = (data.get('dish') ?? '') as string;
     const result = await openai.chat.completions.create({
       model: BASE_MODEL,
+      response_format: {
+        type: 'json_object',
+      },
       stream: false,
       messages: [
         {
           role: 'system',
           content: `
-            TU NE DOIS RETOURNER QUE DU JSON.
             À partir de maintenant, tu es un assistant de cuisine personnel.
             Je vais te donner une demande utilisateur, et tu me donneras une recette de cuisine pour cette dernière en français.
             Si l'utilisateur demande le nom d'un plat, alors tu dois générer une recette pour ce plat.

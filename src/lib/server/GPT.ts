@@ -23,4 +23,4 @@ export const openai = new OpenAI({
   apiKey: OPENAI_API_KEY,
 });
 
-export const BASE_MODEL: ChatCompletionCreateParamsNonStreaming['model'] = 'gpt-3.5-turbo-16k-0613';
+export const BASE_MODEL: ChatCompletionCreateParamsNonStreaming['model'] = 'gpt-3.5-turbo-1106';
