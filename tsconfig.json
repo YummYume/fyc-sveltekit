@@ -9,7 +9,7 @@
     "skipLibCheck": true,
     "sourceMap": true,
     "strict": true,
-    "types": ["bun-types", "@types/dom-view-transitions"]
+    "types": ["bun-types", "@types/dom-view-transitions", "@types/dom-speech-recognition"]
   }
   // Path aliases are handled by https://kit.svelte.dev/docs/configuration#alias
   //
