@@ -17,7 +17,7 @@
 
 <h1 class="h1">Recherche</h1>
 
-<div class="max-w-xl mb-4 mx-auto w-full">
+<div class="max-w-xl mx-auto w-full my-6">
   <Search value={data.query} disabled={isLoading} />
 </div>
 
@@ -28,7 +28,6 @@
     {#if !value.recipe}
       <Card>
         {#if data.query.trim() !== ''}
-          <p class="text-gray-500 text-center" role="status">Aucun résulat pour "{data.query}".</p>
           <form
             method="POST"
             action="?/generate"
@@ -49,6 +48,9 @@
               };
             }}
           >
+            <p class="text-gray-500 text-center" role="status">
+              Aucun résulat pour "{data.query}".
+            </p>
             <input type="hidden" name="dish" value={data.query} class="!hidden" />
             <button type="submit" class="btn" disabled={isLoading}>
               {#if isLoading}
@@ -65,11 +67,13 @@
         {/if}
       </Card>
     {:else}
-      <p class="sr-only" role="status">Recette trouvée.</p>
-      <a href="/recipes/{value.recipe.slug}" class="btn | w-full">
-        <span style="view-transition-name: {value.recipe.slug};">{value.recipe.dish}</span>
-        <ArrowRight class="rtl:rotate-180 w-3.5 h-3.5 ms-2" aria-hidden="true" />
-      </a>
+      <div>
+        <p class="sr-only" role="status">Recette trouvée.</p>
+        <a href="/recipes/{value.recipe.slug}" class="btn | w-full">
+          <span style="view-transition-name: {value.recipe.slug};">{value.recipe.dish}</span>
+          <ArrowRight class="rtl:rotate-180 w-3.5 h-3.5 ms-2" aria-hidden="true" />
+        </a>
+      </div>
     {/if}
 
     {#if value.suggestions.length}
