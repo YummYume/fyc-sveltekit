@@ -1,5 +1,7 @@
 import OpenAI from 'openai';
 
+import type { ChatCompletionCreateParamsNonStreaming } from 'openai/resources/index.mjs';
+
 import { OPENAI_API_KEY } from '$env/static/private';
 
 export const CARLOS_DEFAULT_ERROR_PROMPT = `
@@ -20,3 +22,5 @@ export const CARLOS_ERROR_PROMPT: Record<'404' | '500' | string, string> = {
 export const openai = new OpenAI({
   apiKey: OPENAI_API_KEY,
 });
+
+export const BASE_MODEL: ChatCompletionCreateParamsNonStreaming['model'] = 'gpt-3.5-turbo-16k-0613';

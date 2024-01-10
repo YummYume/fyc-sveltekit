@@ -1,7 +1,7 @@
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { fail, redirect } from '@sveltejs/kit';
 
-import { openai } from '$lib/server/GPT';
+import { BASE_MODEL, openai } from '$lib/server/GPT';
 import { slugify } from '$lib/utils/slug';
 
 import type { PageServerLoad } from './$types.js';
@@ -37,7 +37,7 @@ export const load = (async ({ url, locals }) => {
     }
 
     const output = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo',
+      model: BASE_MODEL,
       stream: false,
       messages: [
         {
@@ -125,7 +125,7 @@ export const actions = {
     const data = await request.formData();
     const dish = (data.get('dish') ?? '') as string;
     const result = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo',
+      model: BASE_MODEL,
       stream: false,
       messages: [
         {

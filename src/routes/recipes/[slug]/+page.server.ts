@@ -1,6 +1,6 @@
 import { fail, redirect } from '@sveltejs/kit';
 
-import { openai } from '$lib/server/GPT.js';
+import { BASE_MODEL, openai } from '$lib/server/GPT.js';
 import { jsonValueToArray } from '$lib/utils/json.js';
 
 import type { PageServerLoad } from './$types.js';
@@ -44,7 +44,7 @@ export const load = (async ({ locals, parent }) => {
   const checkDisallowedIngredients = async (): Promise<string[] | null> => {
     if (session.user.disallowedIngredients && recipe.ingredients) {
       const result = await openai.chat.completions.create({
-        model: 'gpt-3.5-turbo',
+        model: BASE_MODEL,
         stream: false,
         messages: [
           {

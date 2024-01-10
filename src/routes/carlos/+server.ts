@@ -1,4 +1,4 @@
-import { openai } from '$lib/server/GPT';
+import { BASE_MODEL, openai } from '$lib/server/GPT';
 
 import type { RequestHandler } from './$types';
 
@@ -95,7 +95,7 @@ export const POST = (async ({ request, locals }) => {
   }
 
   const stream = await openai.chat.completions.create({
-    model: 'gpt-3.5-turbo',
+    model: BASE_MODEL,
     messages: [{ role: 'system', content: currentPrompt }, ...messages],
     stream: true,
   });

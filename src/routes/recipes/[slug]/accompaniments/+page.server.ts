@@ -1,6 +1,6 @@
 import { redirect } from '@sveltejs/kit';
 
-import { openai } from '$lib/server/GPT.js';
+import { BASE_MODEL, openai } from '$lib/server/GPT.js';
 import { jsonValueToArray } from '$lib/utils/json.js';
 
 import type { PageServerLoad } from './$types.js';
@@ -29,7 +29,7 @@ export const load = (async ({ locals, parent }) => {
     `;
 
     const result = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo',
+      model: BASE_MODEL,
       messages: [{ role: 'system', content: prompt }],
       stream: false,
     });
