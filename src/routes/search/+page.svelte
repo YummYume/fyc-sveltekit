@@ -11,6 +11,7 @@
   import type { ActionData, PageData } from './$types';
 
   import { enhance } from '$app/forms';
+  import { getCurrentSeason } from '$lib/utils/data';
 
   export let data: PageData;
   export let form: ActionData;
@@ -111,6 +112,7 @@
             {/each}
           </ul>
         </nav>
+        <span>{ getCurrentSeason() ?? '' }</span>
       </Card>
     {/if}
   {:catch}
