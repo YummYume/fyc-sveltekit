@@ -37,8 +37,6 @@ export const load = (async ({ locals, parent }) => {
       stream: false,
     });
 
-    console.log('result', result.choices);
-
     return jsonValueToArray(
       JSON.parse(result.choices[0].message.content ?? '').accompaniments,
     ).slice(0, 10);

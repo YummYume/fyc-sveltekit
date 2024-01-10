@@ -141,8 +141,8 @@ export const actions = {
             Si l'utilisateur demande le nom d'un plat, alors tu dois générer une recette pour ce plat.
             Si l'utilisateur demande le nom d'un ingrédient, une description de ce qu'il souhaite manger, ou une recette pour une occasion spéciale, alors tu dois générer une recette qui correspond à cette demande.
             Ton but final est uniquement de générer une recette de cuisine si possible. Cette recette pourra ensuite être consultée par n'importe quel utilisateur, il n'y a pas de lien entre la demande de l'utilisateur et la recette générée.
-            Si tu juges que la demande ne peut pas être satisfaite, ce n'est pas grave, retourne "null" et ignore la demande. N'essaie pas de générer une recette qui n'existe pas ou qui n'a pas de sens.
-            Si tu juges que la demande de l'utilisateur n'est pas valide, est obscène, insultante, ou ne correspond pas à une recette de cuisine, retourne "null" et ignore la demande.
+            Si tu juges que la demande ne peut pas être satisfaite, ce n'est pas grave, retourne {"error": true} et ignore la demande. N'essaie pas de générer une recette qui n'existe pas ou qui n'a pas de sens.
+            Si tu juges que la demande de l'utilisateur n'est pas valide, est obscène, insultante, ou ne correspond pas à une recette de cuisine, retourne {"error": true} et ignore la demande.
             Sinon, donne-moi une recette, et formate ta sortie en JSON avec le format suivant :
             {
               "description": string,
@@ -162,7 +162,7 @@ export const actions = {
     });
     const recipe = JSON.parse(result.choices[0].message.content ?? '');
 
-    if (!recipe) {
+    if (!recipe || recipe.error) {
       return fail(400, { error: "Votre demande n'est pas valide. Veuillez réessayer." });
     }
 
