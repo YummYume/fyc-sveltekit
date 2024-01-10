@@ -4,6 +4,7 @@
   import Card from '$lib/components/Card.svelte';
   import Loader from '$lib/components/Loader.svelte';
   import Search from '$lib/components/Search.svelte';
+  import Season from '$lib/components/Season.svelte';
   import ArrowRight from '$lib/svg/ArrowRight.svelte';
   import Spinner from '$lib/svg/Spinner.svelte';
   import { prefersReducedMotion } from '$lib/utils/preferences';
@@ -11,7 +12,6 @@
   import type { ActionData, PageData } from './$types';
 
   import { enhance } from '$app/forms';
-  import { getCurrentSeason } from '$lib/utils/data';
 
   export let data: PageData;
   export let form: ActionData;
@@ -92,7 +92,7 @@
 
     {#if value.suggestions.length}
       <Card>
-        <h2 class="h2">Suggestions</h2>
+        <h2 class="h2 flex justify-between">Suggestions <Season /></h2>
 
         <nav aria-label="Suggestions">
           <ul class="text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg">
@@ -112,7 +112,6 @@
             {/each}
           </ul>
         </nav>
-        <span>{ getCurrentSeason() ?? '' }</span>
       </Card>
     {/if}
   {:catch}
