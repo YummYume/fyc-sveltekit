@@ -269,7 +269,7 @@
         class="flex items-center rounded-lg gap-2 p-3 bg-amber-600/30 border-2 border-amber-600/75 text-amber-600 max-w-[106.25rem] mx-auto"
         transition:fade={{ duration: prefersReducedMotion() ? 0 : 250 }}
       >
-        <Warning class="w-7 h-7 flex-shrink-0" />
+        <Warning class="w-7 h-7 flex-shrink-0" aria-hidden="true" />
         <div class="flex-grow">
           <p>Contient des ingrédients à éviter, indiqués dans votre profil :</p>
           <ul class="list-disc list-inside capitalize ml-4">

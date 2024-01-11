@@ -27,7 +27,7 @@
   {:then accompaniments}
     <Result dish={data.recipe.dish} {accompaniments} />
   {:catch}
-    <p class="text-red-500 text-center" role="status" transition:fade={fadeParams}>
+    <p class="text-red-500 text-center" role="alert" transition:fade={fadeParams}>
       Une erreur est survenue lors du chargement des accompagnements. Veuillez réessayer plus tard.
     </p>
   {/await}

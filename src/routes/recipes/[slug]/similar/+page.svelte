@@ -23,7 +23,7 @@
 <h1 class="h1">{data.recipe.dish}</h1>
 
 <section class="container mx-auto space-y-4" aria-live="polite">
-  <div class="flex flex-wrap items-center justify-between gap-1">
+  <div class="flex flex-wrap items-center justify-between gap-2">
     <h2 class="h2">Recettes similaires</h2>
     <SeasonBadge {season} />
   </div>
@@ -33,7 +33,7 @@
   {:then similarRecipes}
     <Result dish={data.recipe.dish} {similarRecipes} />
   {:catch}
-    <p class="text-red-500 text-center" role="status" transition:fade={fadeParams}>
+    <p class="text-red-500 text-center" role="alert" transition:fade={fadeParams}>
       Une erreur est survenue lors du chargement des recettes similaires. Veuillez réessayer plus
       tard.
     </p>

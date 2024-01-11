@@ -53,15 +53,18 @@ export const load = (async ({ locals, parent }) => {
           {
             role: 'system',
             content: `
-                Voici une liste d'ingrédients à éviter: ${session.user.disallowedIngredients}.
-                Les ingrédients à éviter sont séparés par une virgule. Si une valeur n'est pas un ingrédient valide, tu peux l'ignorer.
-                Si dans la recette que je te donne, il y a au moins un ingrédient de cette liste ou du même genre, tu me renvoies un objet JSON avec le format suivant :
-                {
-                  "disallowedIngredients": string[],
-                },
-                où "disallowedIngredients" contiendra la liste des ingrédients à éviter que tu as trouvé dans la recette.
-                Si tu ne trouves pas d'ingrédients à éviter, "disallowedIngredients" sera un tableau vide.
-              `,
+              Voici une liste d'ingrédients à éviter pour l'utilisateur actuel : ${JSON.stringify(
+                session.user.disallowedIngredients.split(','),
+              )}.
+              Si une valeur n'est pas un ingrédient valide alors tu peux l'ignorer.
+              L'utilisateur va te donner une liste d'ingrédients et tu dois me dire quels sont les ingrédients à éviter en fonction de la liste d'ingrédients à éviter que je t'ai donné. Tu dois me retourner un objet JSON de la forme suivante :
+              {
+                "disallowedIngredients": string[],
+              },
+              où "disallowedIngredients" contiendra la liste des ingrédients à éviter que tu as trouvé dans la liste d'ingrédients que l'utilisateur t'a donné.
+              Tu ne dois que me retourner les ingrédients à éviter que tu as trouvé dans la liste. S'il n'y a aucun ingrédient à éviter, tu peux me renvoyer un tableau vide. C'est important pour ne pas faire peur à l'utilisateur avec des ingrédients à éviter qui ne sont pas dans la recette.
+              Si tu ne trouves pas d'ingrédients à éviter, "disallowedIngredients" sera un tableau vide.
+            `,
           },
           {
             role: 'user',

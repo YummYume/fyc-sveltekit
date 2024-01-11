@@ -12,5 +12,5 @@
 </script>
 
 <p class={`badge ${badgeColorSeason[season]}`} {...$$restProps}>
-  Optimisées pour la saison <span class="font-bold ml-1">{season}</span>
+  Résultats organisés selon la saison <span class="font-bold ml-1">{season}</span>
 </p>

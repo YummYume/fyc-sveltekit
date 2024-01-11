@@ -7,8 +7,8 @@
   import SeasonBadge from '$lib/components/SeasonBadge.svelte';
   import ArrowRight from '$lib/svg/ArrowRight.svelte';
   import Spinner from '$lib/svg/Spinner.svelte';
-  import { prefersReducedMotion } from '$lib/utils/preferences';
   import { getCurrentSeason } from '$lib/utils/date';
+  import { prefersReducedMotion } from '$lib/utils/preferences';
 
   import type { ActionData, PageData } from './$types';
 
@@ -95,7 +95,7 @@
 
     {#if value.suggestions.length}
       <Card>
-        <div class="flex flex-wrap items-center justify-between gap-1">
+        <div class="flex flex-wrap items-center justify-between gap-2">
           <h2 class="h2">Suggestions</h2>
           <SeasonBadge {season} />
         </div>
@@ -121,7 +121,7 @@
       </Card>
     {/if}
   {:catch}
-    <p class="text-sm font-light text-red-600 text-center" role="status">
+    <p class="text-sm font-light text-red-600 text-center" role="alert">
       Oups! Quelque chose s'est mal passé. Veuillez réessayer plus tard.
     </p>
   {/await}
