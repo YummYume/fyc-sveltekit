@@ -1,6 +1,7 @@
 import { redirect } from '@sveltejs/kit';
 
 import { BASE_MODEL, openai } from '$lib/server/GPT.js';
+import { getCurrentSeason } from '$lib/utils/date.js';
 import { jsonValueToArray } from '$lib/utils/json.js';
 
 import type { PageServerLoad } from './$types.js';
@@ -35,6 +36,7 @@ export const load = (async ({ locals, parent }) => {
       La recette que tu consultes actuellement est "${recipe.dish}".
       Je vais te donner une liste de recettes et ton travail est de me donner les recettes qui sont les plus adaptées pour être recommandées en tant que "recettes similaires".
       Tu peux me donner entre 0 et 3 recettes.
+      Si tu as trouvé des suggestions, tu arrangeras ton tableau en mettant en premier les suggestions de la saison "${getCurrentSeason()}".
       Je veux le résultat au format JSON, comme suit : {"recipes": ["slug1", "slug2", "slug3"]}.
       ${
         session.user.disallowedIngredients

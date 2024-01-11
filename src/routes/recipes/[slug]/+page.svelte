@@ -6,6 +6,7 @@
   import Card from '$lib/components/Card.svelte';
   import Loader from '$lib/components/Loader.svelte';
   import Modal from '$lib/components/Modal.svelte';
+  import SeasonBadge from '$lib/components/SeasonBadge.svelte';
   import Clipboard from '$lib/svg/Clipboard.svelte';
   import Close from '$lib/svg/Close.svelte';
   import Facebook from '$lib/svg/Facebook.svelte';
@@ -17,6 +18,7 @@
   import Twitter from '$lib/svg/Twitter.svelte';
   import Warning from '$lib/svg/Warning.svelte';
   import { copyToClipboard } from '$lib/utils/clipboard';
+  import { getCurrentSeason } from '$lib/utils/date';
   import { infiniteScrollSubmit } from '$lib/utils/infinite-scroll';
   import { prefersReducedMotion } from '$lib/utils/preferences';
   import { toasts } from '$lib/utils/toats';
@@ -58,6 +60,7 @@
       data.recipe.dish
     }\n\n* ${data.recipe.shoppingList.join('\n* ')}&hashtags=recette,listedecourse`,
   );
+  const season = getCurrentSeason();
 
   // Variables
   let reviews: (Review & { user: User })[] = [];
@@ -242,6 +245,11 @@
   open={!!$page.state.similarRecipes}
   on:close={closeCurrentModal}
 >
+  <div slot="title" class="flex flex-col justify-center items-center gap-2 mb-4">
+    <h2 class="modal__title mb-0">Recettes similaires</h2>
+    <SeasonBadge {season} />
+  </div>
+
   {#if !!$page.state.similarRecipes}
     <SimilarRecipesResult
       dish={data.recipe.dish}

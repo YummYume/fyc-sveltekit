@@ -3,6 +3,8 @@
   import { fade, type FadeParams } from 'svelte/transition';
 
   import Loader from '$lib/components/Loader.svelte';
+  import SeasonBadge from '$lib/components/SeasonBadge.svelte';
+  import { getCurrentSeason } from '$lib/utils/date';
   import { prefersReducedMotion } from '$lib/utils/preferences';
 
   import Result from './Result.svelte';
@@ -15,12 +17,16 @@
     duration: prefersReducedMotion() ? 0 : 300,
     easing: cubicOut,
   };
+  const season = getCurrentSeason();
 </script>
 
 <h1 class="h1">{data.recipe.dish}</h1>
 
 <section class="container mx-auto space-y-4" aria-live="polite">
-  <h2 class="h2 text-center">Recettes similaires</h2>
+  <div class="flex flex-wrap items-center justify-between gap-1">
+    <h2 class="h2">Recettes similaires</h2>
+    <SeasonBadge {season} />
+  </div>
 
   {#await data.similarRecipes}
     <Loader message="Chargement des recettes similaires..." />

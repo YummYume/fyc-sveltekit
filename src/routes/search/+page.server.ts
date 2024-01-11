@@ -2,6 +2,7 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { fail, redirect } from '@sveltejs/kit';
 
 import { BASE_MODEL, openai } from '$lib/server/GPT';
+import { getCurrentSeason } from '$lib/utils/date.js';
 import { slugify } from '$lib/utils/slug';
 
 import type { PageServerLoad } from './$types.js';
@@ -55,6 +56,7 @@ export const load = (async ({ url, locals }) => {
             Tu peux ne pas trouver de recette, ce n'est pas grave, retourne {"recipe": null, "suggestions": []} et ignore de la demande de l'utilisateur.
             Si tu juges que la demande de l'utilisateur n'est pas valide, est obscène, insultante, ou ne correspond pas à une recette de cuisine, retourne {"recipe": null, "suggestions": []} et ignore la demande.
             Que tu trouves une recette ou non, tu peux également donner des suggestions (entre 0 et 10) de recettes qui pourraient répondre à la demande de l'utilisateur. Les suggestions doivent être des recettes qui ont un rapport avec la demande de l'utilisateur ou qui ressemblent à la recette que tu as trouvée (si tu en as trouvée une).
+            Si tu as trouvé des suggestions, tu arrangeras ton tableau en mettant en premier les suggestions de la saison "${getCurrentSeason()}".
             Tu peux ne pas donner de suggestions si tu n'en trouves pas.
             Retourne le résultat au format JSON suivant :
             {

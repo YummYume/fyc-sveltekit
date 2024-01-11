@@ -4,9 +4,11 @@
   import Card from '$lib/components/Card.svelte';
   import Loader from '$lib/components/Loader.svelte';
   import Search from '$lib/components/Search.svelte';
+  import SeasonBadge from '$lib/components/SeasonBadge.svelte';
   import ArrowRight from '$lib/svg/ArrowRight.svelte';
   import Spinner from '$lib/svg/Spinner.svelte';
   import { prefersReducedMotion } from '$lib/utils/preferences';
+  import { getCurrentSeason } from '$lib/utils/date';
 
   import type { ActionData, PageData } from './$types';
 
@@ -14,6 +16,8 @@
 
   export let data: PageData;
   export let form: ActionData;
+
+  const season = getCurrentSeason();
 
   let isLoading = false;
 </script>
@@ -91,7 +95,10 @@
 
     {#if value.suggestions.length}
       <Card>
-        <h2 class="h2">Suggestions</h2>
+        <div class="flex flex-wrap items-center justify-between gap-1">
+          <h2 class="h2">Suggestions</h2>
+          <SeasonBadge {season} />
+        </div>
 
         <nav aria-label="Suggestions">
           <ul class="text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg">
