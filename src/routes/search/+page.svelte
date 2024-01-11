@@ -14,10 +14,10 @@
 
   import { enhance } from '$app/forms';
 
-  const season = getCurrentSeason();
-
   export let data: PageData;
   export let form: ActionData;
+
+  const season = getCurrentSeason();
 
   let isLoading = false;
 </script>
@@ -95,7 +95,10 @@
 
     {#if value.suggestions.length}
       <Card>
-        <h2 class="h2 flex justify-between">Suggestions <SeasonBadge {season} /></h2>
+        <div class="flex flex-wrap items-center justify-between gap-1">
+          <h2 class="h2">Suggestions</h2>
+          <SeasonBadge {season} />
+        </div>
 
         <nav aria-label="Suggestions">
           <ul class="text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg">

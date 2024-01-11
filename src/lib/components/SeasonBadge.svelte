@@ -11,6 +11,6 @@
   };
 </script>
 
-<p class={`badge ${badgeColorSeason[season]}`} {...$$props}>
+<p class={`badge ${badgeColorSeason[season]}`} {...$$restProps}>
   Optimisées pour la saison <span class="font-bold ml-1">{season}</span>
 </p>

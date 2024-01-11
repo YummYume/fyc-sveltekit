@@ -12,18 +12,21 @@
   import type { PageData } from './$types';
 
   export let data: PageData;
-  const season = getCurrentSeason();
 
   const fadeParams: FadeParams = {
     duration: prefersReducedMotion() ? 0 : 300,
     easing: cubicOut,
   };
+  const season = getCurrentSeason();
 </script>
 
 <h1 class="h1">{data.recipe.dish}</h1>
 
 <section class="container mx-auto space-y-4" aria-live="polite">
-  <h2 class="h2 text-center flex justify-between">Recettes similaires <SeasonBadge {season} /></h2>
+  <div class="flex flex-wrap items-center justify-between gap-1">
+    <h2 class="h2">Recettes similaires</h2>
+    <SeasonBadge {season} />
+  </div>
 
   {#await data.similarRecipes}
     <Loader message="Chargement des recettes similaires..." />

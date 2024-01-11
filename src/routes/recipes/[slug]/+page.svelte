@@ -40,8 +40,6 @@
   export let data: PageData;
   export let form: ActionData;
 
-  const season = getCurrentSeason();
-
   // Constants
   const [send, receive] = crossfade({
     duration: 700,
@@ -62,6 +60,7 @@
       data.recipe.dish
     }\n\n* ${data.recipe.shoppingList.join('\n* ')}&hashtags=recette,listedecourse`,
   );
+  const season = getCurrentSeason();
 
   // Variables
   let reviews: (Review & { user: User })[] = [];
@@ -246,8 +245,8 @@
   open={!!$page.state.similarRecipes}
   on:close={closeCurrentModal}
 >
-  <div slot="title" class="flex flex-col justify-center items-center gap-2">
-    <h2 class="modal__title">Recettes similaires</h2>
+  <div slot="title" class="flex flex-col justify-center items-center gap-2 mb-4">
+    <h2 class="modal__title mb-0">Recettes similaires</h2>
     <SeasonBadge {season} />
   </div>
 
