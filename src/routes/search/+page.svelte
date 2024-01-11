@@ -1,9 +1,12 @@
 <script lang="ts">
+  import { fade } from 'svelte/transition';
+
   import Card from '$lib/components/Card.svelte';
   import Loader from '$lib/components/Loader.svelte';
   import Search from '$lib/components/Search.svelte';
   import ArrowRight from '$lib/svg/ArrowRight.svelte';
   import Spinner from '$lib/svg/Spinner.svelte';
+  import { prefersReducedMotion } from '$lib/utils/preferences';
 
   import type { ActionData, PageData } from './$types';
 
@@ -77,7 +80,13 @@
     {/if}
 
     {#if form?.error}
-      <p class="text-sm font-light text-red-600 text-center">{form.error}</p>
+      <p
+        class="text-sm font-light text-red-600 text-center"
+        role="alert"
+        transition:fade={{ duration: prefersReducedMotion() ? 0 : 250 }}
+      >
+        {form.error}
+      </p>
     {/if}
 
     {#if value.suggestions.length}
