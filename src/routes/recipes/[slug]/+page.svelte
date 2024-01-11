@@ -6,6 +6,7 @@
   import Card from '$lib/components/Card.svelte';
   import Loader from '$lib/components/Loader.svelte';
   import Modal from '$lib/components/Modal.svelte';
+  import SeasonBadge from '$lib/components/SeasonBadge.svelte';
   import Clipboard from '$lib/svg/Clipboard.svelte';
   import Close from '$lib/svg/Close.svelte';
   import Facebook from '$lib/svg/Facebook.svelte';
@@ -17,6 +18,7 @@
   import Twitter from '$lib/svg/Twitter.svelte';
   import Warning from '$lib/svg/Warning.svelte';
   import { copyToClipboard } from '$lib/utils/clipboard';
+  import { getCurrentSeason } from '$lib/utils/date';
   import { infiniteScrollSubmit } from '$lib/utils/infinite-scroll';
   import { prefersReducedMotion } from '$lib/utils/preferences';
   import { toasts } from '$lib/utils/toats';
@@ -37,6 +39,8 @@
 
   export let data: PageData;
   export let form: ActionData;
+
+  const season = getCurrentSeason();
 
   // Constants
   const [send, receive] = crossfade({
@@ -242,6 +246,8 @@
   open={!!$page.state.similarRecipes}
   on:close={closeCurrentModal}
 >
+  <h2 slot="title" class="modal__title">Recettes similaires <SeasonBadge {season} /></h2>
+
   {#if !!$page.state.similarRecipes}
     <SimilarRecipesResult
       dish={data.recipe.dish}

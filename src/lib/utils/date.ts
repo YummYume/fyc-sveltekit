@@ -22,8 +22,8 @@ const monthsSeasons = {
   November: seasons.autumn,
 };
 
-type Season = ValueOf<typeof seasons>;
-type Month = keyof typeof monthsSeasons;
+export type Season = ValueOf<typeof seasons>;
+export type Month = keyof typeof monthsSeasons;
 
 export const getCurrentMonth = (): Month =>
   new Date().toLocaleString('gb-GB', { month: 'long' }) as Month;

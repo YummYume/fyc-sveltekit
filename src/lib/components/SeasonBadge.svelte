@@ -1,0 +1,16 @@
+<script lang="ts">
+  import type { Season } from '$lib/utils/date';
+
+  export let season: Season;
+
+  const badgeColorSeason = {
+    été: 'badge__green',
+    automne: 'badge__orange',
+    hiver: 'badge__blue',
+    printemps: 'badge__yellow',
+  };
+</script>
+
+<p class={`badge ${badgeColorSeason[season]}`} {...$$props}>
+  Optimisées pour la saison <span class="font-bold ml-1">{season}</span>
+</p>
