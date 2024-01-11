@@ -41,7 +41,7 @@
       return;
     }
 
-    recognition.continuous = true;
+    recognition.continuous = false;
     recognition.interimResults = true;
     recognition.maxAlternatives = 1;
     recognition.lang = 'fr-FR';
@@ -130,7 +130,7 @@
     </p>
     <button
       type="button"
-      class="btn | absolute right-[7.75rem] top-1/2 transform -translate-y-1/2 p-2"
+      class="btn | absolute right-[7.75rem] top-1/2 -translate-y-1/2 p-2"
       class:bg-primary-800={recognitionStarted}
       class:ring-4={recognitionStarted}
       class:ring-primary-300={recognitionStarted}
@@ -148,7 +148,7 @@
     </button>
     <button
       type="submit"
-      class="btn | absolute right-2.5 bottom-2.5 px-4 py-2 w-fit"
+      class="btn | absolute right-2.5 top-1/2 -translate-y-1/2 px-4 py-2 w-fit"
       disabled={disabled || recognitionStarted}
     >
       Rechercher
