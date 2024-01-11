@@ -76,6 +76,10 @@
       </div>
     {/if}
 
+    {#if form?.error}
+      <p class="text-sm font-light text-red-600 text-center">{form.error}</p>
+    {/if}
+
     {#if value.suggestions.length}
       <Card>
         <h2 class="h2">Suggestions</h2>
@@ -105,8 +109,4 @@
       Oups! Quelque chose s'est mal passé. Veuillez réessayer plus tard.
     </p>
   {/await}
-
-  {#if form?.error}
-    <p class="text-sm font-light text-red-600 text-center">{form.error}</p>
-  {/if}
 </div>
