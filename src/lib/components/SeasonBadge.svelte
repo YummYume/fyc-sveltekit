@@ -4,10 +4,10 @@
   export let season: Season;
 
   const badgeColorSeason = {
-    été: 'badge__green',
-    automne: 'badge__orange',
-    hiver: 'badge__blue',
-    printemps: 'badge__yellow',
+    été: 'badge--green',
+    automne: 'badge--orange',
+    hiver: 'badge--blue',
+    printemps: 'badge--yellow',
   };
 </script>
 

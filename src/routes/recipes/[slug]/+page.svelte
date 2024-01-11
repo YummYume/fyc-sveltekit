@@ -246,7 +246,10 @@
   open={!!$page.state.similarRecipes}
   on:close={closeCurrentModal}
 >
-  <h2 slot="title" class="modal__title">Recettes similaires <SeasonBadge {season} /></h2>
+  <div slot="title" class="flex flex-col justify-center items-center gap-2">
+    <h2 class="modal__title">Recettes similaires</h2>
+    <SeasonBadge {season} />
+  </div>
 
   {#if !!$page.state.similarRecipes}
     <SimilarRecipesResult

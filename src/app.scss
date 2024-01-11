@@ -67,19 +67,19 @@
   .badge {
     @apply inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset;
 
-    &__blue {
+    &--blue {
       @apply bg-blue-50 text-blue-700 ring-blue-700/10;
     }
 
-    &__green {
+    &--green {
       @apply bg-green-50 text-green-700 ring-green-700/10;
     }
 
-    &__yellow {
+    &--yellow {
       @apply bg-yellow-50 text-yellow-700 ring-yellow-700/10;
     }
 
-    &__orange {
+    &--orange {
       @apply bg-orange-50 text-orange-700 ring-orange-700/10;
     }
   }
