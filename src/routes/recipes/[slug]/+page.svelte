@@ -489,85 +489,85 @@
 
     <!-- Supprimer l'avis -->
     <!-- {#if data.userReview}
-    <form
-      class="contents"
-      method="post"
-      action="?/removeReview"
-      id="remove-review"
-      use:enhance
-    ></form>
-  {/if} -->
+      <form
+        class="contents"
+        method="post"
+        action="?/removeReview"
+        id="remove-review"
+        use:enhance
+      ></form>
+    {/if} -->
 
     <!-- Ajout d'un avis -->
     <!-- <form
-    action="?/review"
-    method="post"
-    class="space-y-2.5 border border-primary-600 bg-white rounded-md p-5"
-    use:enhance={() => {
-      return async ({ update }) => {
-        await update({ reset: false });
-      };
-    }}
-  >
-    <div class="flex gap-2.5 items-center">
-      <h3 class="h3">Votre avis</h3>
+      action="?/review"
+      method="post"
+      class="space-y-2.5 border border-primary-600 bg-white rounded-md p-5"
+      use:enhance={() => {
+        return async ({ update }) => {
+          await update({ reset: false });
+        };
+      }}
+    >
+      <div class="flex gap-2.5 items-center">
+        <h3 class="h3">Votre avis</h3>
 
-      {#if data.userReview}
-        <input form="remove-review" type="hidden" name="id" value={data.userReview.id} />
-        <button
-          aria-label="Supprimer l'avis"
-          type="submit"
-          form="remove-review"
-          class="btn | bg-red-600 mx-0 p-2.5 hover:!bg-red-700"
+        {#if data.userReview}
+          <input form="remove-review" type="hidden" name="id" value={data.userReview.id} />
+          <button
+            aria-label="Supprimer l'avis"
+            type="submit"
+            form="remove-review"
+            class="btn | bg-red-600 mx-0 p-2.5 hover:!bg-red-700"
+          >
+            <Trash aria-hidden="true" />
+          </button>
+        {/if}
+      </div>
+      <div class="grid gap-2.5 sm:grid-cols-4">
+        <label class="flex flex-col gap-1 sm:col-span-3">
+          <span>Votre commentaire</span>
+          <textarea
+            id="content"
+            name="content"
+            rows="5"
+            required
+            placeholder="J'adore cette recette..."
+            class="w-full px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-600 focus:border-primary-600 resize-y"
+            >{data.userReview?.content ?? ''}</textarea
+          >
+        </label>
+        <label class="flex flex-col gap-1">
+          <span>Votre note</span>
+          <select
+            id="rating"
+            name="rating"
+            required
+            class="w-full px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-600 focus:border-primary-600"
+          >
+            {#each data.allowedRatings as rating}
+              <option value={rating} selected={rating === data.userReview?.rating}>
+                {rating}
+              </option>
+            {/each}
+          </select>
+        </label>
+      </div>
+
+      {#if form?.reviewError}
+        <p
+          role="status"
+          class="text-red-500 text-sm"
+          in:fade={{ duration: prefersReducedMotion() ? 0 : 250 }}
         >
-          <Trash aria-hidden="true" />
-        </button>
+          {form.reviewError}
+        </p>
       {/if}
-    </div>
-    <div class="grid gap-2.5 sm:grid-cols-4">
-      <label class="flex flex-col gap-1 sm:col-span-3">
-        <span>Votre commentaire</span>
-        <textarea
-          id="content"
-          name="content"
-          rows="5"
-          required
-          placeholder="J'adore cette recette..."
-          class="w-full px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-600 focus:border-primary-600 resize-y"
-          >{data.userReview?.content ?? ''}</textarea
-        >
-      </label>
-      <label class="flex flex-col gap-1">
-        <span>Votre note</span>
-        <select
-          id="rating"
-          name="rating"
-          required
-          class="w-full px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-600 focus:border-primary-600"
-        >
-          {#each data.allowedRatings as rating}
-            <option value={rating} selected={rating === data.userReview?.rating}>
-              {rating}
-            </option>
-          {/each}
-        </select>
-      </label>
-    </div>
 
-    {#if form?.reviewError}
-      <p
-        role="status"
-        class="text-red-500 text-sm"
-        in:fade={{ duration: prefersReducedMotion() ? 0 : 250 }}
-      >
-        {form.reviewError}
-      </p>
-    {/if}
-
-    <button type="submit" class="btn | justify-center w-full sm:max-w-xs" aria-controls="reviews">
-      Envoyer
-    </button>
-  </form> -->
+      <button type="submit" class="btn | justify-center w-full sm:max-w-xs" aria-controls="reviews">
+        Envoyer
+      </button>
+    </form> -->
 
     <!-- Liste des avis -->
     <!-- <div class="flex flex-col gap-2" id="reviews" role="region" aria-live="polite">
@@ -619,32 +619,32 @@
 
     <!-- Infinite scroll -->
     <!-- {#if !noMoreReviews}
-    {#if loading}
-      <Loader message="Chargement des avis..." />
-    {:else}
-      <form
-        action="?/loadReviews"
-        method="post"
-        use:infiniteScrollSubmit={{ disabled: !!form?.loadReviewsError }}
-        use:enhance={() => {
-          loading = true;
+      {#if loading}
+        <Loader message="Chargement des avis..." />
+      {:else}
+        <form
+          action="?/loadReviews"
+          method="post"
+          use:infiniteScrollSubmit={{ disabled: !!form?.loadReviewsError }}
+          use:enhance={() => {
+            loading = true;
 
-          return async ({ update }) => {
-            await update({ invalidateAll: false });
+            return async ({ update }) => {
+              await update({ invalidateAll: false });
 
-            loading = false;
-          };
-        }}
-      >
-        <input type="hidden" name="cursor" value={reviews.at(-1)?.id} />
+              loading = false;
+            };
+          }}
+        >
+          <input type="hidden" name="cursor" value={reviews.at(-1)?.id} />
 
-        <noscript>
-          <button type="submit" aria-controls="reviews" class="btn | w-full">
-            Charger plus d'avis
-          </button>
-        </noscript>
-      </form>
-    {/if}
-  {/if} -->
+          <noscript>
+            <button type="submit" aria-controls="reviews" class="btn | w-full">
+              Charger plus d'avis
+            </button>
+          </noscript>
+        </form>
+      {/if}
+    {/if} -->
   </section>
 </div>
