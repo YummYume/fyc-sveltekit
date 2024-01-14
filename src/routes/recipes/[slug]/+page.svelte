@@ -571,51 +571,51 @@
 
     <!-- Liste des avis -->
     <!-- <div class="flex flex-col gap-2" id="reviews" role="region" aria-live="polite">
-    {#each reviews as review (review.id)}
-      {@const titleId = `review-${review.id}-title`}
-      {@const contentId = `review-${review.id}-content`}
-      {@const isAuthor = data.user.userId === review.user.id}
+      {#each reviews as review (review.id)}
+        {@const titleId = `review-${review.id}-title`}
+        {@const contentId = `review-${review.id}-content`}
+        {@const isAuthor = data.user.userId === review.user.id}
 
-      <Card
-        tabindex="0"
-        containerClass={isAuthor ? 'border border-primary-600' : 'border border-gray-300'}
-        aria-labelledby={titleId}
-        aria-describedby={contentId}
-      >
-        <div class="flex gap-1 justify-between">
-          <div class="flex flex-col gap-1">
-            <h3 class="h3" id={titleId}>
-              Avis de {review.user.username}
-              <span aria-label="{review.rating} sur 5">({review.rating}/5)</span>
-            </h3>
-            <p id={contentId}>{review.content}</p>
-            <p class="text-sm text-gray-500 mt-auto">
-              Le {review.createdAt.toLocaleDateString('fr-FR', {
-                day: 'numeric',
-                month: 'long',
-                year: 'numeric',
-              })}
-            </p>
+        <Card
+          tabindex="0"
+          containerClass={isAuthor ? 'border border-primary-600' : 'border border-gray-300'}
+          aria-labelledby={titleId}
+          aria-describedby={contentId}
+        >
+          <div class="flex gap-1 justify-between">
+            <div class="flex flex-col gap-1">
+              <h3 class="h3" id={titleId}>
+                Avis de {review.user.username}
+                <span aria-label="{review.rating} sur 5">({review.rating}/5)</span>
+              </h3>
+              <p id={contentId}>{review.content}</p>
+              <p class="text-sm text-gray-500 mt-auto">
+                Le {review.createdAt.toLocaleDateString('fr-FR', {
+                  day: 'numeric',
+                  month: 'long',
+                  year: 'numeric',
+                })}
+              </p>
+            </div>
+
+            {#if isAuthor}
+              <button
+                aria-label="Supprimer l'avis"
+                class="btn | bg-red-600 mb-auto mx-0 p-2.5 hover:!bg-red-700"
+                form="remove-review"
+                type="submit"
+              >
+                <Trash aria-hidden="true" />
+              </button>
+            {/if}
           </div>
-
-          {#if isAuthor}
-            <button
-              aria-label="Supprimer l'avis"
-              class="btn | bg-red-600 mb-auto mx-0 p-2.5 hover:!bg-red-700"
-              form="remove-review"
-              type="submit"
-            >
-              <Trash aria-hidden="true" />
-            </button>
-          {/if}
-        </div>
-      </Card>
-    {:else}
-      {#if noMoreReviews}
-        <p role="status" class="text-gray-800 text-center">Aucun avis pour le moment.</p>
-      {/if}
-    {/each}
-  </div> -->
+        </Card>
+      {:else}
+        {#if noMoreReviews}
+          <p role="status" class="text-gray-800 text-center">Aucun avis pour le moment.</p>
+        {/if}
+      {/each}
+    </div> -->
 
     <!-- Infinite scroll -->
     <!-- {#if !noMoreReviews}
