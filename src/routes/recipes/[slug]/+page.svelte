@@ -312,6 +312,16 @@
 
 <div class="space-y-8">
   <div class="space-y-2">
+    <!-- {#if data.reviewCount > 0}
+      <div class="flex gap-2.5 items-center justify-center">
+        <span class="text-gray-500">Note moyenne des utilisateurs :</span>
+        <p class="flex" aria-label="{data.reviewAverage} sur 5">
+          <span class="text-gray-900 text-lg font-semibold">{data.reviewAverage}</span>
+          <StarFull class="w-4 h-4 text-yellow-500" />
+        </p>
+      </div>
+    {/if} -->
+
     <div
       class="flex gap-2.5 items-center justify-center"
       role="group"
