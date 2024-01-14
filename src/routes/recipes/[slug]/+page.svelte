@@ -65,36 +65,10 @@
 
   // Lifecycle
   // New reviews loaded
-  // $: if (form?.reviews) {
-  //   if (form.reviews.length < 10) {
-  //     noMoreReviews = true;
-  //   }
-  //   reviews = [
-  //     ...reviews,
-  //     ...form.reviews.filter((review) => !reviews.some(({ id }) => id === review.id)),
-  //   ];
-  // }
+
   // Review added or updated
-  // $: if (form?.review) {
-  //   const index = reviews.findIndex(({ id }) => id === form?.review?.id);
-  //   if (index !== -1) {
-  //     const updatedReviews = [...reviews];
-  //     updatedReviews[index] = form.review;
-  //     reviews = updatedReviews;
-  //   } else {
-  //     reviews = [form.review, ...reviews];
-  //   }
-  // }
+
   // Review removed
-  // $: if (form?.removedReview) {
-  //   reviews = reviews.filter(({ id }) => id !== form?.removedReview?.id);
-  // }
-  // Error while loading or removing review(s)
-  // $: if (form?.loadReviewsError) {
-  //   toasts.error(form.loadReviewsError);
-  // } else if (form?.removeReviewError) {
-  //   toasts.error(form.removeReviewError);
-  // }
 
   // Functions
   const closeIngredientsWarning = () => {
