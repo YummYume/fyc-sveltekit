@@ -37,9 +37,21 @@ export const actions = {
     const password = (data.get('password') ?? '') as string;
     const passwordRepeat = (data.get('password-repeat') ?? '') as string;
 
-    if (username.length < 3) {
+    if (!username) {
       return fail(422, {
-        error: "Votre nom d'utilisateur est trop court. Il doit faire au moins 3 caractères.",
+        error: "Le nom d'utilisateur ne peut pas être vide.",
+      });
+    }
+
+    if (!/^[A-Za-z]+$/g.test(username)) {
+      return fail(422, {
+        error: "Le nom d'utilisateur ne doit contenir que des lettres.",
+      });
+    }
+
+    if (username.length < 3 || username.length > 20) {
+      return fail(422, {
+        error: "Le nom d'utilisateur doit être compris entre 3 et 20 caractères.",
       });
     }
 

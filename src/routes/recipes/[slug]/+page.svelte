@@ -3,6 +3,8 @@
   import { quintOut } from 'svelte/easing';
   import { crossfade, fade } from 'svelte/transition';
 
+  import Card from '$lib/components/Card.svelte';
+  import Loader from '$lib/components/Loader.svelte';
   import Modal from '$lib/components/Modal.svelte';
   import Clipboard from '$lib/svg/Clipboard.svelte';
   import Close from '$lib/svg/Close.svelte';
@@ -11,9 +13,11 @@
   import Spinner from '$lib/svg/Spinner.svelte';
   import StarEmpty from '$lib/svg/StarEmpty.svelte';
   import StarFull from '$lib/svg/StarFull.svelte';
+  import Trash from '$lib/svg/Trash.svelte';
   import Twitter from '$lib/svg/Twitter.svelte';
   import Warning from '$lib/svg/Warning.svelte';
   import { copyToClipboard } from '$lib/utils/clipboard';
+  import { infiniteScrollSubmit } from '$lib/utils/infinite-scroll';
   import { prefersReducedMotion } from '$lib/utils/preferences';
   import { toasts } from '$lib/utils/toats';
 
@@ -21,9 +25,10 @@
   import SimilarRecipesResult from './similar/Result.svelte';
 
   import type { PreloadedPageData } from '$lib/types/preload';
-  import type { PageData } from './$types';
+  import type { ActionData, PageData } from './$types';
   import type { PageData as AccompanimentsPageData } from './accompaniments/$types';
   import type { PageData as SimilarRecipesPageData } from './similar/$types';
+  import type { Review, User } from '@prisma/client';
 
   import { browser } from '$app/environment';
   import { enhance } from '$app/forms';
@@ -31,6 +36,7 @@
   import { page } from '$app/stores';
 
   export let data: PageData;
+  export let form: ActionData;
 
   // Constants
   const [send, receive] = crossfade({
@@ -54,6 +60,9 @@
   );
 
   // Variables
+  let reviews: (Review & { user: User })[] = [];
+  let loading = false;
+  let noMoreReviews = false;
   let accompanimentsLoading = false;
   let similarRecipesLoading = false;
   let isIngredientsWarningOpen = true;
@@ -62,6 +71,45 @@
 
   // Computed
   $: starKey = data.isFavourite ? 'full' : 'empty';
+
+  // Lifecycle
+  // New reviews loaded
+  $: if (form?.reviews) {
+    if (form.reviews.length < 10) {
+      noMoreReviews = true;
+    }
+
+    reviews = [
+      ...reviews,
+      ...form.reviews.filter((review) => !reviews.some(({ id }) => id === review.id)),
+    ];
+  }
+
+  // Review added or updated
+  $: if (form?.review) {
+    const index = reviews.findIndex(({ id }) => id === form?.review?.id);
+
+    if (index !== -1) {
+      const updatedReviews = [...reviews];
+
+      updatedReviews[index] = form.review;
+      reviews = updatedReviews;
+    } else {
+      reviews = [form.review, ...reviews];
+    }
+  }
+
+  // Review removed
+  $: if (form?.removedReview) {
+    reviews = reviews.filter(({ id }) => id !== form?.removedReview?.id);
+  }
+
+  // Error while loading or removing review(s)
+  $: if (form?.loadReviewsError) {
+    toasts.error(form.loadReviewsError);
+  } else if (form?.removeReviewError) {
+    toasts.error(form.removeReviewError);
+  }
 
   // Functions
   const closeIngredientsWarning = () => {
@@ -279,6 +327,16 @@
 
 <div class="space-y-8">
   <div class="space-y-2">
+    {#if data.reviewCount > 0}
+      <div class="flex gap-2.5 items-center justify-center">
+        <span class="text-gray-500">Note moyenne des utilisateurs :</span>
+        <p class="flex" aria-label="{data.reviewAverage} sur 5">
+          <span class="text-gray-900 text-lg font-semibold">{data.reviewAverage}</span>
+          <StarFull class="w-4 h-4 text-yellow-500" />
+        </p>
+      </div>
+    {/if}
+
     <div
       class="flex gap-2.5 items-center justify-center"
       role="group"
@@ -449,5 +507,165 @@
         Trouver des recettes similaires
       </a>
     </div>
+  </section>
+
+  <section class="container mx-auto space-y-4">
+    <h2 class="h2">Avis ({data.reviewCount})</h2>
+
+    {#if data.userReview}
+      <form
+        class="contents"
+        method="post"
+        action="?/removeReview"
+        id="remove-review"
+        use:enhance
+      ></form>
+    {/if}
+
+    <form
+      action="?/review"
+      method="post"
+      class="space-y-2.5 border border-primary-600 bg-white rounded-md p-5"
+      use:enhance={() => {
+        return async ({ update }) => {
+          await update({ reset: false });
+        };
+      }}
+    >
+      <div class="flex gap-2.5 items-center">
+        <h3 class="h3">Votre avis</h3>
+
+        {#if data.userReview}
+          <input form="remove-review" type="hidden" name="id" value={data.userReview.id} />
+          <button
+            aria-label="Supprimer l'avis"
+            type="submit"
+            form="remove-review"
+            class="btn | bg-red-600 mx-0 p-2.5 hover:!bg-red-700"
+          >
+            <Trash aria-hidden="true" />
+          </button>
+        {/if}
+      </div>
+      <div class="grid gap-2.5 sm:grid-cols-4">
+        <label class="flex flex-col gap-1 sm:col-span-3">
+          <span>Votre commentaire</span>
+          <textarea
+            id="content"
+            name="content"
+            rows="5"
+            required
+            placeholder="J'adore cette recette..."
+            class="w-full px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-600 focus:border-primary-600 resize-y"
+            >{data.userReview?.content ?? ''}</textarea
+          >
+        </label>
+        <label class="flex flex-col gap-1">
+          <span>Votre note</span>
+          <select
+            id="rating"
+            name="rating"
+            required
+            class="w-full px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-600 focus:border-primary-600"
+          >
+            {#each data.allowedRatings as rating}
+              <option value={rating} selected={rating === data.userReview?.rating}>
+                {rating}
+              </option>
+            {/each}
+          </select>
+        </label>
+      </div>
+
+      {#if form?.reviewError}
+        <p
+          role="status"
+          class="text-red-500 text-sm"
+          in:fade={{ duration: prefersReducedMotion() ? 0 : 250 }}
+        >
+          {form.reviewError}
+        </p>
+      {/if}
+
+      <button type="submit" class="btn | justify-center w-full sm:max-w-xs" aria-controls="reviews">
+        Envoyer
+      </button>
+    </form>
+
+    <div class="flex flex-col gap-2" id="reviews" role="region" aria-live="polite">
+      {#each reviews as review (review.id)}
+        {@const titleId = `review-${review.id}-title`}
+        {@const contentId = `review-${review.id}-content`}
+        {@const isAuthor = data.user.userId === review.user.id}
+
+        <Card
+          tabindex="0"
+          containerClass={isAuthor ? 'border border-primary-600' : 'border border-gray-300'}
+          aria-labelledby={titleId}
+          aria-describedby={contentId}
+        >
+          <div class="flex gap-1 justify-between">
+            <div class="flex flex-col gap-1">
+              <h3 class="h3" id={titleId}>
+                Avis de {review.user.username}
+                <span aria-label="{review.rating} sur 5">({review.rating}/5)</span>
+              </h3>
+              <p id={contentId}>{review.content}</p>
+              <p class="text-sm text-gray-500 mt-auto">
+                Le {review.createdAt.toLocaleDateString('fr-FR', {
+                  day: 'numeric',
+                  month: 'long',
+                  year: 'numeric',
+                })}
+              </p>
+            </div>
+
+            {#if isAuthor}
+              <button
+                aria-label="Supprimer l'avis"
+                class="btn | bg-red-600 mb-auto mx-0 p-2.5 hover:!bg-red-700"
+                form="remove-review"
+                type="submit"
+              >
+                <Trash aria-hidden="true" />
+              </button>
+            {/if}
+          </div>
+        </Card>
+      {:else}
+        {#if noMoreReviews}
+          <p role="status" class="text-gray-800 text-center">Aucun avis pour le moment.</p>
+        {/if}
+      {/each}
+    </div>
+
+    {#if !noMoreReviews}
+      {#if loading}
+        <Loader message="Chargement des avis..." />
+      {:else}
+        <form
+          action="?/loadReviews"
+          method="post"
+          use:infiniteScrollSubmit={{ disabled: !!form?.loadReviewsError }}
+          use:enhance={() => {
+            loading = true;
+
+            return async ({ update }) => {
+              await update({ invalidateAll: false });
+
+              loading = false;
+            };
+          }}
+        >
+          <input type="hidden" name="cursor" value={reviews.at(-1)?.id} />
+
+          <noscript>
+            <button type="submit" aria-controls="reviews" class="btn | w-full">
+              Charger plus d'avis
+            </button>
+          </noscript>
+        </form>
+      {/if}
+    {/if}
   </section>
 </div>
