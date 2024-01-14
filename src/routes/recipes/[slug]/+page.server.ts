@@ -137,4 +137,177 @@ export const actions = {
 
     return {};
   },
+
+  // review: async ({ locals, request, params }) => {
+  //   const { db, session } = locals;
+
+  //   if (!session) {
+  //     redirect(303, '/login');
+  //   }
+
+  //   const body = await request.formData();
+  //   const content = body.get('content') ?? null;
+  //   const rating = body.get('rating') ?? null;
+
+  //   if (typeof content !== 'string') {
+  //     return fail(400, { reviewError: "Le contenu de l'avis ne doit pas être vide." });
+  //   }
+
+  //   if (content.length < 1 || content.length > 255) {
+  //     return fail(400, {
+  //       reviewError: "Le contenu de l'avis doit être compris entre 1 et 255 caractères.",
+  //     });
+  //   }
+
+  //   if (typeof rating !== 'string') {
+  //     return fail(400, { reviewError: 'La note ne doit pas être vide.' });
+  //   }
+
+  //   const ratingValue = parseFloat(rating);
+
+  //   if (Number.isNaN(ratingValue) || !ALLOWED_RATINGS.includes(ratingValue)) {
+  //     return fail(400, {
+  //       reviewError: `La note doit être l'une des valeurs suivantes : ${ALLOWED_RATINGS.join(
+  //         ', ',
+  //       )}.`,
+  //     });
+  //   }
+
+  //   const review = await db.review.findFirst({
+  //     where: {
+  //       recipe: {
+  //         slug: params.slug,
+  //       },
+  //       userId: session.user.userId,
+  //     },
+  //   });
+
+  //   if (review) {
+  //     const updatedReview = await db.review.update({
+  //       where: {
+  //         id: review.id,
+  //       },
+  //       data: {
+  //         content,
+  //         rating: ratingValue,
+  //       },
+  //       include: {
+  //         user: true,
+  //       },
+  //     });
+
+  //     return { review: updatedReview };
+  //   }
+
+  //   const newReview = await db.review.create({
+  //     data: {
+  //       content,
+  //       rating: ratingValue,
+  //       user: {
+  //         connect: {
+  //           id: session.user.userId,
+  //         },
+  //       },
+  //       recipe: {
+  //         connect: {
+  //           slug: params.slug,
+  //         },
+  //       },
+  //     },
+  //     include: {
+  //       user: true,
+  //     },
+  //   });
+
+  //   return {
+  //     review: newReview,
+  //   };
+  // },
+
+  // removeReview: async ({ locals, request }) => {
+  //   const { db, session } = locals;
+
+  //   if (!session) {
+  //     redirect(303, '/login');
+  //   }
+
+  //   const formData = await request.formData();
+  //   const id = formData.get('id') ?? null;
+
+  //   if (typeof id !== 'string') {
+  //     return fail(400, {
+  //       removeReviewError: 'Le paramètre "id" doit être une chaîne de caractères.',
+  //     });
+  //   }
+
+  //   const reviewId = parseInt(id, 10);
+
+  //   if (Number.isNaN(reviewId)) {
+  //     return fail(400, { removeReviewError: 'Le paramètre "id" doit être un nombre entier.' });
+  //   }
+
+  //   const review = await db.review.findUnique({
+  //     where: {
+  //       id: reviewId,
+  //     },
+  //   });
+
+  //   if (!review) {
+  //     return fail(404, {
+  //       removeReviewError: "Cet avis n'existe pas.",
+  //     });
+  //   }
+
+  //   if (review.userId !== session.user.userId) {
+  //     return fail(403, {
+  //       removeReviewError: "Vous n'êtes pas l'auteur de cet avis.",
+  //     });
+  //   }
+
+  //   const removedReview = await db.review.delete({
+  //     where: {
+  //       id: reviewId,
+  //     },
+  //   });
+
+  //   return { removedReview };
+  // },
+
+  // loadReviews: async ({ locals, request, params }) => {
+  //   const { db, session } = locals;
+
+  //   if (!session) {
+  //     redirect(303, '/login');
+  //   }
+
+  //   const formData = await request.formData();
+  //   const cursor = formData.get('cursor') ?? null;
+
+  //   if (cursor !== null && typeof cursor !== 'string') {
+  //     return fail(400, {
+  //       loadReviewsError: 'Le paramètre "cursor" doit être une chaîne de caractères.',
+  //     });
+  //   }
+
+  //   const id = cursor ? parseInt(cursor, 10) : null;
+
+  //   return {
+  //     reviews: await db.review.findMany({
+  //       take: 10,
+  //       skip: id ? 1 : 0,
+  //       cursor: id ? { id } : undefined,
+  //       include: {
+  //         user: true,
+  //       },
+  //       where: {
+  //         recipe: {
+  //           slug: params.slug,
+  //         },
+  //       },
+  //       orderBy: {
+  //         createdAt: 'desc',
+  //       },
+  //     }),
+  //   };
+  // },
 };
