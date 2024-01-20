@@ -70,6 +70,8 @@
 
   // Review removed
 
+  // Error while loading or removing review(s)
+
   // Functions
   const closeIngredientsWarning = () => {
     isIngredientsWarningOpen = false;
