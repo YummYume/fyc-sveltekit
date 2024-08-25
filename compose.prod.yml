@@ -1,28 +1,4 @@
-version: '3.9'
-
 services:
-  caddy:
-    image: caddy:2.7.4-alpine
-    restart: unless-stopped
-    container_name: fyc-caddy
-    ports:
-      - 80:80
-      - 443:443
-      - 443:443/udp
-    expose:
-      - 9000
-    environment:
-      ACME_EMAIL: "${ACME_EMAIL:?err}"
-    volumes:
-      - ./docker/prod/caddy/Caddyfile:/etc/caddy/Caddyfile
-      - ./data/caddy/data:/data
-      - ./data/caddy/config:/config
-    depends_on:
-      svelte-kit:
-        condition: service_healthy
-    networks:
-      - webserver
-
   svelte-kit:
     build:
       context: .
@@ -36,16 +12,16 @@ services:
     container_name: fyc-svelte-kit
     healthcheck:
       test: wget --no-verbose --tries=1 --spider http://127.0.0.1:3000/api/healthz || exit 1
-      interval: 10s
       timeout: 20s
       retries: 10
       start_period: 60s
-      # Uncomment once start_interval is available (https://github.com/docker/compose/issues/10830)
-      # interval: 60s
-      # start_interval: 1s
+      interval: 60s
+      start_interval: 1s
     networks:
-      - webserver
-      - db
+      webserver:
+        aliases:
+          - cook-svelte-kit
+      db:
 
   mariadb:
     image: mariadb:11.1.2
@@ -60,13 +36,15 @@ services:
       MARIADB_DATABASE: app
     healthcheck:
       test: ['CMD', 'mariadb-admin', 'ping', '-h', 'localhost']
-      interval: 10s
       timeout: 20s
-      retries: 5
+      retries: 10
       start_period: 60s
+      interval: 60s
+      start_interval: 1s
     networks:
       - db
 
 networks:
   webserver:
+    external: true
   db:
