@@ -18,10 +18,8 @@ services:
       interval: 60s
       start_interval: 1s
     networks:
-      webserver:
-        aliases:
-          - cook-svelte-kit
-      db:
+      - webserver
+      - db
 
   mariadb:
     image: mariadb:11.1.2
@@ -45,6 +43,5 @@ services:
       - db
 
 networks:
-  webserver:
-    external: true
-  db:
+  - webserver
+  - db
