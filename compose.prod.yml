@@ -9,7 +9,6 @@ services:
       mariadb:
         condition: service_healthy
     environment:
-      MARIADB_ROOT_PASSWORD: "${MARIADB_ROOT_PASSWORD:?err}"
       MARIADB_DATABASE: "${MARIADB_DATABASE:?err}"
       OPENAI_API_KEY: "${OPENAI_API_KEY:?err}"
       DATABASE_URL: "${DATABASE_URL:?err}"
