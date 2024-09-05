@@ -2,6 +2,24 @@ FROM oven/bun:alpine AS builder
 
 WORKDIR /home/bun/fyc-svelte-kit
 
+ARG ORIGIN=https://cook.yam-yam.dev
+ARG PORT=3000
+ARG PROTOCOL_HEADER=x-forwarded-proto
+ARG HOST_HEADER=x-forwarded-host
+ARG ADDRESS_HEADER=True-Client-IP
+ARG MARIADB_DATABASE
+ARG OPENAI_API_KEY
+ARG DATABASE_URL
+
+ENV ORIGIN=${ORIGIN}
+ENV PORT=${PORT}
+ENV PROTOCOL_HEADER=${PROTOCOL_HEADER}
+ENV HOST_HEADER=${HOST_HEADER}
+ENV ADDRESS_HEADER=${ADDRESS_HEADER}
+ENV MARIADB_DATABASE=${MARIADB_DATABASE}
+ENV OPENAI_API_KEY=${OPENAI_API_KEY}
+ENV DATABASE_URL=${DATABASE_URL}
+
 COPY --from=node:20-alpine /usr/lib /usr/lib
 COPY --from=node:20-alpine /usr/local/share /usr/local/share
 COPY --from=node:20-alpine /usr/local/lib /usr/local/lib
@@ -20,12 +38,6 @@ RUN bun install && \
 FROM oven/bun:alpine
 
 WORKDIR /home/bun/fyc-svelte-kit
-
-ENV ORIGIN=https://cook.yam-yam.dev
-ENV PORT=3000
-ENV PROTOCOL_HEADER=x-forwarded-proto
-ENV HOST_HEADER=x-forwarded-host
-ENV ADDRESS_HEADER=True-Client-IP
 
 COPY --from=node:20-alpine /usr/lib /usr/lib
 COPY --from=node:20-alpine /usr/local/share /usr/local/share
