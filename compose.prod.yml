@@ -5,13 +5,12 @@ services:
       dockerfile: ./docker/prod/bun/Dockerfile
       args:
         ORIGIN: "${ORIGIN:?err}"
+        MARIADB_DATABASE: "${MARIADB_DATABASE:?err}"
+        OPENAI_API_KEY: "${OPENAI_API_KEY:?err}"
+        DATABASE_URL: "${DATABASE_URL:?err}"
     depends_on:
       mariadb:
         condition: service_healthy
-    environment:
-      MARIADB_DATABASE: "${MARIADB_DATABASE:?err}"
-      OPENAI_API_KEY: "${OPENAI_API_KEY:?err}"
-      DATABASE_URL: "${DATABASE_URL:?err}"
     stdin_open: true
     tty: true
     restart: unless-stopped
