@@ -37,7 +37,6 @@ COPY --from=builder --chown=bun:bun /home/bun/fyc-svelte-kit/build ./build
 COPY --chown=bun:bun static ./static
 COPY --chown=bun:bun prisma ./prisma
 COPY --chown=bun:bun package.json bun.lockb ./
-COPY --chown=bun:bun .env.local ./.env
 
 RUN bun install --production --frozen-lockfile && \
     bun run prisma generate
