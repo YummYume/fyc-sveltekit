@@ -3,9 +3,16 @@ services:
     build:
       context: .
       dockerfile: ./docker/prod/bun/Dockerfile
+      args:
+        ORIGIN: "${ORIGIN:?err}"
     depends_on:
       mariadb:
         condition: service_healthy
+    environment:
+      MARIADB_ROOT_PASSWORD: "${MARIADB_ROOT_PASSWORD:?err}"
+      MARIADB_DATABASE: "${MARIADB_DATABASE:?err}"
+      OPENAI_API_KEY: "${OPENAI_API_KEY:?err}"
+      DATABASE_URL: "${DATABASE_URL:?err}"
     stdin_open: true
     tty: true
     restart: unless-stopped
@@ -17,9 +24,6 @@ services:
       start_period: 60s
       interval: 60s
       start_interval: 1s
-    networks:
-      - webserver
-      - db
 
   mariadb:
     image: mariadb:11.1.2
@@ -39,9 +43,3 @@ services:
       start_period: 60s
       interval: 60s
       start_interval: 1s
-    networks:
-      - db
-
-networks:
-  - webserver
-  - db
