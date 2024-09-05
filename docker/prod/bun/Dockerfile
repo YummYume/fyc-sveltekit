@@ -11,7 +11,6 @@ COPY --from=node:20-alpine /usr/local/bin /usr/local/bin
 COPY src ./src
 COPY prisma ./prisma
 COPY vite.config.ts package.json bun.lockb tsconfig.json svelte.config.js postcss.config.cjs tailwind.config.cjs ./
-COPY .env.local ./.env
 
 RUN bun install && \
     bun run prisma generate && \
@@ -45,4 +44,4 @@ RUN bun install --production --frozen-lockfile && \
 
 USER bun
 
-CMD ["node", "-r", "dotenv/config", "build"]
+CMD ["node", "build"]
