@@ -21,8 +21,6 @@ services:
       start_period: 60s
       interval: 60s
       start_interval: 1s
-    labels:
-      - caddy_0.import=gzip
 
   mariadb:
     image: mariadb:11.1.2
