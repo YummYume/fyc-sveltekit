@@ -10,8 +10,6 @@ services:
     depends_on:
       mariadb:
         condition: service_healthy
-    environment:
-      - SERVICE_FQDN_SVELTE-KIT_3000
     stdin_open: true
     tty: true
     restart: unless-stopped
