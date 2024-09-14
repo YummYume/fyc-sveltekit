@@ -7,6 +7,7 @@ ARG PORT=3000
 ARG PROTOCOL_HEADER=x-forwarded-proto
 ARG HOST_HEADER=x-forwarded-host
 ARG ADDRESS_HEADER=True-Client-IP
+ARG PUBLIC_ENV=production
 ARG OPENAI_API_KEY
 ARG DATABASE_URL
 
@@ -17,6 +18,7 @@ ENV HOST_HEADER=${HOST_HEADER}
 ENV ADDRESS_HEADER=${ADDRESS_HEADER}
 ENV OPENAI_API_KEY=${OPENAI_API_KEY}
 ENV DATABASE_URL=${DATABASE_URL}
+ENV PUBLIC_ENV=${PUBLIC_ENV}
 
 COPY --from=node:20-alpine /usr/lib /usr/lib
 COPY --from=node:20-alpine /usr/local/share /usr/local/share
