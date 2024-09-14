@@ -5,6 +5,7 @@
   import { blur } from 'svelte/transition';
 
   import Assistant from '$lib/components/Assistant.svelte';
+  import EnvBanner from '$lib/components/EnvBanner.svelte';
   import { assistantOpen } from '$lib/stores/assistant';
   import UserCircle from '$lib/svg/UserCircle.svelte';
   import { prefersReducedMotion } from '$lib/utils/preferences';
@@ -14,6 +15,7 @@
   import { enhance } from '$app/forms';
   import { onNavigate } from '$app/navigation';
   import { page } from '$app/stores';
+  import { PUBLIC_ENV } from '$env/static/public';
 
   export let data: LayoutData;
 
@@ -105,7 +107,7 @@
   </div>
 </header>
 
-<main class="flex flex-col grow p-5">
+<main class="flex flex-col grow p-5 relative pb-14">
   <slot />
 
   {#if data.user}
@@ -145,6 +147,10 @@
         />
       </div>
     </div>
+  {/if}
+
+  {#if PUBLIC_ENV !== 'production'}
+    <EnvBanner env={PUBLIC_ENV} />
   {/if}
 </main>
 

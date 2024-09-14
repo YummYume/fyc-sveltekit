@@ -1,8 +1,13 @@
 services:
-  svelte-kit:
+  sveltekit:
     build:
       context: .
       dockerfile: ./docker/prod/bun/Dockerfile
+      args:
+        ORIGIN: "${ORIGIN:?err}"
+        OPENAI_API_KEY: "${OPENAI_API_KEY:?err}"
+        DATABASE_URL: "${DATABASE_URL:?err}"
+        PUBLIC_ENV: "${PUBLIC_ENV:?err}"
     depends_on:
       mariadb:
         condition: service_healthy
@@ -17,11 +22,8 @@ services:
       start_period: 60s
       interval: 60s
       start_interval: 1s
-    networks:
-      webserver:
-        aliases:
-          - cook-svelte-kit
-      db:
+    labels:
+      - caddy_0.import=gzip
 
   mariadb:
     image: mariadb:11.1.2
@@ -33,7 +35,7 @@ services:
       MARIADB_RANDOM_ROOT_PASSWORD: "yes"
       MARIADB_USER: "${MARIADB_USER:?err}"
       MARIADB_PASSWORD: "${MARIADB_PASSWORD:?err}"
-      MARIADB_DATABASE: app
+      MARIADB_DATABASE: "${MARIADB_DATABASE-app}"
     healthcheck:
       test: ['CMD', 'mariadb-admin', 'ping', '-h', 'localhost']
       timeout: 20s
@@ -41,10 +43,3 @@ services:
       start_period: 60s
       interval: 60s
       start_interval: 1s
-    networks:
-      - db
-
-networks:
-  webserver:
-    external: true
-  db:
