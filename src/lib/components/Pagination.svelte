@@ -144,7 +144,7 @@
           flex items-center justify-center px-4 h-10 leading-tight text-gray-500 bg-white border border-gray-300
           hover:bg-gray-100 hover:text-gray-700 focus-visible:bg-gray-100 focus-visible:text-gray-700
         "
-        href={getUrlForPage(totalPages)}
+        href={getUrlForPage(nextPage)}
       >
         <Forward aria-hidden="true" />
       </a>

@@ -131,7 +131,7 @@
     ];
 
     const context = {
-      prompt: $page.data.carlosContext?.prompt,
+      prompt: $page.data.carlosContext?.prompt ?? $page.error?.carlosContext?.prompt,
     };
 
     abortController = new AbortController();
@@ -217,7 +217,8 @@
       containerClass="border-2 border-primary-700"
       innerContainerClass="sm:min-h-[50vh] min-h-[55vh] flex flex-col"
     >
-      {@const carlosHasContext = $page.data.carlosContext?.prompt}
+      {@const carlosHasContext =
+        $page.data.carlosContext?.prompt ?? $page.error?.carlosContext?.prompt}
 
       <div class="flex justify-between items-start">
         <div class="grid sm:flex gap-2.5 items-center">
