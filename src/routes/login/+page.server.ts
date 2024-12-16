@@ -5,7 +5,13 @@ import { auth } from '$lib/server/auth';
 
 import type { Actions, PageServerLoad } from './$types';
 
-export const load = (async () => {
+export const load = (async ({ locals }) => {
+  const { session } = locals;
+
+  if (session) {
+    redirect(303, '/');
+  }
+
   return {
     seo: {
       title: 'Se connecter',
@@ -18,7 +24,13 @@ export const load = (async () => {
 }) satisfies PageServerLoad;
 
 export const actions = {
-  login: async ({ request, cookies }) => {
+  login: async ({ request, cookies, locals }) => {
+    const { session } = locals;
+
+    if (session) {
+      redirect(303, '/');
+    }
+
     const data = await request.formData();
     const username = (data.get('username') ?? '') as string;
     const password = (data.get('password') ?? '') as string;

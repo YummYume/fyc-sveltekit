@@ -1,20 +1,25 @@
 <script lang="ts">
   import { quintOut } from 'svelte/easing';
-  import { crossfade } from 'svelte/transition';
+  import { crossfade, fade } from 'svelte/transition';
 
   import Clipboard from '$lib/svg/Clipboard.svelte';
+  import Close from '$lib/svg/Close.svelte';
   import Facebook from '$lib/svg/Facebook.svelte';
   import Reddit from '$lib/svg/Reddit.svelte';
   import StarEmpty from '$lib/svg/StarEmpty.svelte';
   import StarFull from '$lib/svg/StarFull.svelte';
   import Twitter from '$lib/svg/Twitter.svelte';
+  import Warning from '$lib/svg/Warning.svelte';
   import { copyToClipboard } from '$lib/utils/clipboard';
+  import { prefersReducedMotion } from '$lib/utils/preferences';
 
   import type { PageData } from './$types';
 
   import { enhance } from '$app/forms';
 
   export let data: PageData;
+
+  let isIngredientsWarningOpen = true;
 
   const [send, receive] = crossfade({
     duration: 700,
@@ -25,7 +30,50 @@
   const twitter = encodeURI(`https://twitter.com/intent/tweet`);
 
   $: starKey = data.isFavourite ? 'full' : 'empty';
+
+  const closeIngredientsWarning = () => {
+    isIngredientsWarningOpen = false;
+  };
 </script>
+
+<div class="mb-4" role="alert">
+  {#await data.disallowedIngredients then disallowedIngredients}
+    {#if disallowedIngredients && isIngredientsWarningOpen}
+      <div
+        class="flex items-center rounded-lg gap-2 p-3 bg-amber-600/30 border-2 border-amber-600/75 text-amber-600 max-w-[106.25rem] mx-auto"
+        transition:fade={{ duration: prefersReducedMotion() ? 0 : 250 }}
+      >
+        <Warning class="w-7 h-7 flex-shrink-0" />
+        <div class="flex-grow">
+          <p>Contient des ingrédients à éviter, indiqués dans votre profil :</p>
+          <ul class="list-disc list-inside capitalize ml-4">
+            {#each disallowedIngredients as ingredient}
+              <li>{ingredient}</li>
+            {/each}
+          </ul>
+        </div>
+        <button type="button" aria-label="Fermer cette alerte" on:click={closeIngredientsWarning}>
+          <Close />
+        </button>
+      </div>
+    {/if}
+  {:catch}
+    {#if isIngredientsWarningOpen}
+      <div
+        class="flex items-center rounded-lg gap-2 p-3 bg-amber-600/30 border-2 border-amber-600/75 text-amber-600 max-w-[106.25rem] mx-auto"
+        transition:fade={{ duration: prefersReducedMotion() ? 0 : 250 }}
+      >
+        <Warning class="w-7 h-7 flex-shrink-0" />
+        <p class="flex-grow">
+          Impossible de vérifier si la recette contient des ingrédients à ne pas utiliser...
+        </p>
+        <button type="button" aria-label="Fermer cette alerte" on:click={closeIngredientsWarning}>
+          <Close />
+        </button>
+      </div>
+    {/if}
+  {/await}
+</div>
 
 <div class="flex gap-2 items-center justify-center">
   <form method="POST" action="?/favourite" class="relative" use:enhance>

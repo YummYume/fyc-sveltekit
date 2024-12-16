@@ -5,8 +5,7 @@
     "prisma"
   ],
   "devDependencies": {
-    "@sveltejs/adapter-auto": "^3.0.1",
-    "@sveltejs/adapter-node": "^2.0.1",
+    "@sveltejs/adapter-node": "^2.0.2",
     "@sveltejs/enhanced-img": "^0.1.7",
     "@sveltejs/vite-plugin-svelte": "^3.0.1",
     "@tailwindcss/forms": "^0.5.7",

@@ -1,11 +1,11 @@
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { error } from '@sveltejs/kit';
 
-import { db } from '$lib/server/db';
-
 import type { LayoutServerLoad } from './$types';
 
-export const load = (async ({ params }) => {
+export const load = (async ({ params, locals }) => {
+  const { db } = locals;
+
   try {
     const recipe = await db.recipe.findUniqueOrThrow({
       where: {

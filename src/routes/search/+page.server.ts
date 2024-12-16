@@ -2,7 +2,6 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { fail, redirect } from '@sveltejs/kit';
 
 import { openai } from '$lib/server/GPT';
-import { db } from '$lib/server/db';
 import { slugify } from '$lib/utils/slug';
 
 import type { PageServerLoad } from './$types';
@@ -12,7 +11,13 @@ type Dish = {
   slug: string;
 };
 
-export const load = (async ({ url }) => {
+export const load = (async ({ url, locals }) => {
+  const { session, db } = locals;
+
+  if (!session) {
+    redirect(303, '/login');
+  }
+
   const query = url.searchParams.get('q') ?? '';
 
   const getResult = async (): Promise<{ recipe: null | Dish; suggestions: Dish[] }> => {
@@ -106,7 +111,13 @@ export const load = (async ({ url }) => {
 }) satisfies PageServerLoad;
 
 export const actions = {
-  generate: async ({ request }) => {
+  generate: async ({ request, locals }) => {
+    const { session, db } = locals;
+
+    if (!session) {
+      redirect(303, '/login');
+    }
+
     const data = await request.formData();
     const dish = (data.get('dish') ?? '') as string;
     const result = await openai.chat.completions.create({
